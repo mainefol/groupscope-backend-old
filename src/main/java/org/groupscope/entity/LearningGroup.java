@@ -3,8 +3,15 @@ package org.groupscope.entity;
 import javax.persistence.*;
 import java.util.Objects;
 
+/*
+* This class extends from LearnerManager and allow to unite and manage our group of learners
+* */
+
+@Entity
+@Table(name = "groups")
 public class LearningGroup extends LearnerManager<Learner<LearningRole>> {
 
+    // Id entity which database use
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -12,6 +19,7 @@ public class LearningGroup extends LearnerManager<Learner<LearningRole>> {
     @Column(name = "name")
     private String name;
 
+    // Every group have a headman
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "headmen_id")
     private Learner<LearningRole> headmen;

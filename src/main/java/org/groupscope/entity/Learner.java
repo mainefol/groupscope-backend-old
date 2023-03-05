@@ -33,9 +33,11 @@ public class Learner<T> {
     @JoinColumn(name = "group_id")
     private  LearningGroup learningGroup;
 
+    // Constructor
     Learner() {
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
