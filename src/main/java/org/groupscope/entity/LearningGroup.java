@@ -1,6 +1,8 @@
 package org.groupscope.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /*
@@ -9,9 +11,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "groups")
-public class LearningGroup extends LearnerManager<Learner<LearningRole>> {
+public class LearningGroup {
 
-    // Id entity which database use
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -24,11 +25,22 @@ public class LearningGroup extends LearnerManager<Learner<LearningRole>> {
     @JoinColumn(name = "headmen_id")
     private Learner<LearningRole> headmen;
 
+    // Every group have subjects that the headmen has made
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_id")
+    private List<Subject> subjects;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_id")
+    private List<Learner<LearningRole>> learners;
+
     public LearningGroup() {
     }
 
     public LearningGroup(String groupName) {
         super();
+        this.learners = new ArrayList<>();
+        this.subjects = new ArrayList<>();
         this.name = groupName;
     }
 
@@ -50,6 +62,22 @@ public class LearningGroup extends LearnerManager<Learner<LearningRole>> {
 
     public void setHeadmen(Learner<LearningRole> headmen) {
         this.headmen = headmen;
+    }
+
+    public List<Subject> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(List<Subject> subjects) {
+        this.subjects = subjects;
+    }
+
+    public List<Learner<LearningRole>> getLearners() {
+        return learners;
+    }
+
+    public void setLearners(List<Learner<LearningRole>> learners) {
+        this.learners = learners;
     }
 
     @Override

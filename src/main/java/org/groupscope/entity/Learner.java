@@ -2,6 +2,7 @@ package org.groupscope.entity;
 
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 /*
@@ -12,7 +13,6 @@ import java.util.Objects;
 @Table(name = "learners")
 public class Learner<T> {
 
-    // Id entity which database use
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -31,13 +31,14 @@ public class Learner<T> {
     // Everyone lerner must belong to some group
     @ManyToOne
     @JoinColumn(name = "group_id")
-    private  LearningGroup learningGroup;
+    private LearningGroup learningGroup;
 
-    // Constructor
+    @OneToMany(mappedBy = "learner")
+    private List<Task<TaskType>> tasks;
+
     Learner() {
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
