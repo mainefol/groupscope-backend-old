@@ -38,10 +38,13 @@ public class LearningGroup {
     }
 
     public LearningGroup(String groupName) {
-        super();
         this.learners = new ArrayList<>();
         this.subjects = new ArrayList<>();
         this.name = groupName;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {

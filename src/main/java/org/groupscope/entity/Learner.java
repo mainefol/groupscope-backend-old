@@ -36,7 +36,11 @@ public class Learner<T> {
     @OneToMany(mappedBy = "learner")
     private List<Task<TaskType>> tasks;
 
-    Learner() {
+    public Learner() {
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
@@ -73,6 +77,14 @@ public class Learner<T> {
 
     public void setLearningGroup(LearningGroup learningGroup) {
         this.learningGroup = learningGroup;
+    }
+
+    public List<Task<TaskType>> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task<TaskType>> tasks) {
+        this.tasks = tasks;
     }
 
     @Override

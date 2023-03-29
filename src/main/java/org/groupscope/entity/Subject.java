@@ -37,6 +37,10 @@ public class Subject {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -51,6 +55,14 @@ public class Subject {
 
     public void setTasks(List<Task<TaskType>> tasks) {
         this.tasks = tasks;
+    }
+
+    public LearningGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(LearningGroup group) {
+        this.group = group;
     }
 
     @Override
