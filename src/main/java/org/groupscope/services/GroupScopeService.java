@@ -5,6 +5,7 @@ import org.groupscope.entity.*;
 import java.util.List;
 
 public interface GroupScopeService {
+    Subject getSubjectByName(String subjectName);
 
     List<Subject> getAllSubjects();
 

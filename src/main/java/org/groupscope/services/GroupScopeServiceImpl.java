@@ -19,6 +19,11 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    public Subject getSubjectByName(String subjectName) {
+        return groupScopeDAO.findSubjectByName(subjectName);
+    }
+
+    @Override
     public List<Subject> getAllSubjects() {
         return groupScopeDAO.findAllSubjects();
     }

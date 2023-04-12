@@ -36,6 +36,11 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public Subject findSubjectByName(String subjectName) {
+        return subjectRepository.getSubjectByName(subjectName);
+    }
+
+    @Override
     public List<Subject> findAllSubjects() {
         return subjectRepository.findAll();
     }

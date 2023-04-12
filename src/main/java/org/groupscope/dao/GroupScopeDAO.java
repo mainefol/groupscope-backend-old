@@ -5,6 +5,7 @@ import org.groupscope.entity.*;
 import java.util.List;
 
 public interface GroupScopeDAO {
+    Subject findSubjectByName(String subjectName);
 
     List<Subject> findAllSubjects();
 
