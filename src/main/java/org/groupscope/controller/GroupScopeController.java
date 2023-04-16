@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/")
 public class GroupScopeController {
 
-    private final GroupScopeService groupScopeService;
+    private GroupScopeService groupScopeService;
 
     @Autowired
     public GroupScopeController(GroupScopeService groupScopeService) {
@@ -62,9 +63,9 @@ public class GroupScopeController {
         try {
             groupScopeService.addSubject(subjectDTO.toSubject());
 
-            return ResponseEntity.ok(HttpStatus.OK); // return "ok" to client
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            // Must be release the exception that will say what`s wrong
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -73,9 +74,9 @@ public class GroupScopeController {
         try {
             groupScopeService.addTask(taskDTO.toTask());
 
-            return ResponseEntity.ok(HttpStatus.OK); // return "ok" to client
+            return ResponseEntity.ok().build(); // return "ok" to client
         } catch (Exception e) {
-            // Must be release the exception that will say what`s wrong
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -101,6 +102,13 @@ public class GroupScopeController {
         }
     }
 
-    // @PostMapping
-    // implement grade for every student
+    @PostMapping ResponseEntity<HttpStatus> addGrade(@RequestBody GradeDTO gradeDTO) {
+        try {
+
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

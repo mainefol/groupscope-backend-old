@@ -15,14 +15,13 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class GroupScopeDAOImpl implements GroupScopeDAO{
+    private SubjectRepository subjectRepository;
 
-    private final SubjectRepository subjectRepository;
+    private TaskRepository taskRepository;
 
-    private final TaskRepository taskRepository;
+    private LearnerRepository learnerRepository;
 
-    private final LearnerRepository learnerRepository;
-
-    private final LearningGroupRepository learningGroupRepository;
+    private LearningGroupRepository learningGroupRepository;
 
     @Autowired
     public GroupScopeDAOImpl(SubjectRepository subjectRepository,
@@ -53,13 +52,13 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public void saveSubject(Subject subject) {
         subjectRepository.save(subject);
-        log.info("Subject " + subject + " saved");
+        log.info("Subject " + subject.toString() + " saved");
     }
 
     @Override
     public void saveTask(Task<TaskType> task) {
         taskRepository.save(task);
-        log.info("Task " + task + " saved");
+        log.info("Task " + task.toString() + " saved");
     }
 
     @Override

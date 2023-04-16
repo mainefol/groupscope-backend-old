@@ -16,6 +16,8 @@ public class TaskDTO {
 
     private String info;
 
+    private Boolean completion;
+
     private Integer grade;
 
     private Calendar deadline;
@@ -26,6 +28,7 @@ public class TaskDTO {
         dto.setId(task.getId());
         dto.setType(task.getType());
         dto.setInfo(task.getInfo());
+        dto.setCompletion(task.getCompletion());
         dto.setGrade(task.getGrade());
         dto.setDeadline(task.getDeadline());
 
@@ -37,6 +40,7 @@ public class TaskDTO {
         task.setId(this.getId());
         task.setType(this.getType());
         task.setInfo(this.getInfo());
+        task.setCompletion(this.getCompletion());
         task.setGrade(this.getGrade());
         task.setDeadline(this.getDeadline());
 

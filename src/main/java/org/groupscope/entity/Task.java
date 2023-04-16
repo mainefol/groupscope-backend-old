@@ -20,6 +20,9 @@ public class Task<T> {
     @Column(name = "info", length = 255)
     private String info;
 
+    @Column(name = "completion")
+    private Boolean completion;
+
     @Column(name = "grade")
     private Integer grade;
 
@@ -63,6 +66,14 @@ public class Task<T> {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public Boolean getCompletion() {
+        return completion;
+    }
+
+    public void setCompletion(Boolean completion) {
+        this.completion = completion;
     }
 
     public Integer getGrade() {
@@ -111,7 +122,7 @@ public class Task<T> {
                 "type=" + type +
                 ", info='" + info + '\'' +
                 ", deadline=" + deadline +
-                ", subject=" + subject +
+                ", subject=" + subject.toString() +
                 '}';
     }
 

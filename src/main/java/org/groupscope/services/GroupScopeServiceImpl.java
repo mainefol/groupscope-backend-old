@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class GroupScopeServiceImpl implements GroupScopeService{
 
-    private final GroupScopeDAO groupScopeDAO;
+    private GroupScopeDAO groupScopeDAO;
 
     @Autowired
     public GroupScopeServiceImpl(GroupScopeDAO groupScopeDAO) {
