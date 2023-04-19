@@ -1,5 +1,7 @@
 package org.groupscope.services;
 
+import org.groupscope.dto.GradeDTO;
+import org.groupscope.dto.TaskDTO;
 import org.groupscope.entity.*;
 
 import java.util.List;
@@ -14,6 +16,8 @@ public interface GroupScopeService {
     void addSubject(Subject subject);
 
     void addTask(Task<TaskType> task);
+
+    void addGrade(GradeDTO gradeDTO);
 
     Learner<LearningRole> getStudentById(int id);
 

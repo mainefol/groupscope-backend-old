@@ -1,6 +1,8 @@
 package org.groupscope.services;
 
 import org.groupscope.dao.GroupScopeDAO;
+import org.groupscope.dto.GradeDTO;
+import org.groupscope.dto.TaskDTO;
 import org.groupscope.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Override
     public void addTask(Task<TaskType> task) {
         groupScopeDAO.saveTask(task);
+    }
+
+    @Transactional
+    @Override
+    public void addGrade(GradeDTO gradeDTO) {
+        groupScopeDAO.saveGrade(gradeDTO);
+
     }
 
     @Override

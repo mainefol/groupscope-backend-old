@@ -5,12 +5,15 @@ import org.groupscope.dao.repositories.LearnerRepository;
 import org.groupscope.dao.repositories.LearningGroupRepository;
 import org.groupscope.dao.repositories.SubjectRepository;
 import org.groupscope.dao.repositories.TaskRepository;
+import org.groupscope.dto.GradeDTO;
+import org.groupscope.dto.TaskDTO;
 import org.groupscope.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -59,6 +62,16 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     public void saveTask(Task<TaskType> task) {
         taskRepository.save(task);
         log.info("Task " + task.toString() + " saved");
+    }
+
+    @Override
+    public void saveGrade(GradeDTO gradeDTO) {
+        List<Task<TaskType>> tasks = gradeDTO.getTasks()
+                .stream()
+                .map(TaskDTO::toTask)
+                .collect(Collectors.toList());
+
+        taskRepository.saveAll(tasks);
     }
 
     @Override
