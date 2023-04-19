@@ -70,7 +70,12 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
                 .stream()
                 .map(TaskDTO::toTask)
                 .collect(Collectors.toList());
-
+        int learnerId = gradeDTO.getLearnerId();
+        Subject subject = gradeDTO.getSubject().toSubject();
+        for (Task<TaskType> task : tasks) {
+            task.setLearner(learnerRepository.getOne(learnerId));
+            task.setSubject(subject);
+        }
         taskRepository.saveAll(tasks);
     }
 
