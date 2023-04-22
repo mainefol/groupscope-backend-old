@@ -65,21 +65,6 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public void saveGrade(GradeDTO gradeDTO) {
-        List<Task<TaskType>> tasks = gradeDTO.getTasks()
-                .stream()
-                .map(TaskDTO::toTask)
-                .collect(Collectors.toList());
-        int learnerId = gradeDTO.getLearnerId();
-        Subject subject = gradeDTO.getSubject().toSubject();
-        for (Task<TaskType> task : tasks) {
-            task.setLearner(learnerRepository.getOne(learnerId));
-            task.setSubject(subject);
-        }
-        taskRepository.saveAll(tasks);
-    }
-
-    @Override
     public Learner<LearningRole> findStudentById(int id) {
         Optional<Learner<LearningRole>> learner = learnerRepository.findById(id);
         return learner.orElse(null);

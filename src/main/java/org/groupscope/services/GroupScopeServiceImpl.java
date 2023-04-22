@@ -47,13 +47,6 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         groupScopeDAO.saveTask(task);
     }
 
-    @Transactional
-    @Override
-    public void addGrade(GradeDTO gradeDTO) {
-        groupScopeDAO.saveGrade(gradeDTO);
-
-    }
-
     @Override
     public Learner<LearningRole> getStudentById(int id) {
         return groupScopeDAO.findStudentById(id);

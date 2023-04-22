@@ -17,8 +17,6 @@ public interface GroupScopeService {
 
     void addTask(Task<TaskType> task);
 
-    void addGrade(GradeDTO gradeDTO);
-
     Learner<LearningRole> getStudentById(int id);
 
     LearningGroup getGroupById(int id);
