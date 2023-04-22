@@ -28,7 +28,7 @@ public class GroupScopeController {
         this.groupScopeService = groupScopeService;
     }
 
-    @GetMapping
+    @GetMapping("/getSubjects")
     public ResponseEntity<List<SubjectDTO>> getSubjects() {
         try {
             List<SubjectDTO> subjects = groupScopeService.getAllSubjects()
@@ -42,7 +42,7 @@ public class GroupScopeController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/getTasksOfSubject")
     public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@RequestParam("subjectName") String subjectName) {
         try {
             Subject subject = groupScopeService.getSubjectByName(subjectName);
@@ -57,7 +57,7 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/addSubject")
     public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
             groupScopeService.addSubject(subjectDTO.toSubject());
@@ -68,18 +68,17 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/addTask")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO) {
         try {
             groupScopeService.addTask(taskDTO.toTask());
-
             return ResponseEntity.ok().build(); // return "ok" to client
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    @GetMapping
+    @GetMapping("/getStudent")
     public ResponseEntity<LearnerDTO> getStudent(@PathVariable("id") int id) {
         try {
             LearnerDTO student = LearnerDTO.fromOneLearner(groupScopeService.getStudentById(id));
@@ -90,7 +89,7 @@ public class GroupScopeController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/getGroup")
     public ResponseEntity<LearningGroupDTO> getGroup(@PathVariable("id") int id) {
         try {
             LearningGroupDTO learningGroupDTO = LearningGroupDTO.from(groupScopeService.getGroupById(id));
@@ -101,7 +100,8 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping ResponseEntity<HttpStatus> addGrade(@RequestBody GradeDTO gradeDTO) {
+    @PostMapping("/addGrade")
+    ResponseEntity<HttpStatus> addGrade(@RequestBody GradeDTO gradeDTO) {
         try {
             groupScopeService.addGrade(gradeDTO);
 

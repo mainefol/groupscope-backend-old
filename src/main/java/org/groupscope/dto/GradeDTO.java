@@ -13,7 +13,7 @@ public class GradeDTO {
     // It can be any type of data, int used for the example
     private int learnerId;
 
-    private SubjectDTO subject;
+    private String subject;
 
     private List<TaskDTO> tasks;
 
