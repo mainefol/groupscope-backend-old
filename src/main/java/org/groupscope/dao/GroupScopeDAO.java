@@ -16,6 +16,8 @@ public interface GroupScopeDAO {
 
     void saveTask(Task<TaskType> task);
 
+    void saveAllTasks(List<Task<TaskType>> tasks);
+
     Learner<LearningRole> findStudentById(int id);
 
     LearningGroup findGroupById(int id);

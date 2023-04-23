@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class GroupScopeServiceImpl implements GroupScopeService{
 
     private GroupScopeDAO groupScopeDAO;
@@ -43,8 +45,30 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addTask(Task<TaskType> task) {
+    public void addTask(Task<TaskType> task, int id, String subjectName) {
+        task.setSubject(groupScopeDAO.findSubjectByName(subjectName));
+        task.setLearner(groupScopeDAO.findStudentById(id));
+
         groupScopeDAO.saveTask(task);
+    }
+
+    @Transactional
+    @Override
+    public void addGrade(GradeDTO gradeDTO) {
+        List<Task<TaskType>> tasks = gradeDTO.getTasks()
+                .stream()
+                .map(TaskDTO::toTask)
+                .collect(Collectors.toList());
+
+        int learnerId = gradeDTO.getLearnerId();
+        String subject = gradeDTO.getSubject();
+
+        for(Task<TaskType> task : tasks) {
+            task.setLearner(groupScopeDAO.findStudentById(learnerId));
+            task.setSubject(groupScopeDAO.findSubjectByName(subject));
+        }
+
+        groupScopeDAO.saveAllTasks(tasks);
     }
 
     @Override
