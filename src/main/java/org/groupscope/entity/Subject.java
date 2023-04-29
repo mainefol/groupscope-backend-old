@@ -17,7 +17,7 @@ public class Subject {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "subject")
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "subject_id")
     private List<Task<TaskType>> tasks;
 

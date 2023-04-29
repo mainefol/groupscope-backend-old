@@ -1,6 +1,8 @@
 package org.groupscope.entity;
 
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +28,7 @@ public class Learner<T> {
     // Learner role, now it`s can be Student or Headmen. The last can monitor student`s grades
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
+    @Type(type = "string")
     private T role;
 
     // Everyone lerner must belong to some group

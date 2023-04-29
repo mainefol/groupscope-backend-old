@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class SubjectDTO {
@@ -27,8 +28,7 @@ public class SubjectDTO {
         dto.setName(subject.getName());
 
         List<TaskDTO> taskDTOList = subject.getTasks().stream()
-                .map(TaskDTO::from)
-                .toList();
+                .map(TaskDTO::from).collect(Collectors.toList());
 
         dto.setTasks(taskDTOList);
         return dto;

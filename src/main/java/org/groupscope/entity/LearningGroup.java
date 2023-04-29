@@ -21,7 +21,7 @@ public class LearningGroup {
     private String name;
 
     // Every group have a headman
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = Learner.class)
     @JoinColumn(name = "headmen_id")
     private Learner<LearningRole> headmen;
 
@@ -30,7 +30,7 @@ public class LearningGroup {
     @JoinColumn(name = "group_id")
     private List<Subject> subjects;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, targetEntity = Learner.class)
     @JoinColumn(name = "group_id")
     private List<Learner<LearningRole>> learners;
 

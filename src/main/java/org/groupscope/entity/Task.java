@@ -1,5 +1,7 @@
 package org.groupscope.entity;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.List;
@@ -15,6 +17,7 @@ public class Task<T> {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
+    @Type(type = "string")
     private T type;
 
     @Column(name = "info", length = 255)
@@ -37,9 +40,8 @@ public class Task<T> {
     @JoinColumn(name = "learner_id")
     private Learner<LearningRole> learner;
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "tasks")
     private List<Learner<LearningRole>> learners;
-
 
     public Task() {
     }

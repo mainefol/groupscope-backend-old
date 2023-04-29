@@ -91,6 +91,16 @@ public class GroupScopeController {
         }
     }
 
+    @PostMapping("/addGroup")
+    public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO) {
+        try {
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/getGroup")
     public ResponseEntity<LearningGroupDTO> getGroup(@PathVariable("id") int id) {
         try {
@@ -102,8 +112,18 @@ public class GroupScopeController {
         }
     }
 
+    @PostMapping("/addGroup")
+    public ResponseEntity<HttpStatus> addGroup(@RequestBody LearningGroupDTO learningGroupDto) {
+        try {
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PostMapping("/addGrade")
-    ResponseEntity<HttpStatus> addGrade(@RequestBody GradeDTO gradeDTO) {
+    public ResponseEntity<HttpStatus> addGrade(@RequestBody GradeDTO gradeDTO) {
         try {
             groupScopeService.addGrade(gradeDTO);
 

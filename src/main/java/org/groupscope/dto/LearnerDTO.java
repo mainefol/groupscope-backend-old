@@ -4,6 +4,7 @@ import lombok.Data;
 import org.groupscope.entity.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class LearnerDTO {
@@ -28,8 +29,7 @@ public class LearnerDTO {
         dto.setRole(learner.getRole());
 
         List<TaskDTO> taskDTOList = learner.getTasks().stream()
-                .map(TaskDTO::from)
-                .toList();
+                .map(TaskDTO::from).collect(Collectors.toList());
 
         dto.setTasks(taskDTOList);
         return dto;
@@ -46,7 +46,7 @@ public class LearnerDTO {
 
         List<TaskDTO> taskDTOList = learner.getTasks().stream()
                 .map(TaskDTO::from)
-                .toList();
+                .collect(Collectors.toList());
 
         dto.setTasks(taskDTOList);
         return dto;
@@ -64,7 +64,7 @@ public class LearnerDTO {
                         .peek(task -> {
                             task.setLearner(learner);
                             task.setLearners(learner.getLearningGroup().getLearners());
-                        }).toList();
+                        }).collect(Collectors.toList());
 
         learner.setTasks(taskList);
         return learner;

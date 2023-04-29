@@ -7,6 +7,7 @@ import org.groupscope.entity.LearningRole;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class LearningGroupDTO {
@@ -30,14 +31,14 @@ public class LearningGroupDTO {
         List<SubjectDTO> subjectDTOList = learningGroup.getSubjects().stream()
                 .map(SubjectDTO::from)
                 .peek(subjectDTO -> subjectDTO.setGroup(dto))
-                .toList();
+                .collect(Collectors.toList());
 
         dto.setSubjects(subjectDTOList);
 
         List<LearnerDTO> learnerDTOList = learningGroup.getLearners().stream()
                 .map(LearnerDTO::fromManyLearners)
                 .peek(learnerDTO -> learnerDTO.setLearningGroup(dto))
-                .toList();
+                .collect(Collectors.toList());
 
         dto.setLearners(learnerDTOList);
         return dto;
@@ -53,7 +54,7 @@ public class LearningGroupDTO {
             List<Learner<LearningRole>> learnersList = this.learners.stream()
                     .map(LearnerDTO::toLearner)
                     .peek(learner -> learner.setLearningGroup(learningGroup))
-                    .toList();
+                    .collect(Collectors.toList());
             learningGroup.setLearners(learnersList);
         }
 
