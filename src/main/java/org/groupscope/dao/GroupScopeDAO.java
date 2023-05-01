@@ -6,19 +6,24 @@ import org.groupscope.entity.*;
 import java.util.List;
 
 public interface GroupScopeDAO {
+
+    void saveSubject(Subject subject);
+
     Subject findSubjectByName(String subjectName);
 
     List<Subject> findAllSubjects();
-
-    List<Task<TaskType>> findAllTasksOfSubject(Subject subject);
-
-    void saveSubject(Subject subject);
 
     void saveTask(Task<TaskType> task);
 
     void saveAllTasks(List<Task<TaskType>> tasks);
 
+    List<Task<TaskType>> findAllTasksOfSubject(Subject subject);
+
+    void saveStudent(Learner<LearningRole> learner);
+
     Learner<LearningRole> findStudentById(int id);
+
+    void saveGroup(LearningGroup learningGroup);
 
     LearningGroup findGroupById(int id);
 }

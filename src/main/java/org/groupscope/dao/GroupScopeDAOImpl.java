@@ -38,6 +38,12 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public void saveSubject(Subject subject) {
+        subjectRepository.save(subject);
+        log.info("Subject " + subject.toString() + " saved");
+    }
+
+    @Override
     public Subject findSubjectByName(String subjectName) {
         return subjectRepository.getSubjectByName(subjectName);
     }
@@ -45,17 +51,6 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public List<Subject> findAllSubjects() {
         return subjectRepository.findAll();
-    }
-
-    @Override
-    public List<Task<TaskType>> findAllTasksOfSubject(Subject subject) {
-        return taskRepository.findTasksBySubject(subject);
-    }
-
-    @Override
-    public void saveSubject(Subject subject) {
-        subjectRepository.save(subject);
-        log.info("Subject " + subject.toString() + " saved");
     }
 
     @Override
@@ -70,9 +65,26 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public List<Task<TaskType>> findAllTasksOfSubject(Subject subject) {
+        return taskRepository.findTasksBySubject(subject);
+    }
+
+    @Override
+    public void saveStudent(Learner<LearningRole> learner) {
+        learnerRepository.save(learner);
+        log.info("Learner " + learner.toString() + " saved");
+    }
+
+    @Override
     public Learner<LearningRole> findStudentById(int id) {
         Optional<Learner<LearningRole>> learner = learnerRepository.findById(id);
         return learner.orElse(null);
+    }
+
+    @Override
+    public void saveGroup(LearningGroup learningGroup) {
+        learningGroupRepository.save(learningGroup);
+        log.info("Learning Group " + learningGroup.toString() + " saved");
     }
 
     @Override

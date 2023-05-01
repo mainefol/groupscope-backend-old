@@ -91,9 +91,10 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/addGroup")
+    @PostMapping("/addStudent")
     public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
+            groupScopeService.addStudent(learnerDTO);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -113,8 +114,9 @@ public class GroupScopeController {
     }
 
     @PostMapping("/addGroup")
-    public ResponseEntity<HttpStatus> addGroup(@RequestBody LearningGroupDTO learningGroupDto) {
+    public ResponseEntity<HttpStatus> addGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {
+            groupScopeService.addGroup(learningGroupDTO);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
