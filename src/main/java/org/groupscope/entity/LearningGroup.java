@@ -15,7 +15,7 @@ public class LearningGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
@@ -35,19 +35,21 @@ public class LearningGroup {
     private List<Learner<LearningRole>> learners;
 
     public LearningGroup() {
+        //this.learners = new ArrayList<>();
+        //this.subjects = new ArrayList<>();
     }
 
     public LearningGroup(String groupName) {
-        this.learners = new ArrayList<>();
-        this.subjects = new ArrayList<>();
+        //this.learners = new ArrayList<>();
+        //this.subjects = new ArrayList<>();
         this.name = groupName;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 

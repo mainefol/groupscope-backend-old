@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Data
 public class SubjectDTO {
 
-    private int id;
+    private Long id;
 
     private String name;
 

@@ -1,10 +1,7 @@
 package org.groupscope.services;
 
 import org.groupscope.dao.GroupScopeDAO;
-import org.groupscope.dto.GradeDTO;
-import org.groupscope.dto.LearnerDTO;
-import org.groupscope.dto.LearningGroupDTO;
-import org.groupscope.dto.TaskDTO;
+import org.groupscope.dto.*;
 import org.groupscope.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +23,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addSubject(Subject subject) {
+    public void addSubject(SubjectDTO subjectDTO, Long group_id) {
+        Subject subject = subjectDTO.toSubject();
+        subject.setGroup(groupScopeDAO.findGroupById(group_id));
         groupScopeDAO.saveSubject(subject);
     }
+
     @Override
     public Subject getSubjectByName(String subjectName) {
         return groupScopeDAO.findSubjectByName(subjectName);
@@ -41,7 +41,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addTask(Task<TaskType> task, int id, String subjectName) {
+    public void addTask(Task<TaskType> task, Long id, String subjectName) {
         task.setSubject(groupScopeDAO.findSubjectByName(subjectName));
         task.setLearner(groupScopeDAO.findStudentById(id));
 
@@ -61,7 +61,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 .map(TaskDTO::toTask)
                 .collect(Collectors.toList());
 
-        int learnerId = gradeDTO.getLearnerId();
+        Long learnerId = gradeDTO.getLearnerId();
         String subject = gradeDTO.getSubject();
 
         for(Task<TaskType> task : tasks) {
@@ -73,24 +73,26 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public void addStudent(LearnerDTO learnerDTO) {
+    public void addStudent(LearnerDTO learnerDTO, Long group_id) {
         Learner<LearningRole> student = learnerDTO.toLearner();
+        student.setLearningGroup(groupScopeDAO.findGroupById(group_id));
         groupScopeDAO.saveStudent(student);
     }
 
     @Override
-    public Learner<LearningRole> getStudentById(int id) {
+    public Learner<LearningRole> getStudentById(Long id) {
         return groupScopeDAO.findStudentById(id);
     }
 
     @Override
+    @Transactional
     public void addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
         groupScopeDAO.saveGroup(group);
     }
 
     @Override
-    public LearningGroup getGroupById(int id) {
+    public LearningGroup getGroupById(Long id) {
         return groupScopeDAO.findGroupById(id);
     }
 }

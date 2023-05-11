@@ -58,9 +58,10 @@ public class GroupScopeController {
     }
 
     @PostMapping("/addSubject")
-    public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO) {
+    public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO,
+                                                 @PathVariable("id") Long group_id) {
         try {
-            groupScopeService.addSubject(subjectDTO.toSubject());
+            groupScopeService.addSubject(subjectDTO, group_id);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -70,7 +71,7 @@ public class GroupScopeController {
 
     @PostMapping("/addTask/{id}/{subject_name}")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
-                                              @PathVariable("id") int id,   //id = learnerId
+                                              @PathVariable("id") Long id,   //id = learnerId
                                               @PathVariable("subject_name") String subjectName) {
         try {
             groupScopeService.addTask(taskDTO.toTask(), id, subjectName);
@@ -80,8 +81,8 @@ public class GroupScopeController {
         }
     }
 
-    @GetMapping("/getStudent")
-    public ResponseEntity<LearnerDTO> getStudent(@PathVariable("id") int id) {
+    @GetMapping("/getStudent/{id}")
+    public ResponseEntity<LearnerDTO> getStudent(@PathVariable("id") Long id) {
         try {
             LearnerDTO student = LearnerDTO.fromOneLearner(groupScopeService.getStudentById(id));
 
@@ -91,10 +92,11 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/addStudent")
-    public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO) {
+    @PostMapping("/{id}/addStudent")
+    public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO,
+                                                 @PathVariable("id") Long group_id) {
         try {
-            groupScopeService.addStudent(learnerDTO);
+            groupScopeService.addStudent(learnerDTO, group_id);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -102,8 +104,8 @@ public class GroupScopeController {
         }
     }
 
-    @GetMapping("/getGroup")
-    public ResponseEntity<LearningGroupDTO> getGroup(@PathVariable("id") int id) {
+    @GetMapping("/getGroup/{id}")
+    public ResponseEntity<LearningGroupDTO> getGroup(@PathVariable("id") Long id) {
         try {
             LearningGroupDTO learningGroupDTO = LearningGroupDTO.from(groupScopeService.getGroupById(id));
 
@@ -120,6 +122,7 @@ public class GroupScopeController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            log.info("ERROR: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

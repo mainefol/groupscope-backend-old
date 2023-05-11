@@ -1,18 +1,17 @@
 package org.groupscope.dto;
 
 import lombok.Data;
-import org.groupscope.entity.Learner;
-import org.groupscope.entity.LearningGroup;
-import org.groupscope.entity.LearningRole;
+import org.groupscope.entity.*;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 public class LearningGroupDTO {
 
-    private int id;
+    private Long id;
 
     private String name;
 
@@ -46,9 +45,11 @@ public class LearningGroupDTO {
 
     public LearningGroup toLearningGroup() {
         LearningGroup learningGroup = new LearningGroup(this.getName());
-        learningGroup.setId(this.getId());
+        //learningGroup.setId(this.getId());
         learningGroup.setHeadmen(this.getHeadmen().toLearner());
-        toLearningGroup().getHeadmen().setLearningGroup(learningGroup);
+
+        learningGroup.getHeadmen().setLearningGroup(learningGroup);
+        //learningGroup.getHeadmen().setTasks(new ArrayList<>());
 
         if(!CollectionUtils.isEmpty(this.learners)) {
             List<Learner<LearningRole>> learnersList = this.learners.stream()

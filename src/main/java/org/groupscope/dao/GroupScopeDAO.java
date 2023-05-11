@@ -21,9 +21,9 @@ public interface GroupScopeDAO {
 
     void saveStudent(Learner<LearningRole> learner);
 
-    Learner<LearningRole> findStudentById(int id);
+    Learner<LearningRole> findStudentById(Long id);
 
     void saveGroup(LearningGroup learningGroup);
 
-    LearningGroup findGroupById(int id);
+    LearningGroup findGroupById(Long id);
 }

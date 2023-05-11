@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 @Data
 public class LearnerDTO {
 
-    private int id;
+    private Long id;
 
     private String name;
 
@@ -52,21 +52,14 @@ public class LearnerDTO {
         return dto;
     }
 
+    // When you call this method, you must set Group and Tasks to Learner in
     public Learner<LearningRole> toLearner() {
         Learner<LearningRole> learner = new Learner<>();
-        learner.setId(this.getId());
+        //learner.setId(this.getId());
         learner.setName(this.getName());
         learner.setLastname(this.getLastname());
         learner.setRole(this.getRole());
 
-        List<Task<TaskType>> taskList = this.getTasks().stream()
-                        .map(TaskDTO::toTask)
-                        .peek(task -> {
-                            task.setLearner(learner);
-                            task.setLearners(learner.getLearningGroup().getLearners());
-                        }).collect(Collectors.toList());
-
-        learner.setTasks(taskList);
         return learner;
     }
 }

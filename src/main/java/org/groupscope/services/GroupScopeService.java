@@ -1,32 +1,29 @@
 package org.groupscope.services;
 
-import org.groupscope.dto.GradeDTO;
-import org.groupscope.dto.LearnerDTO;
-import org.groupscope.dto.LearningGroupDTO;
-import org.groupscope.dto.TaskDTO;
+import org.groupscope.dto.*;
 import org.groupscope.entity.*;
 
 import java.util.List;
 
 public interface GroupScopeService {
 
-    void addSubject(Subject subject);
+    void addSubject(SubjectDTO subjectDTO, Long group_id);
 
     Subject getSubjectByName(String subjectName);
 
     List<Subject> getAllSubjects();
 
-    void addTask(Task<TaskType> task, int id, String subjectName);
+    void addTask(Task<TaskType> task, Long id, String subjectName);
 
     List<Task<TaskType>> getAllTasksOfSubject(Subject subject);
 
     void addGrade(GradeDTO gradeDTO);
 
-    void addStudent(LearnerDTO learnerDTO);
+    void addStudent(LearnerDTO learnerDTO, Long group_id);
 
-    Learner<LearningRole> getStudentById(int id);
+    Learner<LearningRole> getStudentById(Long id);
 
     void addGroup(LearningGroupDTO learningGroupDTO);
 
-    LearningGroup getGroupById(int id);
+    LearningGroup getGroupById(Long id);
 }

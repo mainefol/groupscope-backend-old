@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class TaskDTO {
 
-    private int id;
+    private Long id;
 
     private TaskType type;
 

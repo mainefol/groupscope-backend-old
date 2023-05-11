@@ -11,7 +11,7 @@ import java.util.Objects;
 @Data
 public class GradeDTO {
     // It can be any type of data, int used for the example
-    private int learnerId;
+    private Long learnerId;
 
     private String subject;
 

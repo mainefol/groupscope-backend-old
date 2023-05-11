@@ -3,6 +3,7 @@ package org.groupscope.entity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,7 @@ public class Task<T> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
@@ -44,13 +45,14 @@ public class Task<T> {
     private List<Learner<LearningRole>> learners;
 
     public Task() {
+        learners = new ArrayList<>();
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

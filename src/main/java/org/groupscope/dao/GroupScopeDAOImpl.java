@@ -50,7 +50,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public List<Subject> findAllSubjects() {
-        return subjectRepository.findAll();
+        return (List<Subject>) subjectRepository.findAll();
     }
 
     @Override
@@ -76,19 +76,19 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public Learner<LearningRole> findStudentById(int id) {
+    public Learner<LearningRole> findStudentById(Long id) {
         Optional<Learner<LearningRole>> learner = learnerRepository.findById(id);
         return learner.orElse(null);
     }
 
     @Override
     public void saveGroup(LearningGroup learningGroup) {
-        learningGroupRepository.save(learningGroup);
+        LearningGroup learningGroup1 = learningGroupRepository.save(learningGroup);
         log.info("Learning Group " + learningGroup.toString() + " saved");
     }
 
     @Override
-    public LearningGroup findGroupById(int id) {
+    public LearningGroup findGroupById(Long id) {
         Optional<LearningGroup> learningGroup = learningGroupRepository.findById(id);
         return learningGroup.orElse(null);
     }
