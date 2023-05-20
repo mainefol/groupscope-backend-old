@@ -41,7 +41,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addTask(Task<TaskType> task, Long id, String subjectName) {
+    public void addTask(Task task, Long id, String subjectName) {
         task.setSubject(groupScopeDAO.findSubjectByName(subjectName));
         task.setLearner(groupScopeDAO.findStudentById(id));
 
@@ -49,14 +49,14 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<Task<TaskType>> getAllTasksOfSubject(Subject subject) {
+    public List<Task> getAllTasksOfSubject(Subject subject) {
         return groupScopeDAO.findAllTasksOfSubject(subject);
     }
 
     @Transactional
     @Override
     public void addGrade(GradeDTO gradeDTO) {
-        List<Task<TaskType>> tasks = gradeDTO.getTasks()
+        List<Task> tasks = gradeDTO.getTasks()
                 .stream()
                 .map(TaskDTO::toTask)
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         Long learnerId = gradeDTO.getLearnerId();
         String subject = gradeDTO.getSubject();
 
-        for(Task<TaskType> task : tasks) {
+        for(Task task : tasks) {
             task.setLearner(groupScopeDAO.findStudentById(learnerId));
             task.setSubject(groupScopeDAO.findSubjectByName(subject));
         }
@@ -73,14 +73,15 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    @Transactional
     public void addStudent(LearnerDTO learnerDTO, Long group_id) {
-        Learner<LearningRole> student = learnerDTO.toLearner();
+        Learner student = learnerDTO.toLearner();
         student.setLearningGroup(groupScopeDAO.findGroupById(group_id));
         groupScopeDAO.saveStudent(student);
     }
 
     @Override
-    public Learner<LearningRole> getStudentById(Long id) {
+    public Learner getStudentById(Long id) {
         return groupScopeDAO.findStudentById(id);
     }
 

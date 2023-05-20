@@ -57,7 +57,7 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/addSubject")
+    @PostMapping("/{id}/addSubject")
     public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO,
                                                  @PathVariable("id") Long group_id) {
         try {

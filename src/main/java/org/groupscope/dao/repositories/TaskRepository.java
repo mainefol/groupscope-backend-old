@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TaskRepository extends CrudRepository<Task<TaskType>,Long> {
-    List<Task<TaskType>> findTasksBySubject(Subject subject);
+public interface TaskRepository extends CrudRepository<Task,Long> {
+    List<Task> findTasksBySubject(Subject subject);
 }

@@ -13,15 +13,15 @@ public interface GroupScopeDAO {
 
     List<Subject> findAllSubjects();
 
-    void saveTask(Task<TaskType> task);
+    void saveTask(Task task);
 
-    void saveAllTasks(List<Task<TaskType>> tasks);
+    void saveAllTasks(List<Task> tasks);
 
-    List<Task<TaskType>> findAllTasksOfSubject(Subject subject);
+    List<Task> findAllTasksOfSubject(Subject subject);
 
-    void saveStudent(Learner<LearningRole> learner);
+    void saveStudent(Learner learner);
 
-    Learner<LearningRole> findStudentById(Long id);
+    Learner findStudentById(Long id);
 
     void saveGroup(LearningGroup learningGroup);
 

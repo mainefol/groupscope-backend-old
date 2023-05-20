@@ -6,6 +6,6 @@ import javax.persistence.MappedSuperclass;
 * Learners roles
 * */
 public enum LearningRole {
-    Student,
-    Headmen
+    STUDENT,
+    HEADMAN
 }

@@ -54,30 +54,30 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public void saveTask(Task<TaskType> task) {
+    public void saveTask(Task task) {
         taskRepository.save(task);
         log.info("Task " + task.toString() + " saved");
     }
 
     @Override
-    public void saveAllTasks(List<Task<TaskType>> tasks) {
+    public void saveAllTasks(List<Task> tasks) {
         taskRepository.saveAll(tasks);
     }
 
     @Override
-    public List<Task<TaskType>> findAllTasksOfSubject(Subject subject) {
+    public List<Task> findAllTasksOfSubject(Subject subject) {
         return taskRepository.findTasksBySubject(subject);
     }
 
     @Override
-    public void saveStudent(Learner<LearningRole> learner) {
+    public void saveStudent(Learner learner) {
         learnerRepository.save(learner);
         log.info("Learner " + learner.toString() + " saved");
     }
 
     @Override
-    public Learner<LearningRole> findStudentById(Long id) {
-        Optional<Learner<LearningRole>> learner = learnerRepository.findById(id);
+    public Learner findStudentById(Long id) {
+        Optional<Learner> learner = learnerRepository.findById(id);
         return learner.orElse(null);
     }
 

@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "learners")
-public class Learner<T> {
+public class Learner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,16 +29,20 @@ public class Learner<T> {
     // Learner role, now it`s can be Student or Headmen. The last can monitor student`s grades
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    @Type(type = "string")
-    private T role;
+    private LearningRole role;
 
     // Everyone lerner must belong to some group
     @ManyToOne
     @JoinColumn(name = "group_id")
     private LearningGroup learningGroup;
 
-    @OneToMany(mappedBy = "learner")
-    private List<Task<TaskType>> tasks;
+    @ManyToMany
+    @JoinTable(
+            name = "learners_tasks",
+            joinColumns = @JoinColumn(name = "learner_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id")
+    )
+    private List<Task> tasks;
 
     public Learner() {
         //tasks = new ArrayList<>();
@@ -68,11 +72,11 @@ public class Learner<T> {
         this.lastname = lastname;
     }
 
-    public T getRole() {
+    public LearningRole getRole() {
         return role;
     }
 
-    public void setRole(T role) {
+    public void setRole(LearningRole role) {
         this.role = role;
     }
 
@@ -84,11 +88,11 @@ public class Learner<T> {
         this.learningGroup = learningGroup;
     }
 
-    public List<Task<TaskType>> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(List<Task<TaskType>> tasks) {
+    public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -105,12 +109,12 @@ public class Learner<T> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Learner<?> learner = (Learner<?>) o;
-        return Objects.equals(name, learner.name) && Objects.equals(lastname, learner.lastname) && Objects.equals(role, learner.role);
+        Learner learner = (Learner) o;
+        return Objects.equals(id, learner.id) && Objects.equals(name, learner.name) && Objects.equals(lastname, learner.lastname) && role == learner.role && Objects.equals(learningGroup, learner.learningGroup) && Objects.equals(tasks, learner.tasks);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, lastname, role);
+        return Objects.hash(id, name, lastname, role, learningGroup, tasks);
     }
 }

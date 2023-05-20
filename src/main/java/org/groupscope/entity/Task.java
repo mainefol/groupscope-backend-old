@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "tasks")
-public class Task<T> {
+public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,8 +18,7 @@ public class Task<T> {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    @Type(type = "string")
-    private T type;
+    private TaskType type;
 
     @Column(name = "info", length = 255)
     private String info;
@@ -39,10 +38,10 @@ public class Task<T> {
 
     @ManyToOne
     @JoinColumn(name = "learner_id")
-    private Learner<LearningRole> learner;
+    private Learner learner;
 
-    @OneToMany(mappedBy = "tasks")
-    private List<Learner<LearningRole>> learners;
+    @ManyToMany
+    private List<Learner> learners;
 
     public Task() {
         learners = new ArrayList<>();
@@ -56,11 +55,11 @@ public class Task<T> {
         this.id = id;
     }
 
-    public T getType() {
+    public TaskType getType() {
         return type;
     }
 
-    public void setType(T type) {
+    public void setType(TaskType type) {
         this.type = type;
     }
 
@@ -104,19 +103,19 @@ public class Task<T> {
         this.subject = subject;
     }
 
-    public Learner<LearningRole> getLearner() {
+    public Learner getLearner() {
         return learner;
     }
 
-    public void setLearner(Learner<LearningRole> learner) {
+    public void setLearner(Learner learner) {
         this.learner = learner;
     }
 
-    public List<Learner<LearningRole>> getLearners() {
+    public List<Learner> getLearners() {
         return learners;
     }
 
-    public void setLearners(List<Learner<LearningRole>> learners) {
+    public void setLearners(List<Learner> learners) {
         this.learners = learners;
     }
 
@@ -134,15 +133,12 @@ public class Task<T> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Task<?> task = (Task<?>) o;
-        return Objects.equals(type, task.type) &&
-                Objects.equals(info, task.info) &&
-                Objects.equals(deadline, task.deadline) &&
-                Objects.equals(subject, task.subject);
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) && type == task.type && Objects.equals(info, task.info) && Objects.equals(completion, task.completion) && Objects.equals(grade, task.grade) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject) && Objects.equals(learner, task.learner) && Objects.equals(learners, task.learners);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, info, deadline, subject);
+        return Objects.hash(id, type, info, completion, grade, deadline, subject, learner, learners);
     }
 }

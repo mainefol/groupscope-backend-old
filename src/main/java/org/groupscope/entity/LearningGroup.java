@@ -23,7 +23,7 @@ public class LearningGroup {
     // Every group have a headman
     @OneToOne(cascade = CascadeType.ALL, targetEntity = Learner.class)
     @JoinColumn(name = "headmen_id")
-    private Learner<LearningRole> headmen;
+    private Learner headmen;
 
     // Every group have subjects that the headmen has made
     @OneToMany(cascade = CascadeType.ALL)
@@ -32,7 +32,7 @@ public class LearningGroup {
 
     @OneToMany(cascade = CascadeType.ALL, targetEntity = Learner.class)
     @JoinColumn(name = "group_id")
-    private List<Learner<LearningRole>> learners;
+    private List<Learner> learners;
 
     public LearningGroup() {
         //this.learners = new ArrayList<>();
@@ -61,11 +61,11 @@ public class LearningGroup {
         this.name = name;
     }
 
-    public Learner<LearningRole> getHeadmen() {
+    public Learner getHeadmen() {
         return headmen;
     }
 
-    public void setHeadmen(Learner<LearningRole> headmen) {
+    public void setHeadmen(Learner headmen) {
         this.headmen = headmen;
     }
 
@@ -77,11 +77,11 @@ public class LearningGroup {
         this.subjects = subjects;
     }
 
-    public List<Learner<LearningRole>> getLearners() {
+    public List<Learner> getLearners() {
         return learners;
     }
 
-    public void setLearners(List<Learner<LearningRole>> learners) {
+    public void setLearners(List<Learner> learners) {
         this.learners = learners;
     }
 

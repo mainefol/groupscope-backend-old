@@ -37,7 +37,7 @@ public class SubjectDTO {
     public Subject toSubject() {
         Subject subject = new Subject(this.getName());
         subject.setId(this.getId());
-        subject.setGroup(this.getGroup().toLearningGroup());
+        //subject.setGroup(this.getGroup().toLearningGroup());
         return subject;
     }
 }

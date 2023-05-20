@@ -21,7 +21,7 @@ public class LearnerDTO {
 
     private List<TaskDTO> tasks;
 
-    public static LearnerDTO fromManyLearners(Learner<LearningRole> learner) {
+    public static LearnerDTO fromManyLearners(Learner learner) {
         LearnerDTO dto = new LearnerDTO();
         dto.setId(learner.getId());
         dto.setName(learner.getName());
@@ -35,7 +35,7 @@ public class LearnerDTO {
         return dto;
     }
 
-    public static LearnerDTO fromOneLearner(Learner<LearningRole> learner) {
+    public static LearnerDTO fromOneLearner(Learner learner) {
         LearnerDTO dto = new LearnerDTO();
         dto.setId(learner.getId());
         dto.setName(learner.getName());
@@ -53,8 +53,8 @@ public class LearnerDTO {
     }
 
     // When you call this method, you must set Group and Tasks to Learner in
-    public Learner<LearningRole> toLearner() {
-        Learner<LearningRole> learner = new Learner<>();
+    public Learner toLearner() {
+        Learner learner = new Learner();
         //learner.setId(this.getId());
         learner.setName(this.getName());
         learner.setLastname(this.getLastname());

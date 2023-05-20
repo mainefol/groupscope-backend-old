@@ -19,7 +19,7 @@ public class Subject {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "subject_id")
-    private List<Task<TaskType>> tasks;
+    private List<Task> tasks;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
@@ -50,11 +50,11 @@ public class Subject {
         this.name = name;
     }
 
-    public List<Task<TaskType>> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(List<Task<TaskType>> tasks) {
+    public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
 

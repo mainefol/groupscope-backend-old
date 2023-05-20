@@ -23,7 +23,7 @@ public class TaskDTO {
     private Calendar deadline;
 
 
-    public static TaskDTO from(Task<TaskType> task) {
+    public static TaskDTO from(Task task) {
         TaskDTO dto = new TaskDTO();
         dto.setId(task.getId());
         dto.setType(task.getType());
@@ -35,8 +35,8 @@ public class TaskDTO {
         return dto;
     }
 
-    public Task<TaskType> toTask() {
-        Task<TaskType> task = new Task<>();
+    public Task toTask() {
+        Task task = new Task();
         task.setId(this.getId());
         task.setType(this.getType());
         task.setInfo(this.getInfo());

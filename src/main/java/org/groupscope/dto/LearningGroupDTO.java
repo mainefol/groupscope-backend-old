@@ -52,7 +52,7 @@ public class LearningGroupDTO {
         //learningGroup.getHeadmen().setTasks(new ArrayList<>());
 
         if(!CollectionUtils.isEmpty(this.learners)) {
-            List<Learner<LearningRole>> learnersList = this.learners.stream()
+            List<Learner> learnersList = this.learners.stream()
                     .map(LearnerDTO::toLearner)
                     .peek(learner -> learner.setLearningGroup(learningGroup))
                     .collect(Collectors.toList());
