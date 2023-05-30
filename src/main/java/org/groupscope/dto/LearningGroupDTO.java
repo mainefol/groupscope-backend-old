@@ -25,18 +25,18 @@ public class LearningGroupDTO {
         LearningGroupDTO dto = new LearningGroupDTO();
         dto.setId(learningGroup.getId());
         dto.setName(learningGroup.getName());
-        dto.setHeadmen(LearnerDTO.fromManyLearners(learningGroup.getHeadmen()));
+        dto.setHeadmen(LearnerDTO.from(learningGroup.getHeadmen()));
 
         List<SubjectDTO> subjectDTOList = learningGroup.getSubjects().stream()
                 .map(SubjectDTO::from)
-                .peek(subjectDTO -> subjectDTO.setGroup(dto))
+                .peek(subjectDTO -> subjectDTO.setGroup(dto.toString()))
                 .collect(Collectors.toList());
 
         dto.setSubjects(subjectDTOList);
 
         List<LearnerDTO> learnerDTOList = learningGroup.getLearners().stream()
-                .map(LearnerDTO::fromManyLearners)
-                .peek(learnerDTO -> learnerDTO.setLearningGroup(dto))
+                .map(LearnerDTO::from)
+                .peek(learnerDTO -> learnerDTO.setLearningGroup(dto.toString()))
                 .collect(Collectors.toList());
 
         dto.setLearners(learnerDTOList);
@@ -45,20 +45,27 @@ public class LearningGroupDTO {
 
     public LearningGroup toLearningGroup() {
         LearningGroup learningGroup = new LearningGroup(this.getName());
-        //learningGroup.setId(this.getId());
         learningGroup.setHeadmen(this.getHeadmen().toLearner());
-
-        learningGroup.getHeadmen().setLearningGroup(learningGroup);
-        //learningGroup.getHeadmen().setTasks(new ArrayList<>());
 
         if(!CollectionUtils.isEmpty(this.learners)) {
             List<Learner> learnersList = this.learners.stream()
                     .map(LearnerDTO::toLearner)
                     .peek(learner -> learner.setLearningGroup(learningGroup))
                     .collect(Collectors.toList());
+
+            learningGroup.getHeadmen().setLearningGroup(learningGroup);
+            learnersList.add(learningGroup.getHeadmen());
+
             learningGroup.setLearners(learnersList);
         }
 
         return learningGroup;
+    }
+
+    @Override
+    public String toString() {
+        return "LearningGroupDTO{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

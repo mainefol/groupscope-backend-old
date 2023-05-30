@@ -16,11 +16,7 @@ public class TaskDTO {
 
     private String info;
 
-    private Boolean completion;
-
-    private Integer grade;
-
-    private Calendar deadline;
+    private String deadline;
 
 
     public static TaskDTO from(Task task) {
@@ -28,8 +24,6 @@ public class TaskDTO {
         dto.setId(task.getId());
         dto.setType(task.getType());
         dto.setInfo(task.getInfo());
-        dto.setCompletion(task.getCompletion());
-        dto.setGrade(task.getGrade());
         dto.setDeadline(task.getDeadline());
 
         return dto;
@@ -40,8 +34,6 @@ public class TaskDTO {
         task.setId(this.getId());
         task.setType(this.getType());
         task.setInfo(this.getInfo());
-        task.setCompletion(this.getCompletion());
-        task.setGrade(this.getGrade());
         task.setDeadline(this.getDeadline());
 
         return task;

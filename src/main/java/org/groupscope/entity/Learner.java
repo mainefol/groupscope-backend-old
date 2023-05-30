@@ -1,6 +1,7 @@
 package org.groupscope.entity;
 
 
+import org.groupscope.entity.grade.Grade;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -36,13 +37,8 @@ public class Learner {
     @JoinColumn(name = "group_id")
     private LearningGroup learningGroup;
 
-    @ManyToMany
-    @JoinTable(
-            name = "learners_tasks",
-            joinColumns = @JoinColumn(name = "learner_id"),
-            inverseJoinColumns = @JoinColumn(name = "task_id")
-    )
-    private List<Task> tasks;
+    @OneToMany(mappedBy = "learner")
+    private List<Grade> grades;
 
     public Learner() {
         //tasks = new ArrayList<>();
@@ -88,12 +84,12 @@ public class Learner {
         this.learningGroup = learningGroup;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
+    public List<Grade> getGrades() {
+        return grades;
     }
 
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
+    public void setGrades(List<Grade> grades) {
+        this.grades = grades;
     }
 
     @Override
@@ -110,11 +106,11 @@ public class Learner {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Learner learner = (Learner) o;
-        return Objects.equals(id, learner.id) && Objects.equals(name, learner.name) && Objects.equals(lastname, learner.lastname) && role == learner.role && Objects.equals(learningGroup, learner.learningGroup) && Objects.equals(tasks, learner.tasks);
+        return Objects.equals(id, learner.id) && Objects.equals(name, learner.name) && Objects.equals(lastname, learner.lastname) && role == learner.role && Objects.equals(learningGroup, learner.learningGroup) && Objects.equals(grades, learner.grades);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, lastname, role, learningGroup, tasks);
+        return Objects.hash(id, name, lastname, role, learningGroup, grades);
     }
 }

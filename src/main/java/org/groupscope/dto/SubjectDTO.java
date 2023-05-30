@@ -20,7 +20,7 @@ public class SubjectDTO {
 
     private List<TaskDTO> tasks;
 
-    private LearningGroupDTO group;
+    private String group;
 
     public static SubjectDTO from(Subject subject) {
         SubjectDTO dto = new SubjectDTO();
@@ -37,7 +37,6 @@ public class SubjectDTO {
     public Subject toSubject() {
         Subject subject = new Subject(this.getName());
         subject.setId(this.getId());
-        //subject.setGroup(this.getGroup().toLearningGroup());
         return subject;
     }
 }

@@ -13,11 +13,11 @@ public interface GroupScopeService {
 
     List<Subject> getAllSubjects();
 
-    void addTask(Task task, Long id, String subjectName);
+    void addTask(TaskDTO taskDTO, String subjectName);
 
     List<Task> getAllTasksOfSubject(Subject subject);
 
-    void addGrade(GradeDTO gradeDTO);
+    void updateGrade(GradeDTO gradeDTO, Long learnerId);
 
     void addStudent(LearnerDTO learnerDTO, Long group_id);
 

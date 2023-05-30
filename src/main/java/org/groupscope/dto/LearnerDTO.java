@@ -2,6 +2,7 @@ package org.groupscope.dto;
 
 import lombok.Data;
 import org.groupscope.entity.*;
+import org.groupscope.entity.grade.Grade;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,38 +18,25 @@ public class LearnerDTO {
 
     private LearningRole role;
 
-    private LearningGroupDTO learningGroup;
+    private String learningGroup;
 
-    private List<TaskDTO> tasks;
+    private List<GradeDTO> grades;
 
-    public static LearnerDTO fromManyLearners(Learner learner) {
+    public static LearnerDTO from(Learner learner) {
         LearnerDTO dto = new LearnerDTO();
         dto.setId(learner.getId());
         dto.setName(learner.getName());
         dto.setLastname(learner.getLastname());
         dto.setRole(learner.getRole());
 
-        List<TaskDTO> taskDTOList = learner.getTasks().stream()
-                .map(TaskDTO::from).collect(Collectors.toList());
+        dto.setLearningGroup(learner.getLearningGroup().toString());
 
-        dto.setTasks(taskDTOList);
-        return dto;
-    }
+        List<GradeDTO> gradeDTOList = learner.getGrades().stream()
+                        .map(GradeDTO::from)
+                        .collect(Collectors.toList());
 
-    public static LearnerDTO fromOneLearner(Learner learner) {
-        LearnerDTO dto = new LearnerDTO();
-        dto.setId(learner.getId());
-        dto.setName(learner.getName());
-        dto.setLastname(learner.getLastname());
-        dto.setRole(learner.getRole());
+        dto.setGrades(gradeDTOList);
 
-        dto.setLearningGroup(LearningGroupDTO.from(learner.getLearningGroup()));
-
-        List<TaskDTO> taskDTOList = learner.getTasks().stream()
-                .map(TaskDTO::from)
-                .collect(Collectors.toList());
-
-        dto.setTasks(taskDTOList);
         return dto;
     }
 

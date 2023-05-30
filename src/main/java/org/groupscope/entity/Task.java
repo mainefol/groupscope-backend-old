@@ -1,5 +1,6 @@
 package org.groupscope.entity;
 
+import org.groupscope.entity.grade.Grade;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -23,28 +24,18 @@ public class Task {
     @Column(name = "info", length = 255)
     private String info;
 
-    @Column(name = "completion")
-    private Boolean completion;
-
-    @Column(name = "grade")
-    private Integer grade;
-
     @Column(name = "deadline")
-    private Calendar deadline;
+    private String deadline;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    @ManyToOne
-    @JoinColumn(name = "learner_id")
-    private Learner learner;
-
-    @ManyToMany
-    private List<Learner> learners;
+    @OneToMany(mappedBy = "task")
+    private List<Grade> grades;
 
     public Task() {
-        learners = new ArrayList<>();
+        grades = new ArrayList<>();
     }
 
     public Long getId() {
@@ -71,27 +62,11 @@ public class Task {
         this.info = info;
     }
 
-    public Boolean getCompletion() {
-        return completion;
-    }
-
-    public void setCompletion(Boolean completion) {
-        this.completion = completion;
-    }
-
-    public Integer getGrade() {
-        return grade;
-    }
-
-    public void setGrade(Integer grade) {
-        this.grade = grade;
-    }
-
-    public Calendar getDeadline() {
+    public String getDeadline() {
         return deadline;
     }
 
-    public void setDeadline(Calendar deadline) {
+    public void setDeadline(String deadline) {
         this.deadline = deadline;
     }
 
@@ -103,20 +78,12 @@ public class Task {
         this.subject = subject;
     }
 
-    public Learner getLearner() {
-        return learner;
+    public List<Grade> getGrades() {
+        return grades;
     }
 
-    public void setLearner(Learner learner) {
-        this.learner = learner;
-    }
-
-    public List<Learner> getLearners() {
-        return learners;
-    }
-
-    public void setLearners(List<Learner> learners) {
-        this.learners = learners;
+    public void setGrades(List<Grade> grades) {
+        this.grades = grades;
     }
 
     @Override
@@ -134,11 +101,11 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) && type == task.type && Objects.equals(info, task.info) && Objects.equals(completion, task.completion) && Objects.equals(grade, task.grade) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject) && Objects.equals(learner, task.learner) && Objects.equals(learners, task.learners);
+        return Objects.equals(id, task.id) && type == task.type && Objects.equals(info, task.info) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject) && Objects.equals(grades, task.grades);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, info, completion, grade, deadline, subject, learner, learners);
+        return Objects.hash(id, type, info, deadline, subject, grades);
     }
 }

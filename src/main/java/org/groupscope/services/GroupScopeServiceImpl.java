@@ -3,6 +3,8 @@ package org.groupscope.services;
 import org.groupscope.dao.GroupScopeDAO;
 import org.groupscope.dto.*;
 import org.groupscope.entity.*;
+import org.groupscope.entity.grade.Grade;
+import org.groupscope.entity.grade.GradeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +25,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addSubject(SubjectDTO subjectDTO, Long group_id) {
+    public void addSubject(SubjectDTO subjectDTO, Long groupId) {
         Subject subject = subjectDTO.toSubject();
-        subject.setGroup(groupScopeDAO.findGroupById(group_id));
+        subject.setGroup(groupScopeDAO.findGroupById(groupId));
         groupScopeDAO.saveSubject(subject);
     }
 
@@ -41,9 +43,19 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addTask(Task task, Long id, String subjectName) {
-        task.setSubject(groupScopeDAO.findSubjectByName(subjectName));
-        task.setLearner(groupScopeDAO.findStudentById(id));
+    public void addTask(TaskDTO taskDTO, String subjectName) {
+        Task task = taskDTO.toTask();
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+        task.setSubject(subject);
+
+        subject.getGroup().getLearners()
+                .forEach(learner -> {
+                    GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                    Grade grade = new Grade(gradeKey, learner, task, false, 0);
+
+                    learner.getGrades().add(grade);
+                    task.getGrades().add(grade);
+                });
 
         groupScopeDAO.saveTask(task);
     }
@@ -55,29 +67,58 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Transactional
     @Override
-    public void addGrade(GradeDTO gradeDTO) {
-        List<Task> tasks = gradeDTO.getTasks()
-                .stream()
-                .map(TaskDTO::toTask)
-                .collect(Collectors.toList());
+    public void updateGrade(GradeDTO gradeDTO, Long learnerId) {
+        Learner learner = getStudentById(learnerId);
 
-        Long learnerId = gradeDTO.getLearnerId();
-        String subject = gradeDTO.getSubject();
+        Subject subject = learner.getLearningGroup().getSubjects().stream()
+                .filter(subjectTmp -> subjectTmp.getName().equals(gradeDTO.getSubjectName()))
+                .findFirst()
+                .orElse(null);
 
-        for(Task task : tasks) {
-            task.setLearner(groupScopeDAO.findStudentById(learnerId));
-            task.setSubject(groupScopeDAO.findSubjectByName(subject));
-        }
+        Task task = subject.getTasks().stream()
+                .filter(taskTmp -> taskTmp.getType().toString().equals(gradeDTO.getTaskName()))
+                .findFirst()
+                .orElse(null);
 
-        groupScopeDAO.saveAllTasks(tasks);
+        GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+
+        learner.getGrades().stream()
+                .filter(grade -> grade.getId().equals(gradeKey))
+                .findFirst()
+                .ifPresent(grade -> {
+                    grade.setCompletion(gradeDTO.getCompletion());
+                    grade.setMark(gradeDTO.getMark());
+                });
+
+        task.getGrades().stream()
+                .filter(grade -> grade.getId().equals(gradeKey))
+                .findFirst()
+                .ifPresent(grade -> {
+                    grade.setCompletion(gradeDTO.getCompletion());
+                    grade.setMark(gradeDTO.getMark());
+                });
+
+        groupScopeDAO.saveStudent(learner);
+        groupScopeDAO.saveTask(task);
     }
 
     @Override
     @Transactional
-    public void addStudent(LearnerDTO learnerDTO, Long group_id) {
-        Learner student = learnerDTO.toLearner();
-        student.setLearningGroup(groupScopeDAO.findGroupById(group_id));
-        groupScopeDAO.saveStudent(student);
+    public void addStudent(LearnerDTO learnerDTO, Long groupId) {
+        Learner learner = learnerDTO.toLearner();
+        learner.setLearningGroup(groupScopeDAO.findGroupById(groupId));
+
+        for (Subject subject : learner.getLearningGroup().getSubjects()) {
+            for (Task task : subject.getTasks()) {
+                GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                Grade grade = new Grade(gradeKey, learner, task, false, 0);
+
+                learner.getGrades().add(grade);
+                task.getGrades().add(grade);
+            }
+        }
+
+        groupScopeDAO.saveStudent(learner);
     }
 
     @Override
@@ -89,6 +130,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public void addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
+        group.getHeadmen().setLearningGroup(group);
         groupScopeDAO.saveGroup(group);
     }
 

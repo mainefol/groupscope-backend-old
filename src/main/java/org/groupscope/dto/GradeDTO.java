@@ -1,9 +1,7 @@
 package org.groupscope.dto;
 
 import lombok.Data;
-
-import java.util.List;
-import java.util.Objects;
+import org.groupscope.entity.grade.Grade;
 
 // This class used to get grade changes from the client
 // Then update database
@@ -11,10 +9,28 @@ import java.util.Objects;
 @Data
 public class GradeDTO {
     // It can be any type of data, int used for the example
-    private Long learnerId;
 
-    private String subject;
+    private String subjectName;
 
-    private List<TaskDTO> tasks;
+    private String taskName;
 
+    private Boolean completion;
+
+    private Integer mark;
+
+    public static GradeDTO from(Grade grade) {
+        GradeDTO dto = new GradeDTO();
+        dto.subjectName = grade.getTask().getSubject().toString();
+        dto.taskName = grade.getTask().getType().toString();
+        dto.completion = grade.getCompletion();
+        dto.mark = grade.getMark();
+        return dto;
+    }
+
+    public Grade toGrade() {
+        Grade grade = new Grade();
+        grade.setCompletion(this.completion);
+        grade.setMark(this.mark);
+        return grade;
+    }
 }
