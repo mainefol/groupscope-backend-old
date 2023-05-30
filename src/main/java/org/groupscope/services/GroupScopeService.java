@@ -15,7 +15,7 @@ public interface GroupScopeService {
 
     void addTask(TaskDTO taskDTO, String subjectName);
 
-    List<Task> getAllTasksOfSubject(Subject subject);
+    List<TaskDTO> getAllTasksOfSubject(String subjectName);
 
     void updateGrade(GradeDTO gradeDTO, Long learnerId);
 

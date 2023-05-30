@@ -61,8 +61,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<Task> getAllTasksOfSubject(Subject subject) {
-        return groupScopeDAO.findAllTasksOfSubject(subject);
+    public List<TaskDTO> getAllTasksOfSubject(String subjectName) {
+        Subject subject = getSubjectByName(subjectName);
+
+        return subject.getTasks()
+                .stream()
+                .map(TaskDTO::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional
