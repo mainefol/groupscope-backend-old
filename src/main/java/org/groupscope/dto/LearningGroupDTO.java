@@ -46,6 +46,7 @@ public class LearningGroupDTO {
     public LearningGroup toLearningGroup() {
         LearningGroup learningGroup = new LearningGroup(this.getName());
         learningGroup.setHeadmen(this.getHeadmen().toLearner());
+        learningGroup.setId(this.getId());
 
         if(!CollectionUtils.isEmpty(this.learners)) {
             List<Learner> learnersList = this.learners.stream()

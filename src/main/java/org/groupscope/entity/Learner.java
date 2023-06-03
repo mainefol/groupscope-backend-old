@@ -37,7 +37,7 @@ public class Learner {
     @JoinColumn(name = "group_id")
     private LearningGroup learningGroup;
 
-    @OneToMany(mappedBy = "learner")
+    @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL)
     private List<Grade> grades;
 
     public Learner() {

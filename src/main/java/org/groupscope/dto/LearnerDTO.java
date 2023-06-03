@@ -43,7 +43,7 @@ public class LearnerDTO {
     // When you call this method, you must set Group and Tasks to Learner in
     public Learner toLearner() {
         Learner learner = new Learner();
-        //learner.setId(this.getId());
+        learner.setId(this.getId());
         learner.setName(this.getName());
         learner.setLastname(this.getLastname());
         learner.setRole(this.getRole());

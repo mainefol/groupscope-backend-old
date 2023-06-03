@@ -1,10 +1,7 @@
 package org.groupscope.dto;
 
 import lombok.Data;
-import org.groupscope.entity.LearningGroup;
-import org.groupscope.entity.Subject;
-import org.groupscope.entity.Task;
-import org.groupscope.entity.TaskType;
+import org.groupscope.entity.*;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
@@ -37,6 +34,16 @@ public class SubjectDTO {
     public Subject toSubject() {
         Subject subject = new Subject(this.getName());
         subject.setId(this.getId());
+
+        if(!CollectionUtils.isEmpty(this.tasks)) {
+            List<Task> taskList = this.tasks.stream()
+                    .map(TaskDTO::toTask)
+                    .peek(learner -> learner.setSubject(subject))
+                    .collect(Collectors.toList());
+
+            subject.setTasks(taskList);
+        }
+
         return subject;
     }
 }

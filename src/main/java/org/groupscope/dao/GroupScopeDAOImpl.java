@@ -40,7 +40,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public void saveSubject(Subject subject) {
         subjectRepository.save(subject);
-        log.info("Subject " + subject.toString() + " saved");
+        log.info("Subject: " + subject.toString() + " saved/updated");
     }
 
     @Override
@@ -49,8 +49,33 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public Subject findSubjectById(Long subject_id) {
+        Optional<Subject> optionalSubject = subjectRepository.findById(subject_id);
+        if (optionalSubject.isPresent()) {
+            return optionalSubject.get();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public List<Subject> findAllSubjects() {
         return (List<Subject>) subjectRepository.findAll();
+    }
+
+    @Override
+    public List<Subject> findAllSubjectsByGroupId(Long group_id) {
+        return null;
+    }
+
+    @Override
+    public void updateSubject(Subject subject) {
+        subjectRepository.save(subject);
+    }
+
+    @Override
+    public void deleteSubjectById(Long id) {
+        subjectRepository.deleteById(id);
     }
 
     @Override
@@ -70,6 +95,16 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public void updateTask(Task task) {
+        taskRepository.save(task);
+    }
+
+    @Override
+    public void deleteTaskById(Long id) {
+        taskRepository.deleteById(id);
+    }
+
+    @Override
     public void saveStudent(Learner learner) {
         learnerRepository.save(learner);
         log.info("Learner " + learner.toString() + " saved");
@@ -79,6 +114,16 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     public Learner findStudentById(Long id) {
         Optional<Learner> learner = learnerRepository.findById(id);
         return learner.orElse(null);
+    }
+
+    @Override
+    public void updateLearner(Learner learner) {
+        learnerRepository.save(learner);
+    }
+
+    @Override
+    public void deleteLearnerById(Long id) {
+        learnerRepository.deleteById(id);
     }
 
     @Override

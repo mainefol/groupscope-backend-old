@@ -8,7 +8,6 @@ import org.groupscope.entity.grade.Grade;
 
 @Data
 public class GradeDTO {
-    // It can be any type of data, int used for the example
 
     private String subjectName;
 

@@ -14,7 +14,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
-*
+* TODO Divide the controller class into several small ones, like:
+*                               GroupScopeController
+*    |                            |                    |                            |
+*   \/                           \/                   \/                           \/
+*  LearnerController        TaskController          ...                           ...
 * */
 @Slf4j
 @RestController
@@ -54,24 +58,22 @@ public class GroupScopeController {
         }
     }
 
-    // Process dto class with only filled name field
     @PatchMapping("/{id}/patchSubject")
     public ResponseEntity<HttpStatus> patchSubject(@RequestBody SubjectDTO subjectDTO,
-                                                 @PathVariable("id") Long groupId) {
+                                                   @PathVariable("id") Long groupId) {
         try {
-
+            groupScopeService.updateSubject(subjectDTO, groupId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    // Process dto class with only filled name field
-    @DeleteMapping("/{id}/deleteSubject")
-    public ResponseEntity<HttpStatus> deleteSubject(@RequestBody SubjectDTO subjectDTO,
-                                                    @PathVariable("id") Long groupId) {
+    // Process dto class with only filled id field
+    @DeleteMapping("/deleteSubject")
+    public ResponseEntity<HttpStatus> deleteSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-
+            groupScopeService.deleteSubject(subjectDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -100,11 +102,11 @@ public class GroupScopeController {
         }
     }
 
-    @PatchMapping("/patchTask/{subject_name}")
+    @PatchMapping("/patchTask/{id}")
     public ResponseEntity<HttpStatus> patchTask(@RequestBody TaskDTO taskDTO,
-                                                @PathVariable("subject_name") String subjectName) {
+                                                @PathVariable("id") Long subjectId) {
         try {
-
+            groupScopeService.updateTask(taskDTO, subjectId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -112,11 +114,10 @@ public class GroupScopeController {
     }
 
     // Process dto class with only filled name field
-    @DeleteMapping("/deleteTask/{subject_name}")
-    public ResponseEntity<HttpStatus> deleteTask(@RequestBody TaskDTO taskDTO,
-                                                 @PathVariable("subject_name") String subjectName) {
+    @DeleteMapping("/deleteTask")
+    public ResponseEntity<HttpStatus> deleteTask(@RequestBody TaskDTO taskDTO) {
         try {
-
+            groupScopeService.deleteTask(taskDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -146,10 +147,21 @@ public class GroupScopeController {
         }
     }
 
-    @DeleteMapping("/deleteStudent/{id}")
-    public ResponseEntity<HttpStatus> deleteStudent(@PathVariable("id") Long learnerId) {
+    @PatchMapping("/patchStudent/{id}")
+    public ResponseEntity<HttpStatus> updateStudent(@RequestBody LearnerDTO learnerDTO,
+                                                    @PathVariable("id") Long groupId) {
         try {
+            groupScopeService.updateLearner(learnerDTO, groupId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 
+    @DeleteMapping("/deleteStudent")
+    public ResponseEntity<HttpStatus> deleteStudent(@RequestBody LearnerDTO learnerDTO) {
+        try {
+            groupScopeService.deleteLearner(learnerDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

@@ -13,16 +13,32 @@ public interface GroupScopeService {
 
     List<Subject> getAllSubjects();
 
+    void updateSubject(SubjectDTO subjectDTO, Long group_id);
+
+    void deleteSubject(SubjectDTO subjectDTO);
+
+    ///////////////////////////////////////////////////
     void addTask(TaskDTO taskDTO, String subjectName);
 
     List<TaskDTO> getAllTasksOfSubject(String subjectName);
 
+    void updateTask(TaskDTO taskDTO, Long subject_id);
+
+    void deleteTask(TaskDTO taskDTO);
+
+    ///////////////////////////////////////////////////
     void updateGrade(GradeDTO gradeDTO, Long learnerId);
 
+    ///////////////////////////////////////////////////
     void addStudent(LearnerDTO learnerDTO, Long group_id);
 
     Learner getStudentById(Long id);
 
+    void updateLearner(LearnerDTO learnerDTO, Long group_id);
+
+    void deleteLearner(LearnerDTO learnerDTO);
+
+    ///////////////////////////////////////////////////
     void addGroup(LearningGroupDTO learningGroupDTO);
 
     LearningGroup getGroupById(Long id);
