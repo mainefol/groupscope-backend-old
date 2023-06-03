@@ -17,6 +17,9 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private TaskType type;
@@ -44,6 +47,14 @@ public class Task {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public TaskType getType() {
@@ -101,11 +112,11 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) && type == task.type && Objects.equals(info, task.info) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject) && Objects.equals(grades, task.grades);
+        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && type == task.type && Objects.equals(info, task.info) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject) && Objects.equals(grades, task.grades);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, info, deadline, subject, grades);
+        return Objects.hash(id, name, type, info, deadline, subject, grades);
     }
 }

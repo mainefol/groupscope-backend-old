@@ -12,6 +12,8 @@ public class TaskDTO {
 
     private Long id;
 
+    private String name;
+
     private TaskType type;
 
     private String info;
@@ -22,6 +24,7 @@ public class TaskDTO {
     public static TaskDTO from(Task task) {
         TaskDTO dto = new TaskDTO();
         dto.setId(task.getId());
+        dto.setName(task.getName());
         dto.setType(task.getType());
         dto.setInfo(task.getInfo());
         dto.setDeadline(task.getDeadline());
@@ -32,6 +35,7 @@ public class TaskDTO {
     public Task toTask() {
         Task task = new Task();
         task.setId(this.getId());
+        task.setName(this.getName());
         task.setType(this.getType());
         task.setInfo(this.getInfo());
         task.setDeadline(this.getDeadline());

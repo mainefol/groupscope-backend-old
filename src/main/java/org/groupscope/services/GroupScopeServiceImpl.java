@@ -106,7 +106,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 .orElse(null);
 
         Task task = subject.getTasks().stream()
-                .filter(taskTmp -> taskTmp.getType().toString().equals(gradeDTO.getTaskName()))
+                .filter(taskTmp -> taskTmp.getName().equals(gradeDTO.getTaskName()))
                 .findFirst()
                 .orElse(null);
 

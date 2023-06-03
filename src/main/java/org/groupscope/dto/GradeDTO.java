@@ -20,7 +20,7 @@ public class GradeDTO {
     public static GradeDTO from(Grade grade) {
         GradeDTO dto = new GradeDTO();
         dto.subjectName = grade.getTask().getSubject().toString();
-        dto.taskName = grade.getTask().getType().toString();
+        dto.taskName = grade.getTask().getName().toString();
         dto.completion = grade.getCompletion();
         dto.mark = grade.getMark();
         return dto;
