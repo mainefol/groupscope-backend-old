@@ -100,9 +100,8 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "type=" + type +
-                ", info='" + info + '\'' +
-                ", deadline=" + deadline +
+                "name='" + name + '\'' +
+                ", type=" + type +
                 ", subject=" + subject.toString() +
                 '}';
     }
@@ -112,7 +111,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && type == task.type && Objects.equals(info, task.info) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject) && Objects.equals(grades, task.grades);
+        return Objects.equals(name, task.name) && type == task.type && Objects.equals(info, task.info) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject);
     }
 
     @Override

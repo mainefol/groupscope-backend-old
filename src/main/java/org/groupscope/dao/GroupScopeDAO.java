@@ -43,6 +43,8 @@ public interface GroupScopeDAO {
 
     LearningGroup findGroupById(Long id);
 
-    // TODO complete method for deleting group
+    // TODO: Complete method for deleting group
     // void deleteGroupById(Long id);
+
+    List<LearningGroup> getAllGroups();
 }

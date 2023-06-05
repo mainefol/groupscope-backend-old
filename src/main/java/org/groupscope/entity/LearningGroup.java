@@ -87,9 +87,7 @@ public class LearningGroup {
 
     @Override
     public String toString() {
-        return "LearningGroup{" +
-                "name='" + name + '\'' +
-                '}';
+        return name;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.groupscope.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dao.GroupScopeDAO;
 import org.groupscope.dto.*;
 import org.groupscope.entity.*;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class GroupScopeServiceImpl implements GroupScopeService{
@@ -22,13 +23,18 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public GroupScopeServiceImpl(GroupScopeDAO groupScopeDAO) {
         this.groupScopeDAO = groupScopeDAO;
     }
-
-    @Transactional
     @Override
+    @Transactional
     public void addSubject(SubjectDTO subjectDTO, Long groupId) {
         Subject subject = subjectDTO.toSubject();
-        subject.setGroup(groupScopeDAO.findGroupById(groupId));
-        groupScopeDAO.saveSubject(subject);
+        if(groupScopeDAO.findGroupById(groupId) != null) {
+            subject.setGroup(groupScopeDAO.findGroupById(groupId));
+
+            if(!subject.getGroup().getSubjects().contains(subject)) {
+                groupScopeDAO.saveSubject(subject);
+            }
+        }
+        // TODO: Make exception for duplicate
     }
 
     @Override
@@ -37,6 +43,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    @Transactional
     public void updateSubject(SubjectDTO subjectDTO, Long groupId) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
         subjectDTO.setId(subject.getId());
@@ -45,6 +52,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    @Transactional
     public void deleteSubject(SubjectDTO subjectDTO) {
         groupScopeDAO.deleteSubjectById(subjectDTO.getId());
     }
@@ -54,28 +62,32 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         return groupScopeDAO.findAllSubjects();
     }
 
-    @Transactional
     @Override
-    public void addTask(TaskDTO taskDTO, String subjectName) {
+    @Transactional
+    public void addTask(TaskDTO taskDTO, Long subjectId) {
         Task task = taskDTO.toTask();
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
-        task.setSubject(subject);
+        Subject subject = groupScopeDAO.findSubjectById(subjectId);
+        if(subject != null) {
+            task.setSubject(subject);
 
-        subject.getGroup().getLearners()
-                .forEach(learner -> {
-                    GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-                    Grade grade = new Grade(gradeKey, learner, task, false, 0);
+            if (!subject.getTasks().contains(task)) {
+                subject.getGroup().getLearners()
+                        .forEach(learner -> {
+                            GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                            Grade grade = new Grade(gradeKey, learner, task, false, 0);
 
-                    learner.getGrades().add(grade);
-                    task.getGrades().add(grade);
-                });
+                            learner.getGrades().add(grade);
+                            task.getGrades().add(grade);
+                        });
 
-        groupScopeDAO.saveTask(task);
+                groupScopeDAO.saveTask(task);
+            }
+        }
     }
 
     @Override
-    public List<TaskDTO> getAllTasksOfSubject(String subjectName) {
-        Subject subject = getSubjectByName(subjectName);
+    public List<TaskDTO> getAllTasksOfSubject(Long subjectId) {
+        Subject subject = groupScopeDAO.findSubjectById(subjectId);
 
         return subject.getTasks()
                 .stream()
@@ -84,6 +96,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    @Transactional
     public void updateTask(TaskDTO taskDTO, Long subject_id) {
         Task task = taskDTO.toTask();
         task.setSubject(groupScopeDAO.findSubjectById(subject_id));
@@ -91,6 +104,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    @Transactional
     public void deleteTask(TaskDTO taskDTO) {
         groupScopeDAO.deleteTaskById(taskDTO.getId());
     }
@@ -136,19 +150,25 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public void addStudent(LearnerDTO learnerDTO, Long groupId) {
         Learner learner = learnerDTO.toLearner();
-        learner.setLearningGroup(groupScopeDAO.findGroupById(groupId));
+        LearningGroup learningGroup = groupScopeDAO.findGroupById(groupId);
 
-        for (Subject subject : learner.getLearningGroup().getSubjects()) {
-            for (Task task : subject.getTasks()) {
-                GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-                Grade grade = new Grade(gradeKey, learner, task, false, 0);
+        if(learningGroup != null) {
+            if(!learningGroup.getLearners().contains(learner)) {
+                learner.setLearningGroup(learningGroup);
 
-                learner.getGrades().add(grade);
-                task.getGrades().add(grade);
+                for (Subject subject : learningGroup.getSubjects()) {
+                    for (Task task : subject.getTasks()) {
+                        GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                        Grade grade = new Grade(gradeKey, learner, task, false, 0);
+
+                        learner.getGrades().add(grade);
+                        task.getGrades().add(grade);
+                    }
+                }
+
+                groupScopeDAO.saveStudent(learner);
             }
         }
-
-        groupScopeDAO.saveStudent(learner);
     }
 
     @Override
@@ -157,14 +177,17 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
+    @Transactional
     public void updateLearner(LearnerDTO learnerDTO, Long group_id) {
+
         Learner learner = learnerDTO.toLearner();
-        learner.setLearningGroup(getGroupById(group_id));
+        learner.setLearningGroup(this.getGroupById(group_id));
         learner.setGrades(this.getStudentById(learner.getId()).getGrades());
         groupScopeDAO.updateLearner(learner);
     }
 
     @Override
+    @Transactional
     public void deleteLearner(LearnerDTO learnerDTO) {
         groupScopeDAO.deleteLearnerById(learnerDTO.getId());
     }
@@ -174,7 +197,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public void addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
         group.getHeadmen().setLearningGroup(group);
-        groupScopeDAO.saveGroup(group);
+        if(!groupScopeDAO.getAllGroups().contains(group)) {
+            groupScopeDAO.saveGroup(group);
+        }
     }
 
     @Override

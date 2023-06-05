@@ -65,8 +65,6 @@ public class LearningGroupDTO {
 
     @Override
     public String toString() {
-        return "LearningGroupDTO{" +
-                "name='" + name + '\'' +
-                '}';
+        return name;
     }
 }

@@ -80,10 +80,11 @@ public class GroupScopeController {
         }
     }
 
-    @GetMapping("/getTasksOfSubject/{subject_name}")
-    public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subject_name") String subjectName) {
+    // TODO rework subject_name
+    @GetMapping("/getTasksOfSubject/{subjectId}")
+    public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subjectId") Long subjectId) {
         try {
-            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName);
+            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectId);
 
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
@@ -91,11 +92,11 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/addTask/{subject_name}")
+    @PostMapping("/addTask/{subjectId}")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
-                                              @PathVariable("subject_name") String subjectName) {
+                                              @PathVariable("subjectId") Long subjectId) {
         try {
-            groupScopeService.addTask(taskDTO, subjectName);
+            groupScopeService.addTask(taskDTO, subjectId);
             return ResponseEntity.ok().build(); // return "ok" to client
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

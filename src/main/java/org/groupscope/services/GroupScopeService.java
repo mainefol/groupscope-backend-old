@@ -18,9 +18,9 @@ public interface GroupScopeService {
     void deleteSubject(SubjectDTO subjectDTO);
 
     ///////////////////////////////////////////////////
-    void addTask(TaskDTO taskDTO, String subjectName);
+    void addTask(TaskDTO taskDTO, Long subjectId);
 
-    List<TaskDTO> getAllTasksOfSubject(String subjectName);
+    List<TaskDTO> getAllTasksOfSubject(Long subjectId);
 
     void updateTask(TaskDTO taskDTO, Long subject_id);
 
@@ -42,4 +42,5 @@ public interface GroupScopeService {
     void addGroup(LearningGroupDTO learningGroupDTO);
 
     LearningGroup getGroupById(Long id);
+
 }

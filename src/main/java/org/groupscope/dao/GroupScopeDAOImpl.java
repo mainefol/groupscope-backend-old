@@ -65,7 +65,10 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public List<Subject> findAllSubjectsByGroupId(Long group_id) {
-        return null;
+        List<Subject> subjects = (List<Subject>) subjectRepository.findAll();
+        return subjects.stream()
+                .filter(subject -> subject.getGroup().getId().equals(group_id))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -118,6 +121,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public void updateLearner(Learner learner) {
+        log.info("Update " + learner.toString());
         learnerRepository.save(learner);
     }
 
@@ -136,5 +140,10 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     public LearningGroup findGroupById(Long id) {
         Optional<LearningGroup> learningGroup = learningGroupRepository.findById(id);
         return learningGroup.orElse(null);
+    }
+
+    @Override
+    public List<LearningGroup> getAllGroups() {
+        return (List<LearningGroup>) learningGroupRepository.findAll();
     }
 }
