@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 *  LearnerController        TaskController          ...                           ...
 * */
 @Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping("/")
 public class GroupScopeController {
