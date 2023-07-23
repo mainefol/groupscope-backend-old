@@ -1,6 +1,7 @@
 package org.groupscope.security.auth;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.groupscope.entity.Learner;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +14,7 @@ import java.util.Collections;
 @Entity
 @Data
 @Table(name = "users")
+@NoArgsConstructor
 public class CustomUser implements UserDetails {
 
     @Id

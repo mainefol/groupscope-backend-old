@@ -31,9 +31,9 @@ public interface GroupScopeService {
 
     ///////////////////////////////////////////////////
 
-    Learner addStudent(LearnerDTO learnerDTO, String inviteCode);
+    Learner addStudent(LearnerDTO learnerDTO, String inviteCode, Provider provider);
 
-    Learner addFreeLearner(LearnerDTO learnerDTO);
+    Learner addFreeLearner(LearnerDTO learnerDTO, Provider provider);
 
     Learner getStudentById(Long id);
 
@@ -42,7 +42,7 @@ public interface GroupScopeService {
     void deleteLearner(LearnerDTO learnerDTO);
 
     ///////////////////////////////////////////////////
-    LearningGroup addGroup(LearningGroupDTO learningGroupDTO);
+    LearningGroup addGroup(LearningGroupDTO learningGroupDTO, Provider provider);
 
     LearningGroup getGroupById(Long id);
 

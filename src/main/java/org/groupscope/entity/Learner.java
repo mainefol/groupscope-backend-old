@@ -34,6 +34,10 @@ public class Learner {
     @Column(name = "role")
     private LearningRole role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private Provider provider;
+
     // Everyone lerner must belong to some group
     @ManyToOne
     @JoinColumn(name = "group_id")
