@@ -41,13 +41,14 @@ public class CustomUserService {
         if(customUser.getPassword() != null) {
             customUser.setPassword(passwordEncoder.encode(customUser.getPassword()));
         }
+        customUser.setProvider(provider);
 
         // Add new learner to existing group
         if(request.getInviteCode() != null) {
             LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
                     request.getLearnerLastname(),
                     LearningRole.STUDENT);
-            Learner learner = groupScopeService.addStudent(learnerDTO, request.getInviteCode(), provider);
+            Learner learner = groupScopeService.addStudent(learnerDTO, request.getInviteCode());
             if(learner != null) {
                 customUser.setLearner(learner);
                 return customUserRepository.save(customUser);
@@ -60,7 +61,7 @@ public class CustomUserService {
                     request.getLearnerLastname(),
                     LearningRole.HEADMAN);
             LearningGroupDTO learningGroupDTO = new LearningGroupDTO(request.getGroupName(), headman);
-            LearningGroup learningGroup = groupScopeService.addGroup(learningGroupDTO, provider);
+            LearningGroup learningGroup = groupScopeService.addGroup(learningGroupDTO);
             if(learningGroup != null) {
                 customUser.setLearner(learningGroup.getHeadmen());
                 return customUserRepository.save(customUser);
@@ -72,7 +73,7 @@ public class CustomUserService {
             LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
                     request.getLearnerLastname(),
                     LearningRole.STUDENT);
-            Learner learner = groupScopeService.addFreeLearner(learnerDTO, provider);
+            Learner learner = groupScopeService.addFreeLearner(learnerDTO);
             if(learner != null) {
                 customUser.setLearner(learner);
                 return customUserRepository.save(customUser);

@@ -1,10 +1,13 @@
 package org.groupscope.entity.grade;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Data
 @Embeddable
 public class GradeKey implements Serializable {
     @Column(name = "learner_id")
@@ -18,22 +21,6 @@ public class GradeKey implements Serializable {
 
     public GradeKey(Long learnerId, Long taskId) {
         this.learnerId = learnerId;
-        this.taskId = taskId;
-    }
-
-    public Long getLearnerId() {
-        return learnerId;
-    }
-
-    public void setLearnerId(Long learnerId) {
-        this.learnerId = learnerId;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
         this.taskId = taskId;
     }
 

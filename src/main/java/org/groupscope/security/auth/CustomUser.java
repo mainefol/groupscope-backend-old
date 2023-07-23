@@ -3,6 +3,7 @@ package org.groupscope.security.auth;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.groupscope.entity.Learner;
+import org.groupscope.entity.Provider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,10 @@ public class CustomUser implements UserDetails {
 
     @Column
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private Provider provider;
 
     @OneToOne
     @JoinColumn(name = "learner_id")

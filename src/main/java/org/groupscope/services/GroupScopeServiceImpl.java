@@ -165,9 +165,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public Learner addStudent(LearnerDTO learnerDTO, String inviteCode, Provider provider) {
+    public Learner addStudent(LearnerDTO learnerDTO, String inviteCode) {
         Learner learner = learnerDTO.toLearner();
-        learner.setProvider(provider);
         LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
 
         if(learningGroup != null) {
@@ -192,9 +191,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public Learner addFreeLearner(LearnerDTO learnerDTO, Provider provider) {
+    public Learner addFreeLearner(LearnerDTO learnerDTO) {
         Learner learner = learnerDTO.toLearner();
-        learner.setProvider(provider);
 
         return groupScopeDAO.saveStudent(learner);
     }
@@ -223,10 +221,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public LearningGroup addGroup(LearningGroupDTO learningGroupDTO, Provider provider) {
+    public LearningGroup addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
         group.getHeadmen().setLearningGroup(group);
-        group.getHeadmen().setProvider(provider);
         if(!groupScopeDAO.getAllGroups().contains(group)) {
             return groupScopeDAO.saveGroup(group);
         } else {

@@ -1,11 +1,13 @@
 package org.groupscope.entity.grade;
 
+import lombok.Data;
 import org.groupscope.entity.Learner;
 import org.groupscope.entity.Task;
 
 import javax.persistence.*;
 import java.util.Objects;
 
+@Data
 @Entity
 public class Grade {
     @EmbeddedId
@@ -35,46 +37,6 @@ public class Grade {
         this.learner = learner;
         this.task = task;
         this.completion = completion;
-        this.mark = mark;
-    }
-
-    public GradeKey getId() {
-        return id;
-    }
-
-    public void setId(GradeKey id) {
-        this.id = id;
-    }
-
-    public Learner getLearner() {
-        return learner;
-    }
-
-    public void setLearner(Learner learner) {
-        this.learner = learner;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
-    public Boolean getCompletion() {
-        return completion;
-    }
-
-    public void setCompletion(Boolean completion) {
-        this.completion = completion;
-    }
-
-    public Integer getMark() {
-        return mark;
-    }
-
-    public void setMark(Integer mark) {
         this.mark = mark;
     }
 
