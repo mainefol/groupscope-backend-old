@@ -77,8 +77,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public void deleteSubjectById(Long id) {
-        subjectRepository.deleteById(id);
+    public void deleteSubject(Subject subject) {
+        subjectRepository.delete(subject);
     }
 
     @Override
@@ -98,8 +98,18 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public Task findTaskByName(String name) {
+        return taskRepository.getTaskByName(name);
+    }
+
+    @Override
     public void updateTask(Task task) {
         taskRepository.save(task);
+    }
+
+    @Override
+    public void deleteTask(Task task) {
+        taskRepository.delete(task);
     }
 
     @Override
@@ -108,9 +118,17 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public void saveStudent(Learner learner) {
-        learnerRepository.save(learner);
-        log.info("Learner " + learner.toString() + " saved");
+    public Learner saveStudent(Learner learner) {
+        Learner learner1 =  learnerRepository.save(learner);
+        if(learner1 != null) {
+            log.info("Learner " + learner.toString() + " saved");
+        }
+        return learner;
+    }
+
+    @Override
+    public Learner findStudentByName(String name) {
+        return learnerRepository.getLearnerByName(name);
     }
 
     @Override
@@ -126,20 +144,33 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public void deleteLearner(Learner learner) {
+        learnerRepository.delete(learner);
+    }
+
+    @Override
     public void deleteLearnerById(Long id) {
         learnerRepository.deleteById(id);
     }
 
     @Override
-    public void saveGroup(LearningGroup learningGroup) {
-        LearningGroup learningGroup1 = learningGroupRepository.save(learningGroup);
-        log.info("Learning Group " + learningGroup.toString() + " saved");
+    public LearningGroup saveGroup(LearningGroup learningGroup) {
+        LearningGroup group = learningGroupRepository.save(learningGroup);
+        if(group != null) {
+            log.info("Learning Group " + group.toString() + " saved");
+        }
+        return group;
     }
 
     @Override
     public LearningGroup findGroupById(Long id) {
         Optional<LearningGroup> learningGroup = learningGroupRepository.findById(id);
         return learningGroup.orElse(null);
+    }
+
+    @Override
+    public LearningGroup findLearningGroupByInviteCode(String inviteCode) {
+        return learningGroupRepository.getLearningGroupByInviteCode(inviteCode);
     }
 
     @Override

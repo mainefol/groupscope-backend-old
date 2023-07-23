@@ -1,10 +1,13 @@
 package org.groupscope.entity;
 
-import javax.persistence.MappedSuperclass;
+import lombok.Data;
+
+import javax.persistence.*;
 
 /*
-* Learners roles
+* Learners roles: STUDENT, HEADMAN
 * */
+
 public enum LearningRole {
     STUDENT,
     HEADMAN

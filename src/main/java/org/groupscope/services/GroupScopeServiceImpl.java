@@ -23,12 +23,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public GroupScopeServiceImpl(GroupScopeDAO groupScopeDAO) {
         this.groupScopeDAO = groupScopeDAO;
     }
+
     @Override
     @Transactional
-    public void addSubject(SubjectDTO subjectDTO, Long groupId) {
+    public void addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
         Subject subject = subjectDTO.toSubject();
-        if(groupScopeDAO.findGroupById(groupId) != null) {
-            subject.setGroup(groupScopeDAO.findGroupById(groupId));
+        if(learningGroup != null) {
+            subject.setGroup(learningGroup);
 
             if(!subject.getGroup().getSubjects().contains(subject)) {
                 groupScopeDAO.saveSubject(subject);
@@ -44,17 +45,21 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void updateSubject(SubjectDTO subjectDTO, Long groupId) {
+    public void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
+        if(subjectDTO.getNewName() != null) {
+            subject.setName(subjectDTO.getNewName());
+        }
         subjectDTO.setId(subject.getId());
-        subject.setGroup(groupScopeDAO.findGroupById(groupId));
+        subject.setGroup(learningGroup);
         groupScopeDAO.updateSubject(subject);
     }
 
     @Override
     @Transactional
     public void deleteSubject(SubjectDTO subjectDTO) {
-        groupScopeDAO.deleteSubjectById(subjectDTO.getId());
+        Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
+        groupScopeDAO.deleteSubject(subject);
     }
 
     @Override
@@ -64,9 +69,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void addTask(TaskDTO taskDTO, Long subjectId) {
+    public void addTask(TaskDTO taskDTO, String subjectName) {
         Task task = taskDTO.toTask();
-        Subject subject = groupScopeDAO.findSubjectById(subjectId);
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
         if(subject != null) {
             task.setSubject(subject);
 
@@ -86,8 +91,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<TaskDTO> getAllTasksOfSubject(Long subjectId) {
-        Subject subject = groupScopeDAO.findSubjectById(subjectId);
+    public List<TaskDTO> getAllTasksOfSubject(SubjectDTO subjectDTO) {
+        Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
 
         return subject.getTasks()
                 .stream()
@@ -95,62 +100,74 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 .collect(Collectors.toList());
     }
 
+    // TODO rewrite
     @Override
     @Transactional
-    public void updateTask(TaskDTO taskDTO, Long subject_id) {
-        Task task = taskDTO.toTask();
-        task.setSubject(groupScopeDAO.findSubjectById(subject_id));
+    public void updateTask(TaskDTO taskDTO, String subjectName) {
+        Task task = groupScopeDAO.findTaskByName(taskDTO.getName());
+        task.setSubject(groupScopeDAO.findSubjectByName(subjectName));
+        if(taskDTO.getNewName() != null)
+            task.setName(taskDTO.getNewName());
+        if(taskDTO.getType() != null)
+            task.setType(taskDTO.getType());
+        if(taskDTO.getInfo() != null)
+            task.setInfo(taskDTO.getInfo());
+        if(taskDTO.getDeadline() != null)
+            task.setDeadline(taskDTO.getDeadline());
         groupScopeDAO.updateTask(task);
     }
 
     @Override
     @Transactional
     public void deleteTask(TaskDTO taskDTO) {
-        groupScopeDAO.deleteTaskById(taskDTO.getId());
+        Task task = groupScopeDAO.findTaskByName(taskDTO.getName());
+        groupScopeDAO.deleteTask(task);
     }
 
     @Transactional
     @Override
-    public void updateGrade(GradeDTO gradeDTO, Long learnerId) {
-        Learner learner = getStudentById(learnerId);
+    public void updateGrade(GradeDTO gradeDTO, Learner learner) {
+        if(learner.getLearningGroup().getSubjects() != null) {
+            Subject subject = learner.getLearningGroup().getSubjects().stream()
+                    .filter(subjectTmp -> subjectTmp.getName().equals(gradeDTO.getSubjectName()))
+                    .findFirst()
+                    .orElse(null);
+            if (subject != null && subject.getTasks() != null) {
+                Task task = subject.getTasks().stream()
+                        .filter(taskTmp -> taskTmp.getName().equals(gradeDTO.getTaskName()))
+                        .findFirst()
+                        .orElse(null);
+                if(task != null) {
+                    GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
 
-        Subject subject = learner.getLearningGroup().getSubjects().stream()
-                .filter(subjectTmp -> subjectTmp.getName().equals(gradeDTO.getSubjectName()))
-                .findFirst()
-                .orElse(null);
+                    learner.getGrades().stream()
+                            .filter(grade -> grade.getId().equals(gradeKey))
+                            .findFirst()
+                            .ifPresent(grade -> {
+                                grade.setCompletion(gradeDTO.getCompletion());
+                                grade.setMark(gradeDTO.getMark());
+                            });
 
-        Task task = subject.getTasks().stream()
-                .filter(taskTmp -> taskTmp.getName().equals(gradeDTO.getTaskName()))
-                .findFirst()
-                .orElse(null);
+                    task.getGrades().stream()
+                            .filter(grade -> grade.getId().equals(gradeKey))
+                            .findFirst()
+                            .ifPresent(grade -> {
+                                grade.setCompletion(gradeDTO.getCompletion());
+                                grade.setMark(gradeDTO.getMark());
+                            });
 
-        GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-
-        learner.getGrades().stream()
-                .filter(grade -> grade.getId().equals(gradeKey))
-                .findFirst()
-                .ifPresent(grade -> {
-                    grade.setCompletion(gradeDTO.getCompletion());
-                    grade.setMark(gradeDTO.getMark());
-                });
-
-        task.getGrades().stream()
-                .filter(grade -> grade.getId().equals(gradeKey))
-                .findFirst()
-                .ifPresent(grade -> {
-                    grade.setCompletion(gradeDTO.getCompletion());
-                    grade.setMark(gradeDTO.getMark());
-                });
-
-        groupScopeDAO.saveStudent(learner);
-        groupScopeDAO.saveTask(task);
+                    groupScopeDAO.saveStudent(learner);
+                    groupScopeDAO.saveTask(task);
+                }
+            }
+        }
     }
 
     @Override
     @Transactional
-    public void addStudent(LearnerDTO learnerDTO, Long groupId) {
+    public Learner addStudent(LearnerDTO learnerDTO, String inviteCode) {
         Learner learner = learnerDTO.toLearner();
-        LearningGroup learningGroup = groupScopeDAO.findGroupById(groupId);
+        LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
 
         if(learningGroup != null) {
             if(!learningGroup.getLearners().contains(learner)) {
@@ -165,10 +182,19 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         task.getGrades().add(grade);
                     }
                 }
-
-                groupScopeDAO.saveStudent(learner);
             }
+            return groupScopeDAO.saveStudent(learner);
+        } else {
+            return null;
         }
+    }
+
+    @Override
+    @Transactional
+    public Learner addFreeLearner(LearnerDTO learnerDTO) {
+        Learner learner = learnerDTO.toLearner();
+
+        return groupScopeDAO.saveStudent(learner);
     }
 
     @Override
@@ -178,32 +204,40 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void updateLearner(LearnerDTO learnerDTO, Long group_id) {
-
-        Learner learner = learnerDTO.toLearner();
-        learner.setLearningGroup(this.getGroupById(group_id));
-        learner.setGrades(this.getStudentById(learner.getId()).getGrades());
+    public void updateLearner(LearnerDTO learnerDTO, Learner learner) {
+        if(learnerDTO.getNewName() != null)
+            learner.setName(learnerDTO.getNewName());
+        if(learnerDTO.getNewLastname() != null)
+            learner.setLastname(learnerDTO.getLastname());
         groupScopeDAO.updateLearner(learner);
     }
 
     @Override
     @Transactional
     public void deleteLearner(LearnerDTO learnerDTO) {
-        groupScopeDAO.deleteLearnerById(learnerDTO.getId());
+        Learner learner = groupScopeDAO.findStudentByName(learnerDTO.getName());
+        groupScopeDAO.deleteLearner(learner);
     }
 
     @Override
     @Transactional
-    public void addGroup(LearningGroupDTO learningGroupDTO) {
+    public LearningGroup addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
         group.getHeadmen().setLearningGroup(group);
         if(!groupScopeDAO.getAllGroups().contains(group)) {
-            groupScopeDAO.saveGroup(group);
+            return groupScopeDAO.saveGroup(group);
+        } else {
+            return null;
         }
     }
 
     @Override
     public LearningGroup getGroupById(Long id) {
         return groupScopeDAO.findGroupById(id);
+    }
+
+    @Override
+    public LearningGroup getGroupByInviteCode(String inviteCode) {
+        return groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
     }
 }

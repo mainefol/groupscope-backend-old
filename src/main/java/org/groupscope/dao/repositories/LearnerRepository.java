@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LearnerRepository extends CrudRepository<Learner, Long> {
-
+    Learner getLearnerByName(String name);
 }

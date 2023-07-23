@@ -1,6 +1,7 @@
 package org.groupscope.entity;
 
 
+import lombok.Data;
 import org.groupscope.entity.grade.Grade;
 import org.hibernate.annotations.Type;
 
@@ -13,6 +14,7 @@ import java.util.Objects;
 * It`s a main entity, which will use in our project
 * */
 
+@Data
 @Entity
 @Table(name = "learners")
 public class Learner {
@@ -37,59 +39,19 @@ public class Learner {
     @JoinColumn(name = "group_id")
     private LearningGroup learningGroup;
 
-    @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Grade> grades;
 
     public Learner() {
-        //tasks = new ArrayList<>();
+        this.grades = new ArrayList<>();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public Learner(String name, String lastname, LearningRole role, LearningGroup learningGroup) {
         this.name = name;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    public LearningRole getRole() {
-        return role;
-    }
-
-    public void setRole(LearningRole role) {
         this.role = role;
-    }
-
-    public LearningGroup getLearningGroup() {
-        return learningGroup;
-    }
-
-    public void setLearningGroup(LearningGroup learningGroup) {
         this.learningGroup = learningGroup;
-    }
-
-    public List<Grade> getGrades() {
-        return grades;
-    }
-
-    public void setGrades(List<Grade> grades) {
-        this.grades = grades;
+        this.grades = new ArrayList<>();
     }
 
     @Override

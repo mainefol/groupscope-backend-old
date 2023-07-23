@@ -1,11 +1,14 @@
 package org.groupscope.entity;
 
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Data
 @Entity
 @Table(name = "subjects")
 public class Subject {
@@ -16,7 +19,7 @@ public class Subject {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "subject_id")
     private List<Task> tasks;
 
@@ -31,38 +34,6 @@ public class Subject {
     public Subject(String name) {
         this.name = name;
         tasks = new ArrayList<>();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public LearningGroup getGroup() {
-        return group;
-    }
-
-    public void setGroup(LearningGroup group) {
-        this.group = group;
     }
 
     @Override

@@ -14,12 +14,13 @@ public class TaskDTO {
 
     private String name;
 
+    private String newName;
+
     private TaskType type;
 
     private String info;
 
     private String deadline;
-
 
     public static TaskDTO from(Task task) {
         TaskDTO dto = new TaskDTO();

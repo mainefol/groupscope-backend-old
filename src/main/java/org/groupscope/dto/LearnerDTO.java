@@ -14,13 +14,27 @@ public class LearnerDTO {
 
     private String name;
 
+    private String newName;
+
     private String lastname;
+
+    private String newLastname;
 
     private LearningRole role;
 
     private String learningGroup;
 
     private List<GradeDTO> grades;
+
+    public LearnerDTO() {
+
+    }
+
+    public LearnerDTO(String name, String lastname, LearningRole role) {
+        this.name = name;
+        this.lastname = lastname;
+        this.role = role;
+    }
 
     public static LearnerDTO from(Learner learner) {
         LearnerDTO dto = new LearnerDTO();
@@ -29,14 +43,17 @@ public class LearnerDTO {
         dto.setLastname(learner.getLastname());
         dto.setRole(learner.getRole());
 
-        dto.setLearningGroup(learner.getLearningGroup().toString());
+        if(learner.getLearningGroup() != null) {
+            dto.setLearningGroup(learner.getLearningGroup().toString());
+        }
 
-        List<GradeDTO> gradeDTOList = learner.getGrades().stream()
-                        .map(GradeDTO::from)
-                        .collect(Collectors.toList());
+        if(learner.getGrades() != null) {
+            List<GradeDTO> gradeDTOList = learner.getGrades().stream()
+                    .map(GradeDTO::from)
+                    .collect(Collectors.toList());
 
-        dto.setGrades(gradeDTOList);
-
+            dto.setGrades(gradeDTOList);
+        }
         return dto;
     }
 

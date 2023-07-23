@@ -15,16 +15,27 @@ public class LearningGroupDTO {
 
     private String name;
 
+    private String inviteCode;
+
     private LearnerDTO headmen;
 
     private List<SubjectDTO> subjects;
 
     private List<LearnerDTO> learners;
 
+    public LearningGroupDTO() {
+    }
+
+    public LearningGroupDTO(String name, LearnerDTO headmen) {
+        this.name = name;
+        this.headmen = headmen;
+    }
+
     public static LearningGroupDTO from(LearningGroup learningGroup) {
         LearningGroupDTO dto = new LearningGroupDTO();
         dto.setId(learningGroup.getId());
         dto.setName(learningGroup.getName());
+        dto.setInviteCode(learningGroup.getInviteCode());
         dto.setHeadmen(LearnerDTO.from(learningGroup.getHeadmen()));
 
         List<SubjectDTO> subjectDTOList = learningGroup.getSubjects().stream()

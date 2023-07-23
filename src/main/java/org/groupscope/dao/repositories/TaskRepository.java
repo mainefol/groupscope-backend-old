@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends CrudRepository<Task,Long> {
     List<Task> findTasksBySubject(Subject subject);
+
+    Task getTaskByName(String name);
 }

@@ -15,6 +15,8 @@ public class SubjectDTO {
 
     private String name;
 
+    private String newName;
+
     private List<TaskDTO> tasks;
 
     private String group;

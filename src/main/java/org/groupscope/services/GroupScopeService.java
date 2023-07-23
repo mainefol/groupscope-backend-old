@@ -7,40 +7,45 @@ import java.util.List;
 
 public interface GroupScopeService {
 
-    void addSubject(SubjectDTO subjectDTO, Long group_id);
+    void addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
 
     Subject getSubjectByName(String subjectName);
 
     List<Subject> getAllSubjects();
 
-    void updateSubject(SubjectDTO subjectDTO, Long group_id);
+    void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
 
     void deleteSubject(SubjectDTO subjectDTO);
 
     ///////////////////////////////////////////////////
-    void addTask(TaskDTO taskDTO, Long subjectId);
+    void addTask(TaskDTO taskDTO, String subjectName);
 
-    List<TaskDTO> getAllTasksOfSubject(Long subjectId);
+    List<TaskDTO> getAllTasksOfSubject(SubjectDTO subjectDTO);
 
-    void updateTask(TaskDTO taskDTO, Long subject_id);
+    void updateTask(TaskDTO taskDTO, String subjectName);
 
     void deleteTask(TaskDTO taskDTO);
 
     ///////////////////////////////////////////////////
-    void updateGrade(GradeDTO gradeDTO, Long learnerId);
+    void updateGrade(GradeDTO gradeDTO, Learner learner);
 
     ///////////////////////////////////////////////////
-    void addStudent(LearnerDTO learnerDTO, Long group_id);
+
+    Learner addStudent(LearnerDTO learnerDTO, String inviteCode);
+
+    Learner addFreeLearner(LearnerDTO learnerDTO);
 
     Learner getStudentById(Long id);
 
-    void updateLearner(LearnerDTO learnerDTO, Long group_id);
+    void updateLearner(LearnerDTO learnerDTO, Learner learner);
 
     void deleteLearner(LearnerDTO learnerDTO);
 
     ///////////////////////////////////////////////////
-    void addGroup(LearningGroupDTO learningGroupDTO);
+    LearningGroup addGroup(LearningGroupDTO learningGroupDTO);
 
     LearningGroup getGroupById(Long id);
+
+    LearningGroup getGroupByInviteCode(String inviteCode);
 
 }

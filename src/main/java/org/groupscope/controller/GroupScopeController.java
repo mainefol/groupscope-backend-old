@@ -4,39 +4,37 @@ package org.groupscope.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dto.*;
 import org.groupscope.entity.*;
+import org.groupscope.security.auth.CustomUser;
 import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
-* TODO Divide the controller class into several small ones, like:
-*                               GroupScopeController
-*    |                            |                    |                            |
-*   \/                           \/                   \/                           \/
-*  LearnerController        TaskController          ...                           ...
-* */
+
 @Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/")
 public class GroupScopeController {
 
-    private GroupScopeService groupScopeService;
+    private final GroupScopeService groupScopeService;
 
     @Autowired
     public GroupScopeController(GroupScopeService groupScopeService) {
         this.groupScopeService = groupScopeService;
     }
 
-    @GetMapping("/getSubjects")
+    @GetMapping("/subjects")
     public ResponseEntity<List<SubjectDTO>> getSubjects() {
         try {
-            List<SubjectDTO> subjects = groupScopeService.getAllSubjects()
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            LearningGroup group = user.getLearner().getLearningGroup();
+            List<SubjectDTO> subjects = group.getSubjects()
                     .stream()
                     .map(SubjectDTO::from)
                     .collect(Collectors.toList());
@@ -47,45 +45,60 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/{id}/addSubject")
-    public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO,
-                                                 @PathVariable("id") Long groupId) {
+    @PostMapping("/subject/add")
+    public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-            groupScopeService.addSubject(subjectDTO, groupId);
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.addSubject(subjectDTO, user.getLearner().getLearningGroup());
 
-            return ResponseEntity.ok().build();
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    @PatchMapping("/{id}/patchSubject")
-    public ResponseEntity<HttpStatus> patchSubject(@RequestBody SubjectDTO subjectDTO,
-                                                   @PathVariable("id") Long groupId) {
+    @PatchMapping("/subject/patch")
+    public ResponseEntity<HttpStatus> patchSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-            groupScopeService.updateSubject(subjectDTO, groupId);
-            return ResponseEntity.ok().build();
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.updateSubject(subjectDTO, user.getLearner().getLearningGroup());
+
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    // Process dto class with only filled id field
-    @DeleteMapping("/deleteSubject")
+    // Process dto class with only filled name field
+    @DeleteMapping("/subject/delete")
     public ResponseEntity<HttpStatus> deleteSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-            groupScopeService.deleteSubject(subjectDTO);
-            return ResponseEntity.ok().build();
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.deleteSubject(subjectDTO);
+
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    // TODO rework subject_name
-    @GetMapping("/getTasksOfSubject/{subjectId}")
-    public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subjectId") Long subjectId) {
+    // Process dto class with only filled name field
+    @GetMapping("/subject/tasks")
+    public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectId);
+            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectDTO);
 
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
@@ -93,55 +106,69 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/addTask/{subjectId}")
+    @PostMapping("/{subject-name}/task/add")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
-                                              @PathVariable("subjectId") Long subjectId) {
+                                              @PathVariable("subject-name") String subjectName) {
         try {
-            groupScopeService.addTask(taskDTO, subjectId);
-            return ResponseEntity.ok().build(); // return "ok" to client
+            groupScopeService.addTask(taskDTO, subjectName);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/patchTask/{id}")
+    @PatchMapping("/{subject-name}/task/patch")
     public ResponseEntity<HttpStatus> patchTask(@RequestBody TaskDTO taskDTO,
-                                                @PathVariable("id") Long subjectId) {
+                                                @PathVariable("subject-name") String subjectName) {
         try {
-            groupScopeService.updateTask(taskDTO, subjectId);
-            return ResponseEntity.ok().build();
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.updateTask(taskDTO, subjectName);
+
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     // Process dto class with only filled name field
-    @DeleteMapping("/deleteTask")
-    public ResponseEntity<HttpStatus> deleteTask(@RequestBody TaskDTO taskDTO) {
+    @DeleteMapping("/{subject-name}/task/delete")
+    public ResponseEntity<HttpStatus> deleteTask(@RequestBody TaskDTO taskDTO,
+                                                 @PathVariable("subject-name") String subjectName) {
         try {
-            groupScopeService.deleteTask(taskDTO);
-            return ResponseEntity.ok().build();
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.deleteTask(taskDTO);
+
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @GetMapping("/getStudent/{id}")
-    public ResponseEntity<LearnerDTO> getStudent(@PathVariable("id") Long id) {
+    @GetMapping("/student")
+    public ResponseEntity<LearnerDTO> getStudent() {
         try {
-            LearnerDTO learner = LearnerDTO.from(groupScopeService.getStudentById(id));
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            LearnerDTO learnerDTO = LearnerDTO.from(user.getLearner());
 
-            return ResponseEntity.ok(learner);
+            return ResponseEntity.ok(learnerDTO);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PostMapping("/addStudent/{id}")
-    public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO,
-                                                 @PathVariable("id") Long groupId) {
+    // Now it`s not working
+    @PostMapping("/student/add")
+    public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
-            groupScopeService.addStudent(learnerDTO, groupId);
+            //groupScopeService.addStudent(learnerDTO, groupId);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -149,18 +176,18 @@ public class GroupScopeController {
         }
     }
 
-    @PatchMapping("/patchStudent/{id}")
-    public ResponseEntity<HttpStatus> updateStudent(@RequestBody LearnerDTO learnerDTO,
-                                                    @PathVariable("id") Long groupId) {
+    @PatchMapping("/student/patch")
+    public ResponseEntity<HttpStatus> updateStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
-            groupScopeService.updateLearner(learnerDTO, groupId);
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            groupScopeService.updateLearner(learnerDTO, user.getLearner());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @DeleteMapping("/deleteStudent")
+    @DeleteMapping("/student/delete")
     public ResponseEntity<HttpStatus> deleteStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
             groupScopeService.deleteLearner(learnerDTO);
@@ -170,35 +197,24 @@ public class GroupScopeController {
         }
     }
 
-
-    @GetMapping("/getGroup/{id}")
-    public ResponseEntity<LearningGroupDTO> getGroup(@PathVariable("id") Long id) {
+    @GetMapping("/group")
+    public ResponseEntity<LearningGroupDTO> getGroup() {
         try {
-            LearningGroupDTO learningGroupDTO = LearningGroupDTO.from(groupScopeService.getGroupById(id));
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            LearningGroupDTO learningGroupDTO = LearningGroupDTO.from(user.getLearner().getLearningGroup());
 
             return ResponseEntity.ok(learningGroupDTO);
         } catch (Exception e) {
+            log.info("Error: " + e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PostMapping("/addGroup")
-    public ResponseEntity<HttpStatus> addGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
+    @PostMapping("/grade")
+    public ResponseEntity<HttpStatus> updateGrade(@RequestBody GradeDTO gradeDTO) {
         try {
-            groupScopeService.addGroup(learningGroupDTO);
-
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.info("ERROR: " + e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PostMapping("/updateGrade/{id}")
-    public ResponseEntity<HttpStatus> updateGrade(@RequestBody GradeDTO gradeDTO,
-                                               @PathVariable("id") Long learnerId) {
-        try {
-            groupScopeService.updateGrade(gradeDTO, learnerId);
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            groupScopeService.updateGrade(gradeDTO, user.getLearner());
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -206,11 +222,11 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/updateGrades/{id}")
-    public ResponseEntity<HttpStatus> updateGrades(@RequestBody List<GradeDTO> gradeDTOs,
-                                                  @PathVariable("id") Long learnerId) {
+    @PostMapping("/grades")
+    public ResponseEntity<HttpStatus> updateGrades(@RequestBody List<GradeDTO> gradeDTOs) {
         try {
-            gradeDTOs.forEach(gradeDTO -> groupScopeService.updateGrade(gradeDTO, learnerId));
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            gradeDTOs.forEach(gradeDTO -> groupScopeService.updateGrade(gradeDTO, user.getLearner()));
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

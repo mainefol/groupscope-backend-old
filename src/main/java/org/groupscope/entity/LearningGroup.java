@@ -1,14 +1,19 @@
 package org.groupscope.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /*
-* This class extends from LearnerManager and allow to unite and manage our group of learners
+* This class allows to unite and manage our group of learners
 * */
 
+@Data
 @Entity
 @Table(name = "groups")
 public class LearningGroup {
@@ -20,69 +25,35 @@ public class LearningGroup {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "code")
+    private String inviteCode;
+
     // Every group have a headman
     @OneToOne(cascade = CascadeType.ALL, targetEntity = Learner.class)
     @JoinColumn(name = "headmen_id")
     private Learner headmen;
 
     // Every group have subjects that the headmen has made
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id")
     private List<Subject> subjects;
 
-    @OneToMany(cascade = CascadeType.ALL, targetEntity = Learner.class)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Learner.class)
     @JoinColumn(name = "group_id")
     private List<Learner> learners;
 
     public LearningGroup() {
-        //this.learners = new ArrayList<>();
-        //this.subjects = new ArrayList<>();
+        SecureRandom secureRandom = new SecureRandom();
+        this.inviteCode = new BigInteger(32, secureRandom).toString(32);
+        this.subjects = new ArrayList<>();
     }
 
     public LearningGroup(String groupName) {
-        //this.learners = new ArrayList<>();
-        //this.subjects = new ArrayList<>();
         this.name = groupName;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Learner getHeadmen() {
-        return headmen;
-    }
-
-    public void setHeadmen(Learner headmen) {
-        this.headmen = headmen;
-    }
-
-    public List<Subject> getSubjects() {
-        return subjects;
-    }
-
-    public void setSubjects(List<Subject> subjects) {
-        this.subjects = subjects;
-    }
-
-    public List<Learner> getLearners() {
-        return learners;
-    }
-
-    public void setLearners(List<Learner> learners) {
-        this.learners = learners;
+        SecureRandom secureRandom = new SecureRandom();
+        this.inviteCode = new BigInteger(32, secureRandom).toString(32);
+        this.subjects = new ArrayList<>();
     }
 
     @Override
@@ -95,11 +66,11 @@ public class LearningGroup {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LearningGroup that = (LearningGroup) o;
-        return Objects.equals(name, that.name);
+        return Objects.equals(name, that.name) && Objects.equals(inviteCode, that.inviteCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, inviteCode);
     }
 }
