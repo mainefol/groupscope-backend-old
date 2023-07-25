@@ -44,7 +44,7 @@ public class LearningGroup {
 
     public LearningGroup() {
         SecureRandom secureRandom = new SecureRandom();
-        this.inviteCode = new BigInteger(32, secureRandom).toString(32);
+        this.inviteCode = new BigInteger(32, secureRandom).toString(32) + this.getId().toString();
         this.subjects = new ArrayList<>();
     }
 
@@ -52,7 +52,7 @@ public class LearningGroup {
         this.name = groupName;
 
         SecureRandom secureRandom = new SecureRandom();
-        this.inviteCode = new BigInteger(32, secureRandom).toString(32);
+        this.inviteCode = new BigInteger(32, secureRandom).toString(32) + this.getId().toString();
         this.subjects = new ArrayList<>();
     }
 

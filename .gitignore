@@ -1,4 +1,19 @@
-# Default ignored files
-.idea
+HELP.md
+/target/
+!.mvn/wrapper/maven-wrapper.jar
 
-/*.properties
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.properties
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class GroupScopeServiceImpl implements GroupScopeService{
 
-    private GroupScopeDAO groupScopeDAO;
+    private final GroupScopeDAO groupScopeDAO;
 
     @Autowired
     public GroupScopeServiceImpl(GroupScopeDAO groupScopeDAO) {
@@ -100,7 +100,6 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 .collect(Collectors.toList());
     }
 
-    // TODO rewrite
     @Override
     @Transactional
     public void updateTask(TaskDTO taskDTO, String subjectName) {
@@ -124,8 +123,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         groupScopeDAO.deleteTask(task);
     }
 
-    @Transactional
+
     @Override
+    @Transactional
     public void updateGrade(GradeDTO gradeDTO, Learner learner) {
         if(learner.getLearningGroup().getSubjects() != null) {
             Subject subject = learner.getLearningGroup().getSubjects().stream()

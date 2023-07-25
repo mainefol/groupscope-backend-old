@@ -56,7 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth")
-    public ResponseEntity<AuthResponse> auth(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest request) {
         CustomUser user = customUserService.findByLoginAndPassword(request.getLogin(), request.getPassword());
         if(user != null) {
             String token = jwtProvider.generateToken(user.getLogin());
