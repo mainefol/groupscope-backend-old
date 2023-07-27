@@ -76,6 +76,6 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, info, deadline, subject, grades);
+        return Objects.hash(id, name, type, info, deadline, subject);
     }
 }

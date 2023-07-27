@@ -53,11 +53,12 @@ public class Subject {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Subject subject = (Subject) o;
-        return Objects.equals(name, subject.name);
+        return Objects.equals(name, subject.name) &&
+                Objects.equals(group, subject.group);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(id, name, group);
     }
 }

@@ -70,11 +70,14 @@ public class Learner {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Learner learner = (Learner) o;
-        return Objects.equals(name, learner.name) && Objects.equals(lastname, learner.lastname) && role == learner.role && Objects.equals(learningGroup, learner.learningGroup);
+        return Objects.equals(name, learner.name) &&
+                Objects.equals(lastname, learner.lastname) &&
+                role == learner.role &&
+                Objects.equals(learningGroup, learner.learningGroup);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, lastname, role, learningGroup, grades);
+        return Objects.hash(id, name, lastname, role, learningGroup);
     }
 }
