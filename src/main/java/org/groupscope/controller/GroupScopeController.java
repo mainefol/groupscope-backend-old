@@ -41,7 +41,7 @@ public class GroupScopeController {
 
             return ResponseEntity.ok(subjects);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -102,7 +102,7 @@ public class GroupScopeController {
 
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -113,7 +113,7 @@ public class GroupScopeController {
             groupScopeService.addTask(taskDTO, subjectName);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -160,11 +160,11 @@ public class GroupScopeController {
 
             return ResponseEntity.ok(learnerDTO);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    // Now it`s not working
+    // It maybe will be in service in the future
     @PostMapping("/student/add")
     public ResponseEntity<HttpStatus> addStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
@@ -172,7 +172,7 @@ public class GroupScopeController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -193,7 +193,7 @@ public class GroupScopeController {
             groupScopeService.deleteLearner(learnerDTO);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -206,7 +206,7 @@ public class GroupScopeController {
             return ResponseEntity.ok(learningGroupDTO);
         } catch (Exception e) {
             log.info("Error: " + e.getMessage());
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -218,7 +218,7 @@ public class GroupScopeController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -230,7 +230,7 @@ public class GroupScopeController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

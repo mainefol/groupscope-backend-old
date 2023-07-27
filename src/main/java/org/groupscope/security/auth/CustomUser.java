@@ -12,6 +12,11 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
+/*
+ * This class represents a custom user entity for authentication and authorization in the system.
+ * It implements the UserDetails interface required by Spring Security for user authentication.
+ */
+
 @Entity
 @Data
 @Table(name = "users")
@@ -28,10 +33,12 @@ public class CustomUser implements UserDetails {
     @Column
     private String password;
 
+    // The authentication provider of the user (e.g., LOCAL or GOOGLE).
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     private Provider provider;
 
+    // One-to-one relationship with the Learner entity. Each user has a corresponding learner.
     @OneToOne
     @JoinColumn(name = "learner_id")
     private Learner learner;

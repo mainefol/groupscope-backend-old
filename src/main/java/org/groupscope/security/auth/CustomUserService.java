@@ -37,13 +37,20 @@ public class CustomUserService {
         this.groupScopeService = groupScopeService;
     }
 
+    /*
+     * Saves the custom user to the repository and performs additional actions based on the registration request.
+     * If a user is registering with an invite code, they will be added to an existing group.
+     * If a user is registering with a group name, a new group will be created and the user will be set as the headman.
+     * If a user is registering without a group addition, they will be registered as a free learner.
+     * Returns the saved custom user or null if the user couldn't be saved.
+     */
     public CustomUser saveUser(CustomUser customUser, RegistrationRequest request, Provider provider) {
         if(customUser.getPassword() != null) {
             customUser.setPassword(passwordEncoder.encode(customUser.getPassword()));
         }
         customUser.setProvider(provider);
 
-        // Add new learner to existing group
+        // Add new learner to an existing group based on the invite code
         if(request.getInviteCode() != null) {
             LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
                     request.getLearnerLastname(),
@@ -55,7 +62,7 @@ public class CustomUserService {
             } else {
                 return null;
             }
-        // Add new learner and create new group
+        // Add new learner and create a new group
         } else if (request.getGroupName() != null) {
             LearnerDTO headman = new LearnerDTO(request.getLearnerName(),
                     request.getLearnerLastname(),
@@ -83,10 +90,18 @@ public class CustomUserService {
         }
     }
 
+    /*
+     * Find a custom user by their login (username).
+     * Returns the custom user if found, or null if not found.
+     */
     public CustomUser findByLogin(String login) {
         return customUserRepository.findByLogin(login);
     }
 
+    /*
+     * Find a custom user by their login (username) and password.
+     * Returns the custom user if found and the provided password matches the stored password, or null if not found or password doesn't match.
+     */
     public CustomUser findByLoginAndPassword(String login, String password) {
         CustomUser customUser = findByLogin(login);
         if(customUser != null) {

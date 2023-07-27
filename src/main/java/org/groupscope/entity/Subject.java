@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/*
+ * This class represents a subject in the learning system.
+ * Each subject can have multiple tasks associated with it and belongs to a specific learning group.
+ */
+
 @Data
 @Entity
 @Table(name = "subjects")
@@ -19,10 +24,12 @@ public class Subject {
     @Column(name = "name")
     private String name;
 
+    // One-to-many relationship with the Task entity. Each subject can have multiple tasks.
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "subject_id")
     private List<Task> tasks;
 
+    // Many-to-one relationship with the LearningGroup entity. Each subject belongs to a group.
     @ManyToOne
     @JoinColumn(name = "group_id")
     private LearningGroup group;

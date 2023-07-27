@@ -17,6 +17,11 @@ import java.io.IOException;
 
 import static org.springframework.util.StringUtils.hasText;
 
+/*
+ * This class is a JwtFilter responsible for authenticating and authorizing requests using JWT tokens.
+ * It intercepts incoming requests, extracts JWT tokens, validates them, and sets the user authentication in the security context.
+ */
+
 @Component
 public class JwtFilter extends GenericFilterBean {
 
@@ -32,6 +37,10 @@ public class JwtFilter extends GenericFilterBean {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+    /*
+     * This method intercepts incoming requests, extracts the JWT token from the "Authorization" header,
+     * validates the token, and sets the user authentication in the security context.
+     */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
@@ -45,6 +54,10 @@ public class JwtFilter extends GenericFilterBean {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
+    /*
+     * Extracts the JWT token from the "Authorization" header of the HTTP request.
+     * Returns the extracted token or null if no token is found.
+     */
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader(AUTHORIZATION);
         if(hasText(bearer) && bearer.startsWith("Bearer ")) {

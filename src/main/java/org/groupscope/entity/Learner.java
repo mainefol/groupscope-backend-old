@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Objects;
 
 /*
-* It`s a main entity, which will use in our project
-* */
+ * It`s a main entity, which will use in our project.
+ * This class represents a learner (student) in the system.
+ */
 
 @Data
 @Entity
@@ -39,6 +40,7 @@ public class Learner {
     @JoinColumn(name = "group_id")
     private LearningGroup learningGroup;
 
+    // One-to-many relationship with the Grade entity. Each learner can have multiple grades.
     @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Grade> grades;
 

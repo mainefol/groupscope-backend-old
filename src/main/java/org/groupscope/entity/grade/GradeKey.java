@@ -7,6 +7,11 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+/*
+ * This class represents the composite primary key for the Grade entity.
+ * It is used to uniquely identify each grade, based on the combination of learnerId and taskId.
+ */
+
 @Data
 @Embeddable
 public class GradeKey implements Serializable {

@@ -7,25 +7,35 @@ import org.groupscope.entity.Task;
 import javax.persistence.*;
 import java.util.Objects;
 
+/*
+ * This class represents a grade for a specific task given to a learner.
+ * It contains information such as the learner, the task, completion status, and the mark.
+ */
+
 @Data
 @Entity
 public class Grade {
+    // EmbeddedId annotation indicates that this entity has a composite primary key (GradeKey).
     @EmbeddedId
     GradeKey id;
 
+    // Many-to-one relationship with the Learner entity. Each grade is associated with a learner.
     @ManyToOne
     @MapsId("learnerId")
     @JoinColumn(name = "learner_id")
     Learner learner;
 
+    // Many-to-one relationship with the Task entity. Each grade is associated with a task.
     @ManyToOne
     @MapsId("taskId")
     @JoinColumn(name = "task_id")
     Task task;
 
+    // Indicates if the task has been completed by the learner.
     @Column(name = "completion")
     private Boolean completion;
 
+    // The grade/mark received by the learner for the task.
     @Column(name = "mark")
     private Integer mark;
 

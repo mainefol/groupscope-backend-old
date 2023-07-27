@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Objects;
 
 /*
-* This class allows to unite and manage our group of learners
-* */
+ * This class allows to unite and manage our group of learners.
+ * Represents a learning group that contains learners and subjects.
+ */
 
 @Data
 @Entity
@@ -33,16 +34,18 @@ public class LearningGroup {
     @JoinColumn(name = "headmen_id")
     private Learner headmen;
 
-    // Every group have subjects that the headmen has made
+    // Every group has subjects that the headmen has added
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id")
     private List<Subject> subjects;
 
+    // List of learners in the group.
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Learner.class)
     @JoinColumn(name = "group_id")
     private List<Learner> learners;
 
     public LearningGroup() {
+        // Generate a random invite code for the group.
         SecureRandom secureRandom = new SecureRandom();
         this.inviteCode = new BigInteger(32, secureRandom).toString(32) + this.getId().toString();
         this.subjects = new ArrayList<>();
@@ -51,6 +54,7 @@ public class LearningGroup {
     public LearningGroup(String groupName) {
         this.name = groupName;
 
+        // Generate a random invite code for the group.
         SecureRandom secureRandom = new SecureRandom();
         this.inviteCode = new BigInteger(32, secureRandom).toString(32) + this.getId().toString();
         this.subjects = new ArrayList<>();
