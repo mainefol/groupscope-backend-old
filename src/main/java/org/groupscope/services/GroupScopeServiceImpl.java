@@ -35,7 +35,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 groupScopeDAO.saveSubject(subject);
             }
         }
-        // TODO: Make exception for duplicate
+        throw new NullPointerException();
     }
 
     @Override
@@ -123,44 +123,32 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         groupScopeDAO.deleteTask(task);
     }
 
-
     @Override
     @Transactional
     public void updateGrade(GradeDTO gradeDTO, Learner learner) {
-        if(learner.getLearningGroup().getSubjects() != null) {
-            Subject subject = learner.getLearningGroup().getSubjects().stream()
-                    .filter(subjectTmp -> subjectTmp.getName().equals(gradeDTO.getSubjectName()))
-                    .findFirst()
-                    .orElse(null);
-            if (subject != null && subject.getTasks() != null) {
-                Task task = subject.getTasks().stream()
-                        .filter(taskTmp -> taskTmp.getName().equals(gradeDTO.getTaskName()))
+        Task task = groupScopeDAO.findTaskByName(gradeDTO.getTaskName());
+        Subject subject = groupScopeDAO.findSubjectByName(gradeDTO.getSubjectName());
+            if(task != null && subject.equals(task.getSubject())) {
+                GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                learner.getGrades().stream()
+                        .filter(grade -> grade.getId().equals(gradeKey))
                         .findFirst()
-                        .orElse(null);
-                if(task != null) {
-                    GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                        .ifPresent(grade -> {
+                            grade.setCompletion(gradeDTO.getCompletion());
+                            grade.setMark(gradeDTO.getMark());
+                        });
 
-                    learner.getGrades().stream()
-                            .filter(grade -> grade.getId().equals(gradeKey))
-                            .findFirst()
-                            .ifPresent(grade -> {
-                                grade.setCompletion(gradeDTO.getCompletion());
-                                grade.setMark(gradeDTO.getMark());
-                            });
+                task.getGrades().stream()
+                        .filter(grade -> grade.getId().equals(gradeKey))
+                        .findFirst()
+                        .ifPresent(grade -> {
+                            grade.setCompletion(gradeDTO.getCompletion());
+                            grade.setMark(gradeDTO.getMark());
+                        });
 
-                    task.getGrades().stream()
-                            .filter(grade -> grade.getId().equals(gradeKey))
-                            .findFirst()
-                            .ifPresent(grade -> {
-                                grade.setCompletion(gradeDTO.getCompletion());
-                                grade.setMark(gradeDTO.getMark());
-                            });
-
-                    groupScopeDAO.saveStudent(learner);
-                    groupScopeDAO.saveTask(task);
+                groupScopeDAO.saveStudent(learner);
+                groupScopeDAO.saveTask(task);
                 }
-            }
-        }
     }
 
     @Override

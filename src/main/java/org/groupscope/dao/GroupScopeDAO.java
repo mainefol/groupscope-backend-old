@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GroupScopeDAO {
 
-    void saveSubject(Subject subject);
+    Subject saveSubject(Subject subject);
 
     Subject findSubjectByName(String subjectName);
 

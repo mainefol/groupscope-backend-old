@@ -5,8 +5,6 @@ import org.groupscope.dao.repositories.LearnerRepository;
 import org.groupscope.dao.repositories.LearningGroupRepository;
 import org.groupscope.dao.repositories.SubjectRepository;
 import org.groupscope.dao.repositories.TaskRepository;
-import org.groupscope.dto.GradeDTO;
-import org.groupscope.dto.TaskDTO;
 import org.groupscope.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,9 +36,11 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public void saveSubject(Subject subject) {
-        subjectRepository.save(subject);
-        log.info("Subject: " + subject.toString() + " saved/updated");
+    public Subject saveSubject(Subject subject) {
+        Subject result = subjectRepository.save(subject);
+        if(result != null)
+            log.info("Subject: " + subject.toString() + " saved/updated");
+        return result;
     }
 
     @Override
@@ -119,11 +119,11 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public Learner saveStudent(Learner learner) {
-        Learner learner1 =  learnerRepository.save(learner);
-        if(learner1 != null) {
+        Learner result =  learnerRepository.save(learner);
+        if(result != null) {
             log.info("Learner " + learner.toString() + " saved");
         }
-        return learner;
+        return result;
     }
 
     @Override
