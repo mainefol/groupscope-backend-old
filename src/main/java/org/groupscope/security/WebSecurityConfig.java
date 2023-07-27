@@ -29,8 +29,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/subjects/*", "/tasks/*").hasAuthority(LearningRole.STUDENT.name())
-                .antMatchers("/group/*").hasAuthority(LearningRole.HEADMAN.name())
+                .antMatchers("/subjects", "/subject/*", "/task/*", "/student/*", "/grade", "/grades")
+                .hasAuthority(LearningRole.STUDENT.name())
+                .antMatchers("/subjects", "/subject/*", "/task/*", "/student/*", "/grade", "/grades", "/group/*")
+                .hasAuthority(LearningRole.HEADMAN.name())
                 .antMatchers("/register", "/auth").permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
