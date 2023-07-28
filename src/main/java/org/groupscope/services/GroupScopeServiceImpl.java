@@ -35,7 +35,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 groupScopeDAO.saveSubject(subject);
             }
         }
-        throw new NullPointerException();
+        else
+            throw new NullPointerException();
     }
 
     @Override
@@ -47,19 +48,26 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
-        if(subjectDTO.getNewName() != null) {
-            subject.setName(subjectDTO.getNewName());
+        if(subject != null) {
+            if (subjectDTO.getNewName() != null) {
+                subject.setName(subjectDTO.getNewName());
+            }
+            subjectDTO.setId(subject.getId());
+            subject.setGroup(learningGroup);
+            groupScopeDAO.updateSubject(subject);
         }
-        subjectDTO.setId(subject.getId());
-        subject.setGroup(learningGroup);
-        groupScopeDAO.updateSubject(subject);
+        else
+            throw new NullPointerException();
     }
 
     @Override
     @Transactional
     public void deleteSubject(SubjectDTO subjectDTO) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
-        groupScopeDAO.deleteSubject(subject);
+        if (subject != null)
+            groupScopeDAO.deleteSubject(subject);
+        else
+            throw new NullPointerException();
     }
 
     @Override
@@ -88,39 +96,53 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 groupScopeDAO.saveTask(task);
             }
         }
+        else
+            throw new NullPointerException();
     }
 
     @Override
     public List<TaskDTO> getAllTasksOfSubject(SubjectDTO subjectDTO) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
 
-        return subject.getTasks()
-                .stream()
-                .map(TaskDTO::from)
-                .collect(Collectors.toList());
+        if(subject != null) {
+            return subject.getTasks()
+                    .stream()
+                    .map(TaskDTO::from)
+                    .collect(Collectors.toList());
+        }
+        else
+            throw new NullPointerException();
     }
 
     @Override
     @Transactional
     public void updateTask(TaskDTO taskDTO, String subjectName) {
         Task task = groupScopeDAO.findTaskByName(taskDTO.getName());
-        task.setSubject(groupScopeDAO.findSubjectByName(subjectName));
-        if(taskDTO.getNewName() != null)
-            task.setName(taskDTO.getNewName());
-        if(taskDTO.getType() != null)
-            task.setType(taskDTO.getType());
-        if(taskDTO.getInfo() != null)
-            task.setInfo(taskDTO.getInfo());
-        if(taskDTO.getDeadline() != null)
-            task.setDeadline(taskDTO.getDeadline());
-        groupScopeDAO.updateTask(task);
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+        if (task != null && subject != null) {
+            task.setSubject(subject);
+            if (taskDTO.getNewName() != null)
+                task.setName(taskDTO.getNewName());
+            if (taskDTO.getType() != null)
+                task.setType(taskDTO.getType());
+            if (taskDTO.getInfo() != null)
+                task.setInfo(taskDTO.getInfo());
+            if (taskDTO.getDeadline() != null)
+                task.setDeadline(taskDTO.getDeadline());
+            groupScopeDAO.updateTask(task);
+        }
+        else
+            throw new NullPointerException();
     }
 
     @Override
     @Transactional
     public void deleteTask(TaskDTO taskDTO) {
         Task task = groupScopeDAO.findTaskByName(taskDTO.getName());
-        groupScopeDAO.deleteTask(task);
+        if (task != null)
+            groupScopeDAO.deleteTask(task);
+        else
+            throw new NullPointerException();
     }
 
     @Override
@@ -148,7 +170,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
                 groupScopeDAO.saveStudent(learner);
                 groupScopeDAO.saveTask(task);
-                }
+            }
+            else
+                throw new NullPointerException();
     }
 
     @Override
@@ -204,7 +228,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public void deleteLearner(LearnerDTO learnerDTO) {
         Learner learner = groupScopeDAO.findStudentByName(learnerDTO.getName());
-        groupScopeDAO.deleteLearner(learner);
+        if(learner != null)
+            groupScopeDAO.deleteLearner(learner);
+        else
+            throw new NullPointerException();
     }
 
     @Override
@@ -212,6 +239,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public LearningGroup addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
         group.getHeadmen().setLearningGroup(group);
+        group.generateInviteCode();
         if(!groupScopeDAO.getAllGroups().contains(group)) {
             return groupScopeDAO.saveGroup(group);
         } else {

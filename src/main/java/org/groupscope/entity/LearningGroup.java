@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,19 +46,21 @@ public class LearningGroup {
     private List<Learner> learners;
 
     public LearningGroup() {
-        // Generate a random invite code for the group.
-        SecureRandom secureRandom = new SecureRandom();
-        this.inviteCode = new BigInteger(32, secureRandom).toString(32) + this.getId().toString();
         this.subjects = new ArrayList<>();
     }
 
     public LearningGroup(String groupName) {
         this.name = groupName;
-
-        // Generate a random invite code for the group.
-        SecureRandom secureRandom = new SecureRandom();
-        this.inviteCode = new BigInteger(32, secureRandom).toString(32) + this.getId().toString();
         this.subjects = new ArrayList<>();
+    }
+
+    // Generate a random invite code for the group.
+    public void generateInviteCode(){
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(this.id);
+
+        SecureRandom secureRandom = new SecureRandom(buffer.array());
+        this.inviteCode = new BigInteger(32, secureRandom).toString(32);
     }
 
     @Override

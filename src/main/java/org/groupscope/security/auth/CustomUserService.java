@@ -13,6 +13,7 @@ import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -44,6 +45,7 @@ public class CustomUserService {
      * If a user is registering without a group addition, they will be registered as a free learner.
      * Returns the saved custom user or null if the user couldn't be saved.
      */
+    @Transactional
     public CustomUser saveUser(CustomUser customUser, RegistrationRequest request, Provider provider) {
         if(customUser.getPassword() != null) {
             customUser.setPassword(passwordEncoder.encode(customUser.getPassword()));
