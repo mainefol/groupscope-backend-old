@@ -78,6 +78,6 @@ public class Learner {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, lastname, role, learningGroup);
+        return Objects.hash(name, lastname, role, learningGroup);
     }
 }

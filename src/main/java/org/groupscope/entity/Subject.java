@@ -59,6 +59,6 @@ public class Subject {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, group);
+        return Objects.hash(name, group);
     }
 }
