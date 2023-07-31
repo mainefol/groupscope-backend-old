@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class GroupScopeDAOImpl implements GroupScopeDAO{
-    private SubjectRepository subjectRepository;
+    private final SubjectRepository subjectRepository;
 
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    private LearnerRepository learnerRepository;
+    private final LearnerRepository learnerRepository;
 
-    private LearningGroupRepository learningGroupRepository;
+    private final LearningGroupRepository learningGroupRepository;
 
     @Autowired
     public GroupScopeDAOImpl(SubjectRepository subjectRepository,
@@ -38,8 +38,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public Subject saveSubject(Subject subject) {
         Subject result = subjectRepository.save(subject);
-        if(result != null)
-            log.info("Subject: " + subject.toString() + " saved/updated");
+        log.info("Subject: " + subject.toString() + " saved/updated");
         return result;
     }
 
@@ -51,11 +50,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public Subject findSubjectById(Long subject_id) {
         Optional<Subject> optionalSubject = subjectRepository.findById(subject_id);
-        if (optionalSubject.isPresent()) {
-            return optionalSubject.get();
-        } else {
-            return null;
-        }
+        return optionalSubject.orElse(null);
     }
 
     @Override
