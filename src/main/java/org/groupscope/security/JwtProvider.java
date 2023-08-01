@@ -14,8 +14,11 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtProvider {
-    @Value("$(jwt.secret)")
+    @Value("${jwt.secret}")
     private String jwtSecret;
+
+    @Value("${jwt.lifitime}")
+    private Integer jwtLifetime;
 
     public String generateToken(String login) {
         Date date = Date.from(LocalDate.now().plusDays(15).atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -25,8 +28,6 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-
-    // TODO make a method that can calculate the end of token`s life
 
     public boolean validateToken(String token) {
         try {
