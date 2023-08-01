@@ -43,8 +43,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public Subject findSubjectByName(String subjectName) {
-        return subjectRepository.getSubjectByName(subjectName);
+    public Subject findSubjectByName(String name) {
+        return subjectRepository.getSubjectByName(name);
     }
 
     @Override
@@ -59,11 +59,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public List<Subject> findAllSubjectsByGroupId(Long group_id) {
-        List<Subject> subjects = (List<Subject>) subjectRepository.findAll();
-        return subjects.stream()
-                .filter(subject -> subject.getGroup().getId().equals(group_id))
-                .collect(Collectors.toList());
+    public List<Subject> findAllSubjectsByGroupName(String groupName) {
+        return subjectRepository.getSubjectsByGroupName(groupName);
     }
 
     @Override

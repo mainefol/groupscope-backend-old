@@ -15,7 +15,7 @@ public interface GroupScopeDAO {
     List<Subject> findAllSubjects();
 
     // TODO complete method for getting all subjects
-    List<Subject> findAllSubjectsByGroupId(Long group_id);
+    List<Subject> findAllSubjectsByGroupName(String groupName);
 
     void updateSubject(Subject subject);
 

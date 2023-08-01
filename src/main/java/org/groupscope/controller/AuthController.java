@@ -43,38 +43,55 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<HttpStatus> registerUser(@RequestBody @Valid RegistrationRequest request) {
-        if(customUserService.findByLogin(request.getLogin()) == null) {
+        try {
+            // Checking for user existing
+            if (customUserService.findByLogin(request.getLogin()) != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+
+            // Save new user
             CustomUser user = customUserService.saveUser(request.toUser(), request, Provider.LOCAL);
             if (user != null) {
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.badRequest().build();
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }catch(Exception e) {
+            log.info(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/auth")
     public ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest request) {
-        CustomUser user = customUserService.findByLoginAndPassword(request.getLogin(), request.getPassword());
-        if(user != null) {
-            String token = jwtProvider.generateToken(user.getLogin());
-            AuthResponse authResponse = new AuthResponse(token);
-            return ResponseEntity.ok(authResponse);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        try {
+            CustomUser user = customUserService.findByLoginAndPassword(request.getLogin(), request.getPassword());
+            if (user != null) {
+                String token = jwtProvider.generateToken(user.getLogin());
+                AuthResponse authResponse = new AuthResponse(token);
+                return ResponseEntity.ok(authResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch(Exception e) {
+            log.info(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
     @PostMapping("/oauth2")
     public ResponseEntity<AuthResponse> auth(@RequestBody @Valid OAuth2Request request) {
-        CustomUser user = customOAuth2UserService.loginOAuthGoogle(request);
-        if(user != null) {
-            String token = jwtProvider.generateToken(user.getLogin());
-            AuthResponse authResponse = new AuthResponse(token);
-            return ResponseEntity.ok(authResponse);
-        } else {
+        try {
+            CustomUser user = customOAuth2UserService.loginOAuthGoogle(request);
+            if (user != null) {
+                String token = jwtProvider.generateToken(user.getLogin());
+                AuthResponse authResponse = new AuthResponse(token);
+                return ResponseEntity.ok(authResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

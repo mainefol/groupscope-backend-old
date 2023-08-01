@@ -47,19 +47,15 @@ public class CustomUserService {
             customUser.setPassword(passwordEncoder.encode(customUser.getPassword()));
         }
         customUser.setProvider(provider);
+        LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
+                request.getLearnerLastname(),
+                LearningRole.STUDENT);
 
         // Add new learner to an existing group based on the invite code
         if(request.getInviteCode() != null) {
-            LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
-                    request.getLearnerLastname(),
-                    LearningRole.STUDENT);
-            Learner learner = groupScopeService.addStudent(learnerDTO, request.getInviteCode());
-            if(learner != null) {
-                customUser.setLearner(learner);
-                return customUserRepository.save(customUser);
-            } else {
-                return null;
-            }
+            Learner student = groupScopeService.addStudent(learnerDTO, request.getInviteCode());
+            return processLearner(customUser, student);
+
         // Add new learner and create a new group
         } else if (request.getGroupName() != null) {
             LearnerDTO headman = new LearnerDTO(request.getLearnerName(),
@@ -75,16 +71,17 @@ public class CustomUserService {
             }
         // Add new learner without group addition
         } else {
-            LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
-                    request.getLearnerLastname(),
-                    LearningRole.STUDENT);
-            Learner learner = groupScopeService.addFreeLearner(learnerDTO);
-            if(learner != null) {
-                customUser.setLearner(learner);
-                return customUserRepository.save(customUser);
-            } else {
-                return null;
-            }
+            Learner student = groupScopeService.addFreeLearner(learnerDTO);
+            return processLearner(customUser, student);
+        }
+    }
+
+    private CustomUser processLearner(CustomUser user, Learner learner) {
+        if (learner != null) {
+            user.setLearner(learner);
+            return customUserRepository.save(user);
+        } else {
+            return null;
         }
     }
 

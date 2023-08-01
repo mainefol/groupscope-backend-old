@@ -7,6 +7,7 @@ import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 groupScopeDAO.saveSubject(subject);
             }
         }
-        else
-            throw new NullPointerException();
+        else {
+            throw new NullPointerException("Learning group was null");
+        }
     }
 
     @Override
@@ -57,7 +59,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             groupScopeDAO.updateSubject(subject);
         }
         else
-            throw new NullPointerException();
+            throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
     }
 
     @Override
@@ -67,7 +69,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if (subject != null)
             groupScopeDAO.deleteSubject(subject);
         else
-            throw new NullPointerException();
+            throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
     }
 
     @Override
@@ -97,7 +99,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             }
         }
         else
-            throw new NullPointerException();
+            throw new NullPointerException("Subject not found with name: " + subjectName);
     }
 
     @Override
@@ -111,7 +113,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                     .collect(Collectors.toList());
         }
         else
-            throw new NullPointerException();
+            throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
     }
 
     @Override
@@ -131,8 +133,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 task.setDeadline(taskDTO.getDeadline());
             groupScopeDAO.updateTask(task);
         }
-        else
-            throw new NullPointerException();
+        else {
+            throw (task == null) ? new NullPointerException("Task not found with name: " + taskDTO.getName()) :
+                                    new NullPointerException("Subject not found with name: " + subjectName);
+        }
     }
 
     @Override
@@ -142,7 +146,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if (task != null)
             groupScopeDAO.deleteTask(task);
         else
-            throw new NullPointerException();
+            throw new NullPointerException("Task not found with name: " + taskDTO.getName());
     }
 
     @Override
@@ -171,8 +175,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 groupScopeDAO.saveStudent(learner);
                 groupScopeDAO.saveTask(task);
             }
-            else
-                throw new NullPointerException();
+            else {
+                if(task == null)
+                    throw new NullPointerException("Task not found with name: " + gradeDTO.getTaskName());
+                else
+                    throw new IllegalArgumentException("The task is not relevant to the subject : " + gradeDTO.getSubjectName());
+            }
     }
 
     @Override
@@ -194,10 +202,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         task.getGrades().add(grade);
                     }
                 }
+                return groupScopeDAO.saveStudent(learner);
             }
-            return groupScopeDAO.saveStudent(learner);
+            else
+                return null;
         } else {
-            return null;
+            throw new NullPointerException("Learning group not found with invite code: " + inviteCode);
         }
     }
 
@@ -231,7 +241,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if(learner != null)
             groupScopeDAO.deleteLearner(learner);
         else
-            throw new NullPointerException();
+            throw new NullPointerException("Learner not found with name: " + learnerDTO.getName());
     }
 
     @Override
