@@ -1,6 +1,8 @@
 package org.groupscope.entity.grade;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -14,20 +16,15 @@ import java.util.Objects;
 
 @Data
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class GradeKey implements Serializable {
+
     @Column(name = "learner_id")
     Long learnerId;
 
     @Column(name = "task_id")
     Long taskId;
-
-    public GradeKey() {
-    }
-
-    public GradeKey(Long learnerId, Long taskId) {
-        this.learnerId = learnerId;
-        this.taskId = taskId;
-    }
 
     @Override
     public boolean equals(Object o) {

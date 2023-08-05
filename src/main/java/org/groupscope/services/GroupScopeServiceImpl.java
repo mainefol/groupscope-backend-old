@@ -249,8 +249,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public LearningGroup addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
         group.getHeadmen().setLearningGroup(group);
-        group.generateInviteCode();
         if(!groupScopeDAO.getAllGroups().contains(group)) {
+            group = groupScopeDAO.saveGroup(group);
+            group.generateInviteCode();
             return groupScopeDAO.saveGroup(group);
         } else {
             return null;

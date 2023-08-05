@@ -1,6 +1,8 @@
 package org.groupscope.entity.grade;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.groupscope.entity.Learner;
 import org.groupscope.entity.Task;
 
@@ -14,6 +16,8 @@ import java.util.Objects;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Grade {
     // EmbeddedId annotation indicates that this entity has a composite primary key (GradeKey).
     @EmbeddedId
@@ -39,16 +43,6 @@ public class Grade {
     @Column(name = "mark")
     private Integer mark;
 
-    public Grade(){
-    }
-
-    public Grade(GradeKey id, Learner learner, Task task, Boolean completion, Integer mark) {
-        this.id = id;
-        this.learner = learner;
-        this.task = task;
-        this.completion = completion;
-        this.mark = mark;
-    }
 
     @Override
     public boolean equals(Object o) {
