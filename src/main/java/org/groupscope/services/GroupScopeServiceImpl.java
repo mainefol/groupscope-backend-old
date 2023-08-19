@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -50,7 +51,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
-        if(subject != null) {
+        if(subject != null && Objects.equals(subject.getGroup().getId(), learningGroup.getId())) {
             if (subjectDTO.getNewName() != null) {
                 subject.setName(subjectDTO.getNewName());
             }
@@ -59,7 +60,11 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             groupScopeDAO.updateSubject(subject);
         }
         else
-            throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
+            if(subject == null)
+                throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
+            else
+                throw new IllegalArgumentException("Subject" + subjectDTO.getName() +
+                        "is not relevant to group: " + learningGroup.toString());
     }
 
     @Override
