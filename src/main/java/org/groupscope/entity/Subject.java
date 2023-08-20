@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/*
+/**
  * This class represents a subject in the learning system.
  * Each subject can have multiple tasks associated with it and belongs to a specific learning group.
  */

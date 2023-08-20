@@ -10,7 +10,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
-/*
+/**
  * This class represents a task in the learning system.
  * Tasks are associated with a specific subject and can have multiple grades associated with them.
  */

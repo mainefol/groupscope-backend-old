@@ -4,7 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 
-/*
+/**
  * This enumeration represents different roles that a learner can have.
  * It defines two constant values: STUDENT and HEADMAN.
  */

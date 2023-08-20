@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/*
+/**
  * This class allows to unite and manage our group of learners.
  * Represents a learning group that contains learners and subjects.
  */

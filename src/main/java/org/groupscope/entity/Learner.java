@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/*
+/**
  * It`s a main entity, which will use in our project.
  * This class represents a learner (student) in the system.
  */
