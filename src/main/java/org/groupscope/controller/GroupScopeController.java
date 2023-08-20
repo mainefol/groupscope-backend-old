@@ -222,6 +222,37 @@ public class GroupScopeController {
         }
     }
 
+    @PostMapping("/group/create")
+    public ResponseEntity<HttpStatus> createGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
+        try {
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            learningGroupDTO.setHeadmen(LearnerDTO.from(user.getLearner()));
+            groupScopeService.addGroup(learningGroupDTO);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    // TODO Consider adding an existing student to the group.
+    //  Problem: The student may have some grades from the previous group
+    @PostMapping("/group/join")
+    public ResponseEntity<HttpStatus> joinToGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
+        try {
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            groupScopeService.addStudent(LearnerDTO.from(user.getLearner()), learningGroupDTO.getInviteCode());
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @PostMapping("/grade")
     public ResponseEntity<HttpStatus> updateGrade(@RequestBody GradeDTO gradeDTO) {
         try {

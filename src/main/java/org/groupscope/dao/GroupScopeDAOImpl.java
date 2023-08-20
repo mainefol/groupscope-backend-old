@@ -9,9 +9,9 @@ import org.groupscope.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -24,15 +24,19 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     private final LearningGroupRepository learningGroupRepository;
 
+    private final EntityManager entityManager;
+
     @Autowired
     public GroupScopeDAOImpl(SubjectRepository subjectRepository,
                              TaskRepository taskRepository,
                              LearnerRepository learnerRepository,
-                             LearningGroupRepository learningGroupRepository) {
+                             LearningGroupRepository learningGroupRepository,
+                             EntityManager entityManager) {
         this.subjectRepository = subjectRepository;
         this.taskRepository = taskRepository;
         this.learnerRepository = learnerRepository;
         this.learningGroupRepository = learningGroupRepository;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -111,7 +115,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public Learner saveStudent(Learner learner) {
-        Learner result =  learnerRepository.save(learner);
+        Learner result =  learnerRepository.save(entityManager.merge(learner));
         if(result != null) {
             log.info("Learner " + learner.toString() + " saved");
         }
@@ -130,9 +134,10 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public void updateLearner(Learner learner) {
+    public Learner updateLearner(Learner learner) {
+        Learner mergedLearner = entityManager.merge(learner);
         log.info("Update " + learner.toString());
-        learnerRepository.save(learner);
+        return learnerRepository.save(learner);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class Learner {
     private LearningGroup learningGroup;
 
     // One-to-many relationship with the Grade entity. Each learner can have multiple grades.
-    @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "learner", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<Grade> grades;
 
     public Learner() {

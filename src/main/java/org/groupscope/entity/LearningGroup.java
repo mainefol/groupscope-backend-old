@@ -31,7 +31,7 @@ public class LearningGroup {
     private String inviteCode;
 
     // Every group have a headman
-    @OneToOne(cascade = CascadeType.ALL, targetEntity = Learner.class)
+    @OneToOne(cascade = CascadeType.MERGE, targetEntity = Learner.class)
     @JoinColumn(name = "headmen_id")
     private Learner headmen;
 

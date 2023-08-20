@@ -188,10 +188,18 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             }
     }
 
+    /**
+     For saving new user
+     */
     @Override
     @Transactional
     public Learner addStudent(LearnerDTO learnerDTO, String inviteCode) {
-        Learner learner = learnerDTO.toLearner();
+        Learner learner;
+        if(learnerDTO.getId() != null)
+            learner = groupScopeDAO.findStudentById(learnerDTO.getId());
+        else
+            learner = learnerDTO.toLearner();
+
         LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
 
         if(learningGroup != null) {
@@ -211,10 +219,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             }
             else
                 return null;
-        } else {
+        } else
             throw new NullPointerException("Learning group not found with invite code: " + inviteCode);
-        }
     }
+
 
     @Override
     @Transactional
@@ -253,6 +261,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public LearningGroup addGroup(LearningGroupDTO learningGroupDTO) {
         LearningGroup group = learningGroupDTO.toLearningGroup();
+        group.getHeadmen().setRole(LearningRole.HEADMAN);
         group.getHeadmen().setLearningGroup(group);
         if(!groupScopeDAO.getAllGroups().contains(group)) {
             group = groupScopeDAO.saveGroup(group);

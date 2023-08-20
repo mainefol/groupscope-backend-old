@@ -40,7 +40,7 @@ public interface GroupScopeDAO {
 
     Learner findStudentById(Long id);
 
-    void updateLearner(Learner learner);
+    Learner updateLearner(Learner learner);
 
     void deleteLearner(Learner learner);
 
