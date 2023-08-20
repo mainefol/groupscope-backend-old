@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-//@CrossOrigin
+@CrossOrigin
 @RestController
 @RequestMapping("/")
 public class GroupScopeController {
