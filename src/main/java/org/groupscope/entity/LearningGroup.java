@@ -36,7 +36,7 @@ public class LearningGroup {
     private Learner headmen;
 
     // Every group has subjects that the headmen has added
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private List<Subject> subjects;
 

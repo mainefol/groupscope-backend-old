@@ -13,4 +13,6 @@ public interface GradeRepository extends CrudRepository<Grade, Long> {
     Grade findGradeByLearnerAndTask(Learner learner, Task task);
 
     Grade findGradeById(GradeKey id);
+
+    void deleteGradesByLearner(Learner learner);
 }

@@ -7,7 +7,6 @@ import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,10 +95,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                             GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
                             Grade grade = new Grade(gradeKey, learner, task, false, 0);
 
-                            learner.getGrades().add(grade);
                             task.getGrades().add(grade);
                         });
-
                 groupScopeDAO.saveTask(task);
             }
         }
@@ -159,33 +156,33 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public void updateGrade(GradeDTO gradeDTO, Learner learner) {
         Task task = groupScopeDAO.findTaskByName(gradeDTO.getTaskName());
         Subject subject = groupScopeDAO.findSubjectByName(gradeDTO.getSubjectName());
-            if(task != null && subject.equals(task.getSubject())) {
-                GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-                learner.getGrades().stream()
-                        .filter(grade -> grade.getId().equals(gradeKey))
-                        .findFirst()
-                        .ifPresent(grade -> {
-                            grade.setCompletion(gradeDTO.getCompletion());
-                            grade.setMark(gradeDTO.getMark());
-                        });
 
-                task.getGrades().stream()
-                        .filter(grade -> grade.getId().equals(gradeKey))
-                        .findFirst()
-                        .ifPresent(grade -> {
-                            grade.setCompletion(gradeDTO.getCompletion());
-                            grade.setMark(gradeDTO.getMark());
-                        });
+        if (task == null || !subject.equals(task.getSubject())) {
+            if(task == null)
+                throw new NullPointerException("Task not found with name: " + gradeDTO.getTaskName());
+            else
+                throw new IllegalArgumentException("The task is not relevant to the subject : " + gradeDTO.getSubjectName());
+        } else {
+            GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+            learner.getGrades().stream()
+                    .filter(grade -> grade.getId().equals(gradeKey))
+                    .findFirst()
+                    .ifPresent(grade -> {
+                        grade.setCompletion(gradeDTO.getCompletion());
+                        grade.setMark(gradeDTO.getMark());
+                    });
 
-                groupScopeDAO.saveStudent(learner);
-                groupScopeDAO.saveTask(task);
-            }
-            else {
-                if(task == null)
-                    throw new NullPointerException("Task not found with name: " + gradeDTO.getTaskName());
-                else
-                    throw new IllegalArgumentException("The task is not relevant to the subject : " + gradeDTO.getSubjectName());
-            }
+            task.getGrades().stream()
+                    .filter(grade -> grade.getId().equals(gradeKey))
+                    .findFirst()
+                    .ifPresent(grade -> {
+                        grade.setCompletion(gradeDTO.getCompletion());
+                        grade.setMark(gradeDTO.getMark());
+                    });
+
+            groupScopeDAO.saveStudent(learner);
+            groupScopeDAO.saveTask(task);
+        }
     }
 
     /**
@@ -193,36 +190,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
      */
     @Override
     @Transactional
-    public Learner addStudent(LearnerDTO learnerDTO, String inviteCode) {
-        Learner learner;
-        if(learnerDTO.getId() != null)
-            learner = groupScopeDAO.findStudentById(learnerDTO.getId());
-        else
-            learner = learnerDTO.toLearner();
-
+    public Learner addStudent(Learner learner, String inviteCode) {
         LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
+        learner.setLearningGroup(learningGroup);
+        learner.setRole(LearningRole.STUDENT);
 
-        if(learningGroup != null) {
-            if(!learningGroup.getLearners().contains(learner)) {
-                learner.setLearningGroup(learningGroup);
-
-                for (Subject subject : learningGroup.getSubjects()) {
-                    for (Task task : subject.getTasks()) {
-                        GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-                        Grade grade = new Grade(gradeKey, learner, task, false, 0);
-
-                        learner.getGrades().add(grade);
-                        task.getGrades().add(grade);
-                    }
-                }
-                return groupScopeDAO.saveStudent(learner);
-            }
-            else
-                return null;
-        } else
-            throw new NullPointerException("Learning group not found with invite code: " + inviteCode);
+        return refreshLearnerGrades(learner, learningGroup);
     }
-
 
     @Override
     @Transactional
@@ -263,6 +237,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         LearningGroup group = learningGroupDTO.toLearningGroup();
         group.getHeadmen().setRole(LearningRole.HEADMAN);
         group.getHeadmen().setLearningGroup(group);
+
+        if(group.getHeadmen().getId() != null)
+            groupScopeDAO.deleteGradesByLearner(group.getHeadmen());
+
         if(!groupScopeDAO.getAllGroups().contains(group)) {
             group = groupScopeDAO.saveGroup(group);
             group.generateInviteCode();
@@ -280,5 +258,32 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Override
     public LearningGroup getGroupByInviteCode(String inviteCode) {
         return groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
+    }
+
+    /**
+        The learner must be included in new group
+     */
+    private Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
+        if(learner.getId() != null)
+            groupScopeDAO.deleteGradesByLearner(learner);
+
+        if(newGroup != null) {
+            if(!newGroup.getLearners().contains(learner)) {
+                for (Subject subject : newGroup.getSubjects()) {
+                    for (Task task : subject.getTasks()) {
+                        GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                        Grade grade = new Grade(gradeKey, learner, task, false, 0);
+
+                        learner.getGrades().add(grade);
+                    }
+                }
+                return groupScopeDAO.saveStudent(learner);
+            }
+            else {
+                log.info("The learner: " + learner.toString() + " is not include in group " + newGroup.getName());
+                return null;
+            }
+        } else
+            throw new NullPointerException("Learning group is null in method refreshLearnerGrades()");
     }
 }

@@ -2,8 +2,6 @@ package org.groupscope.dto;
 
 import lombok.Data;
 import org.groupscope.entity.*;
-import org.groupscope.entity.grade.Grade;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

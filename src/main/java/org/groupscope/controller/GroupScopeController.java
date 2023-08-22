@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -119,6 +120,7 @@ public class GroupScopeController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -244,13 +246,14 @@ public class GroupScopeController {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-            groupScopeService.addStudent(LearnerDTO.from(user.getLearner()), learningGroupDTO.getInviteCode());
+            groupScopeService.addStudent(user.getLearner(), learningGroupDTO.getInviteCode());
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+
     }
 
     @PostMapping("/grade")

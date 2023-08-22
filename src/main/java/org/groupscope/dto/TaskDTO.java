@@ -3,9 +3,6 @@ package org.groupscope.dto;
 import lombok.Data;
 import org.groupscope.entity.*;
 
-import javax.persistence.*;
-import java.util.Calendar;
-import java.util.List;
 
 @Data
 public class TaskDTO {
@@ -43,4 +40,10 @@ public class TaskDTO {
 
         return task;
     }
+
+    // TODO finish validation
+    private boolean isValid() {
+        return false;
+    }
+
 }

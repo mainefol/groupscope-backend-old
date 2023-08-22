@@ -43,7 +43,6 @@ public class Grade {
     @Column(name = "mark")
     private Integer mark;
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

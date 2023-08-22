@@ -1,10 +1,7 @@
 package org.groupscope.dao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.groupscope.dao.repositories.LearnerRepository;
-import org.groupscope.dao.repositories.LearningGroupRepository;
-import org.groupscope.dao.repositories.SubjectRepository;
-import org.groupscope.dao.repositories.TaskRepository;
+import org.groupscope.dao.repositories.*;
 import org.groupscope.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,19 +21,19 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     private final LearningGroupRepository learningGroupRepository;
 
-    private final EntityManager entityManager;
+    private final GradeRepository gradeRepository;
 
     @Autowired
     public GroupScopeDAOImpl(SubjectRepository subjectRepository,
                              TaskRepository taskRepository,
                              LearnerRepository learnerRepository,
                              LearningGroupRepository learningGroupRepository,
-                             EntityManager entityManager) {
+                             GradeRepository gradeRepository) {
         this.subjectRepository = subjectRepository;
         this.taskRepository = taskRepository;
         this.learnerRepository = learnerRepository;
         this.learningGroupRepository = learningGroupRepository;
-        this.entityManager = entityManager;
+        this.gradeRepository = gradeRepository;
     }
 
     @Override
@@ -115,7 +112,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public Learner saveStudent(Learner learner) {
-        Learner result =  learnerRepository.save(entityManager.merge(learner));
+        Learner result =  learnerRepository.save(learner);
         if(result != null) {
             log.info("Learner " + learner.toString() + " saved");
         }
@@ -135,7 +132,6 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public Learner updateLearner(Learner learner) {
-        Learner mergedLearner = entityManager.merge(learner);
         log.info("Update " + learner.toString());
         return learnerRepository.save(learner);
     }
@@ -173,5 +169,10 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public List<LearningGroup> getAllGroups() {
         return (List<LearningGroup>) learningGroupRepository.findAll();
+    }
+
+    @Override
+    public void deleteGradesByLearner(Learner learner) {
+        gradeRepository.deleteGradesByLearner(learner);
     }
 }

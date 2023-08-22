@@ -31,7 +31,7 @@ public interface GroupScopeService {
 
     ///////////////////////////////////////////////////
 
-    Learner addStudent(LearnerDTO learnerDTO, String inviteCode);
+    Learner addStudent(Learner learner, String inviteCode);
 
     Learner addFreeLearner(LearnerDTO learnerDTO);
 
