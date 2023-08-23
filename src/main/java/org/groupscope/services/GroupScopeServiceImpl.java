@@ -264,9 +264,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         The learner must be included in new group
      */
     private Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
-        if(learner.getId() != null)
+        if(learner.getId() != null) {
             groupScopeDAO.deleteGradesByLearner(learner);
-
+            learner.getGrades().clear();
+        }
         if(newGroup != null) {
             if(!newGroup.getLearners().contains(learner)) {
                 for (Subject subject : newGroup.getSubjects()) {
