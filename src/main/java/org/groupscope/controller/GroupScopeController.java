@@ -99,11 +99,10 @@ public class GroupScopeController {
         }
     }
 
-    // Process dto class with only filled name field
-    @GetMapping("/subject/tasks")
-    public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@RequestBody SubjectDTO subjectDTO) {
+    @GetMapping("/{subject-name}/tasks")
+    public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
-            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectDTO);
+            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName);
 
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
@@ -116,8 +115,14 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
                                               @PathVariable("subject-name") String subjectName) {
         try {
-            groupScopeService.addTask(taskDTO, subjectName);
-            return ResponseEntity.ok().build();
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.addTask(taskDTO, subjectName);
+
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -181,10 +186,10 @@ public class GroupScopeController {
         try {
             //groupScopeService.addStudent(learnerDTO, groupId);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
         }
     }
 

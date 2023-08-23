@@ -20,7 +20,7 @@ public interface GroupScopeService {
     ///////////////////////////////////////////////////
     void addTask(TaskDTO taskDTO, String subjectName);
 
-    List<TaskDTO> getAllTasksOfSubject(SubjectDTO subjectDTO);
+    List<TaskDTO> getAllTasksOfSubject(String subjectName);
 
     void updateTask(TaskDTO taskDTO, String subjectName);
 

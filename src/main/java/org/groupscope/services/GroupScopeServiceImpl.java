@@ -105,8 +105,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<TaskDTO> getAllTasksOfSubject(SubjectDTO subjectDTO) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
+    public List<TaskDTO> getAllTasksOfSubject(String subjectName) {
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
 
         if(subject != null) {
             return subject.getTasks()
@@ -115,7 +115,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                     .collect(Collectors.toList());
         }
         else
-            throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
+            throw new NullPointerException("Subject not found with name: " + subjectName);
     }
 
     @Override
