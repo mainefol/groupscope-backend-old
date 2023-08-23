@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 public class GroupScopeController {
 
     private final GroupScopeService groupScopeService;
@@ -30,7 +29,7 @@ public class GroupScopeController {
         this.groupScopeService = groupScopeService;
     }
 
-    @GetMapping("/subjects")
+    @GetMapping("/subject/all")
     public ResponseEntity<List<SubjectDTO>> getSubjects() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -81,13 +80,12 @@ public class GroupScopeController {
         }
     }
 
-    // Process dto class with only filled name field
-    @DeleteMapping("/subject/delete")
-    public ResponseEntity<HttpStatus> deleteSubject(@RequestBody SubjectDTO subjectDTO) {
+    @DeleteMapping("/subject/{subject-name}/delete")
+    public ResponseEntity<HttpStatus> deleteSubject(@PathVariable("subject-name") String subjectName) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
-                groupScopeService.deleteSubject(subjectDTO);
+                groupScopeService.deleteSubject(subjectName);
 
                 return ResponseEntity.ok().build();
             } else {
@@ -99,7 +97,7 @@ public class GroupScopeController {
         }
     }
 
-    @GetMapping("/{subject-name}/tasks")
+    @GetMapping("/subject/{subject-name}/tasks")
     public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
             List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName);
@@ -111,7 +109,7 @@ public class GroupScopeController {
         }
     }
 
-    @PostMapping("/{subject-name}/task/add")
+    @PostMapping("/subject/{subject-name}/task/add")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
                                               @PathVariable("subject-name") String subjectName) {
         try {
@@ -130,7 +128,7 @@ public class GroupScopeController {
         }
     }
 
-    @PatchMapping("/{subject-name}/task/patch")
+    @PatchMapping("/subject/{subject-name}/task/patch")
     public ResponseEntity<HttpStatus> patchTask(@RequestBody TaskDTO taskDTO,
                                                 @PathVariable("subject-name") String subjectName) {
         try {
@@ -149,7 +147,7 @@ public class GroupScopeController {
     }
 
     // Process dto class with only filled name field
-    @DeleteMapping("/{subject-name}/task/delete")
+    @DeleteMapping("/subject/{subject-name}/task/delete")
     public ResponseEntity<HttpStatus> deleteTask(@RequestBody TaskDTO taskDTO,
                                                  @PathVariable("subject-name") String subjectName) {
         try {

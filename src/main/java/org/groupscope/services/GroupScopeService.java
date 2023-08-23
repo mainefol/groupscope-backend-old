@@ -15,7 +15,7 @@ public interface GroupScopeService {
 
     void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
 
-    void deleteSubject(SubjectDTO subjectDTO);
+    void deleteSubject(String subjectName);
 
     ///////////////////////////////////////////////////
     void addTask(TaskDTO taskDTO, String subjectName);

@@ -68,12 +68,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void deleteSubject(SubjectDTO subjectDTO) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
+    public void deleteSubject(String subjectName) {
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
         if (subject != null)
             groupScopeDAO.deleteSubject(subject);
         else
-            throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
+            throw new NullPointerException("Subject not found with name: " + subjectName);
     }
 
     @Override
