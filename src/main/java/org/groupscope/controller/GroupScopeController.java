@@ -239,8 +239,6 @@ public class GroupScopeController {
         }
     }
 
-    // TODO Consider adding an existing student to the group.
-    //  Problem: The student may have some grades from the previous group
     @PostMapping("/group/join")
     public ResponseEntity<HttpStatus> joinToGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {

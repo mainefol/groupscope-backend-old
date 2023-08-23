@@ -31,19 +31,23 @@ public class TaskDTO {
     }
 
     public Task toTask() {
-        Task task = new Task();
-        task.setId(this.getId());
-        task.setName(this.getName());
-        task.setType(this.getType());
-        task.setInfo(this.getInfo());
-        task.setDeadline(this.getDeadline());
+        if(this.isValid()) {
+            Task task = new Task();
+            task.setId(this.getId());
+            task.setName(this.getName());
+            task.setType(this.getType());
+            task.setInfo(this.getInfo());
+            task.setDeadline(this.getDeadline());
 
-        return task;
+            return task;
+        } else
+            throw new IllegalArgumentException("Wrong task type or date format in Task object");
     }
 
     // TODO finish validation
+    //  to check: type and deadline
     private boolean isValid() {
-        return false;
+        return true;
     }
 
 }
