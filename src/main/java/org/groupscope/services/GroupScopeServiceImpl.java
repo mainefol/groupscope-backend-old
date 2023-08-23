@@ -63,7 +63,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
             else
                 throw new IllegalArgumentException("Subject" + subjectDTO.getName() +
-                        "is not relevant to group: " + learningGroup.toString());
+                        "is not relevant to group: " + learningGroup);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 return groupScopeDAO.saveStudent(learner);
             }
             else {
-                log.info("The learner: " + learner.toString() + " is not include in group " + newGroup.getName());
+                log.info("The learner: " + learner + " is not include in group " + newGroup.getName());
                 return null;
             }
         } else
