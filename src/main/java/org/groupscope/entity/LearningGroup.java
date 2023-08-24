@@ -1,6 +1,7 @@
 package org.groupscope.entity;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -15,6 +16,7 @@ import java.util.Objects;
  * Represents a learning group that contains learners and subjects.
  */
 
+@Slf4j
 @Data
 @Entity
 @Table(name = "groups")
@@ -56,11 +58,14 @@ public class LearningGroup {
 
     // Generate a random invite code for the group.
     public void generateInviteCode(){
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.putLong(this.id);
+        if (this.inviteCode == null) {
+            ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+            buffer.putLong(this.id);
 
-        SecureRandom secureRandom = new SecureRandom(buffer.array());
-        this.inviteCode = new BigInteger(32, secureRandom).toString(32);
+            SecureRandom secureRandom = new SecureRandom(buffer.array());
+            this.inviteCode = new BigInteger(32, secureRandom).toString(32);
+        } else
+            log.info("Invite code for " + this + " has already been generated");
     }
 
     @Override
