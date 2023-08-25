@@ -1,7 +1,6 @@
 package org.groupscope.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.groupscope.dto.LearnerDTO;
 import org.groupscope.entity.Provider;
 import org.groupscope.security.JwtProvider;
 import org.groupscope.security.auth.CustomUser;
@@ -11,12 +10,9 @@ import org.groupscope.security.dto.AuthResponse;
 import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
 import org.groupscope.security.oauth2.CustomOAuth2UserService;
-import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

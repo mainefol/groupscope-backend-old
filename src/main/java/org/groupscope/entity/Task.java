@@ -2,11 +2,9 @@ package org.groupscope.entity;
 
 import lombok.Data;
 import org.groupscope.entity.grade.Grade;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 

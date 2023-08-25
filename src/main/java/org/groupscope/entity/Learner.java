@@ -3,7 +3,6 @@ package org.groupscope.entity;
 
 import lombok.Data;
 import org.groupscope.entity.grade.Grade;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
