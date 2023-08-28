@@ -1,6 +1,5 @@
 package org.groupscope.security;
 
-import org.groupscope.entity.LearningRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
