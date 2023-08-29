@@ -39,9 +39,12 @@ public interface GroupScopeService {
 
     void updateLearner(LearnerDTO learnerDTO, Learner learner);
 
-    void deleteLearner(LearnerDTO learnerDTO);
+    void deleteLearner(String learnerName);
 
     ///////////////////////////////////////////////////
+
+    LearningGroupDTO getGroup(Learner learner);
+
     LearningGroup addGroup(LearningGroupDTO learningGroupDTO);
 
     LearningGroup getGroupById(Long id);

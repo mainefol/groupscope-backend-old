@@ -6,6 +6,7 @@ import org.groupscope.dto.*;
 import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -223,12 +224,22 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void deleteLearner(LearnerDTO learnerDTO) {
-        Learner learner = groupScopeDAO.findStudentByName(learnerDTO.getName());
+    public void deleteLearner(String learrnerName) {
+        Learner learner = groupScopeDAO.findStudentByName(learrnerName);
         if(learner != null)
             groupScopeDAO.deleteLearner(learner);
         else
-            throw new NullPointerException("Learner not found with name: " + learnerDTO.getName());
+            throw new NullPointerException("Learner not found with name: " + learrnerName);
+    }
+
+    @Override
+    @Transactional
+    public LearningGroupDTO getGroup(Learner learner) {
+
+        for(Learner lr : learner.getLearningGroup().getLearners())
+            lr.setGrades(groupScopeDAO.findAllByLearner(lr));
+
+        return LearningGroupDTO.from(learner.getLearningGroup());
     }
 
     @Override

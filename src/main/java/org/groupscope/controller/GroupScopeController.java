@@ -42,7 +42,7 @@ public class GroupScopeController {
             return ResponseEntity.ok(subjects);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -59,7 +59,7 @@ public class GroupScopeController {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -76,7 +76,7 @@ public class GroupScopeController {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -93,11 +93,11 @@ public class GroupScopeController {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
-    @GetMapping("/subject/{subject-name}/tasks")
+    @GetMapping("/subject/{subject-name}/task/all")
     public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
             List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName);
@@ -124,7 +124,7 @@ public class GroupScopeController {
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -142,7 +142,7 @@ public class GroupScopeController {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -161,7 +161,7 @@ public class GroupScopeController {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -174,7 +174,7 @@ public class GroupScopeController {
             return ResponseEntity.ok(learnerDTO);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -199,18 +199,22 @@ public class GroupScopeController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
+    //TODO added user deleting
     @DeleteMapping("/student/delete")
-    public ResponseEntity<HttpStatus> deleteStudent(@RequestBody LearnerDTO learnerDTO) {
+    public ResponseEntity<HttpStatus> deleteStudent() {
         try {
-            groupScopeService.deleteLearner(learnerDTO);
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            // delete learner
+            groupScopeService.deleteLearner(user.getLearner().getName());
+            // delete user
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -218,12 +222,13 @@ public class GroupScopeController {
     public ResponseEntity<LearningGroupDTO> getGroup() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            LearningGroupDTO learningGroupDTO = LearningGroupDTO.from(user.getLearner().getLearningGroup());
+            LearningGroupDTO learningGroupDTO = groupScopeService.getGroup(user.getLearner());
 
             return ResponseEntity.ok(learningGroupDTO);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 

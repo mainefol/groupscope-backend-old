@@ -53,8 +53,8 @@ public class AuthController {
                 return ResponseEntity.badRequest().build();
             }
         }catch(Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            log.info(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -71,7 +71,7 @@ public class AuthController {
             }
         } catch(Exception e) {
             log.info(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 

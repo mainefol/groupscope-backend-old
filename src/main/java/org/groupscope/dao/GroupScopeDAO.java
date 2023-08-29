@@ -1,6 +1,7 @@
 package org.groupscope.dao;
 
 import org.groupscope.entity.*;
+import org.groupscope.entity.grade.Grade;
 
 import java.util.List;
 
@@ -60,6 +61,8 @@ public interface GroupScopeDAO {
 
     List<LearningGroup> getAllGroups();
 
+
+    List<Grade> findAllByLearner(Learner learner);
 
     void deleteGradesByLearner(Learner learner);
 }
