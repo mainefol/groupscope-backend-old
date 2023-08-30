@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dao.repositories.*;
 import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
+import org.groupscope.entity.grade.GradeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -182,11 +183,22 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
         return (List<LearningGroup>) learningGroupRepository.findAll();
     }
 
+
+
+    @Override
+    public Grade findGradeByLearnerAndTask(Learner learner, Task task) {
+        return gradeRepository.findGradeByLearnerAndTask(learner, task);
+    }
+
+    @Override
+    public Grade findGradeById(GradeKey id) {
+        return gradeRepository.findGradeById(id);
+    }
+
     @Override
     public List<Grade> findAllByLearner(Learner learner) {
         return gradeRepository.findAllByLearner(learner);
     }
-
 
     @Override
     public Grade saveGrade(Grade grade) {

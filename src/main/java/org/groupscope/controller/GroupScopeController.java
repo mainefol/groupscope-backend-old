@@ -40,6 +40,9 @@ public class GroupScopeController {
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(subjects);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();

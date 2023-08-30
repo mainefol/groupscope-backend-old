@@ -2,6 +2,7 @@ package org.groupscope.dao;
 
 import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
+import org.groupscope.entity.grade.GradeKey;
 
 import java.util.List;
 
@@ -67,6 +68,10 @@ public interface GroupScopeDAO {
     Grade saveGrade(Grade grade);
 
     List<Grade> saveAllGrades(List<Grade> grades);
+
+    Grade findGradeByLearnerAndTask(Learner learner, Task task);
+
+    Grade findGradeById(GradeKey id);
 
     List<Grade> findAllByLearner(Learner learner);
 

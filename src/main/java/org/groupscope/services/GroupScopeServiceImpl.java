@@ -174,20 +174,11 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             if(!gradeDTO.isValid())
                 throw new IllegalArgumentException("The mark of grade not valid ");
 
-            // TODO To rework using a method that allows you to find a grade by learner name and task
-
             GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-            learner.getGrades().stream()
-                    .filter(grade -> grade.getId().equals(gradeKey))
-                    .findFirst()
-                    .ifPresent(grade -> {
-                        grade.setCompletion(gradeDTO.getCompletion());
-                        grade.setMark(gradeDTO.getMark());
-                    });
-
-            groupScopeDAO.saveAllGrades(learner.getGrades());
-
-            //
+            Grade grade = groupScopeDAO.findGradeById(gradeKey);
+            grade.setCompletion(gradeDTO.getCompletion());
+            grade.setMark(gradeDTO.getMark());
+            groupScopeDAO.saveGrade(grade);
         }
     }
 

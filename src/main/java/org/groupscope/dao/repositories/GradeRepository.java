@@ -11,12 +11,11 @@ import java.util.List;
 
 public interface GradeRepository extends CrudRepository<Grade, Long> {
 
-    // TODO final method
     Grade findGradeByLearnerAndTask(Learner learner, Task task);
 
-    List<Grade> findAllByLearner(Learner learner);
-
     Grade findGradeById(GradeKey id);
+
+    List<Grade> findAllByLearner(Learner learner);
 
     void deleteGradesByLearner(Learner learner);
 
