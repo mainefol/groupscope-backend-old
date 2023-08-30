@@ -44,7 +44,11 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     public Subject getSubjectByName(String subjectName) {
-        return groupScopeDAO.findSubjectByName(subjectName);
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+        if(subject != null)
+            return groupScopeDAO.findSubjectByName(subjectName);
+        else
+            throw new NullPointerException("Subject with name = " + subjectName + "not found");
     }
 
     @Override
@@ -147,16 +151,19 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public void deleteTask(String subjectName, TaskDTO taskDTO) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectName);
-        Task task = subject.getTasks().stream()
-                .filter(t ->t.getName().equals(taskDTO.getName()))
-                .findFirst()
-                .orElse(null);
 
-        if (task != null) {
-            groupScopeDAO.deleteGradesByTask(task);
-            groupScopeDAO.deleteTaskById(task.getId());
+        if(subject != null) {
+            Task task = subject.getTasks().stream()
+                    .filter(t -> t.getName().equals(taskDTO.getName()))
+                    .findFirst()
+                    .orElse(null);
+            if (task != null) {
+                groupScopeDAO.deleteGradesByTask(task);
+                groupScopeDAO.deleteTaskById(task.getId());
+            } else
+                throw new NullPointerException("Task not found with name: " + taskDTO.getName());
         } else
-            throw new NullPointerException("Task not found with name: " + taskDTO.getName());
+            throw new NullPointerException("Subject not found with name: " + subjectName);
     }
 
     @Override
@@ -189,23 +196,30 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Transactional
     public Learner addStudent(Learner learner, String inviteCode) {
         LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
-        learner.setLearningGroup(learningGroup);
-        learner.setRole(LearningRole.STUDENT);
+        if(learningGroup != null) {
+            learner.setLearningGroup(learningGroup);
+            learner.setRole(LearningRole.STUDENT);
 
-        return refreshLearnerGrades(learner, learningGroup);
+            return refreshLearnerGrades(learner, learningGroup);
+        }
+        else
+            throw new NullPointerException("Group with inviteCode = " + inviteCode + " not found");
     }
 
     @Override
     @Transactional
     public Learner addFreeLearner(LearnerDTO learnerDTO) {
         Learner learner = learnerDTO.toLearner();
-
         return groupScopeDAO.saveStudent(learner);
     }
 
     @Override
     public Learner getStudentById(Long id) {
-        return groupScopeDAO.findStudentById(id);
+        Learner learner = groupScopeDAO.findStudentById(id);
+        if(learner != null)
+            return learner;
+        else
+            throw new NullPointerException("Learner with id = " + id + " not found");
     }
 
     @Override
@@ -233,7 +247,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public LearningGroupDTO getGroup(Learner learner) {
 
         for(Learner lr : learner.getLearningGroup().getLearners())
-            lr.setGrades(groupScopeDAO.findAllByLearner(lr));
+            lr.setGrades(groupScopeDAO.findAllGradesByLearner(lr));
 
         return LearningGroupDTO.from(learner.getLearningGroup());
     }
@@ -253,18 +267,26 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             group.generateInviteCode();
             return groupScopeDAO.saveGroup(group);
         } else {
-            return null;
+            throw new IllegalArgumentException("Group " + group.getName() + " has been already existing");
         }
     }
 
     @Override
     public LearningGroup getGroupById(Long id) {
-        return groupScopeDAO.findGroupById(id);
+        LearningGroup learningGroup = groupScopeDAO.findGroupById(id);
+        if(learningGroup != null)
+            return learningGroup;
+        else
+            throw new NullPointerException("Group with id = " + id + " not found");
     }
 
     @Override
     public LearningGroup getGroupByInviteCode(String inviteCode) {
-        return groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
+        LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
+        if(learningGroup != null)
+            return learningGroup;
+        else
+            throw new NullPointerException("Group with inviteCode = " + inviteCode + " not found");
     }
 
     /**

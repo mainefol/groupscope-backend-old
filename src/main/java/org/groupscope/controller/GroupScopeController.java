@@ -42,7 +42,7 @@ public class GroupScopeController {
             return ResponseEntity.ok(subjects);
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -60,6 +60,9 @@ public class GroupScopeController {
             } else {
                 return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -77,6 +80,9 @@ public class GroupScopeController {
             } else {
                 return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -94,6 +100,9 @@ public class GroupScopeController {
             } else {
                 return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -106,9 +115,12 @@ public class GroupScopeController {
             List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName);
 
             return ResponseEntity.ok(tasks);
-        } catch (Exception e) {
+        } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -124,9 +136,11 @@ public class GroupScopeController {
             } else {
                 return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -143,6 +157,9 @@ public class GroupScopeController {
             } else {
                 return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -162,6 +179,9 @@ public class GroupScopeController {
             } else {
                 return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -175,6 +195,9 @@ public class GroupScopeController {
             LearnerDTO learnerDTO = LearnerDTO.from(user.getLearner());
 
             return ResponseEntity.ok(learnerDTO);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -188,6 +211,9 @@ public class GroupScopeController {
             //groupScopeService.addStudent(learnerDTO, groupId);
 
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
@@ -199,7 +225,11 @@ public class GroupScopeController {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             groupScopeService.updateLearner(learnerDTO, user.getLearner());
+
             return ResponseEntity.ok().build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -211,10 +241,13 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> deleteStudent() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            // delete learner
-            groupScopeService.deleteLearner(user.getLearner().getName());
             // delete user
+            groupScopeService.deleteLearner(user.getLearner().getName());
+            // delete learner
             return ResponseEntity.ok().build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -228,8 +261,10 @@ public class GroupScopeController {
             LearningGroupDTO learningGroupDTO = groupScopeService.getGroup(user.getLearner());
 
             return ResponseEntity.ok(learningGroupDTO);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
@@ -244,6 +279,9 @@ public class GroupScopeController {
             groupScopeService.addGroup(learningGroupDTO);
 
             return ResponseEntity.ok().build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -254,10 +292,12 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> joinToGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
             groupScopeService.addStudent(user.getLearner(), learningGroupDTO.getInviteCode());
 
             return ResponseEntity.ok().build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -272,6 +312,9 @@ public class GroupScopeController {
             groupScopeService.updateGrade(gradeDTO, user.getLearner());
 
             return ResponseEntity.ok().build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -285,6 +328,9 @@ public class GroupScopeController {
             gradeDTOs.forEach(gradeDTO -> groupScopeService.updateGrade(gradeDTO, user.getLearner()));
 
             return ResponseEntity.ok().build();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

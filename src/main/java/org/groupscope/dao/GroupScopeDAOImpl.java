@@ -196,7 +196,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
-    public List<Grade> findAllByLearner(Learner learner) {
+    public List<Grade> findAllGradesByLearner(Learner learner) {
         return gradeRepository.findAllByLearner(learner);
     }
 

@@ -73,7 +73,7 @@ public interface GroupScopeDAO {
 
     Grade findGradeById(GradeKey id);
 
-    List<Grade> findAllByLearner(Learner learner);
+    List<Grade> findAllGradesByLearner(Learner learner);
 
     void deleteGradesByLearner(Learner learner);
 
