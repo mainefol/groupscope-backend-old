@@ -20,7 +20,7 @@ public class GradeDTO {
     public static GradeDTO from(Grade grade) {
         GradeDTO dto = new GradeDTO();
         dto.subjectName = grade.getTask().getSubject().toString();
-        dto.taskName = grade.getTask().getName().toString();
+        dto.taskName = grade.getTask().getName();
         dto.completion = grade.getCompletion();
         dto.mark = grade.getMark();
         return dto;
@@ -33,8 +33,6 @@ public class GradeDTO {
         return grade;
     }
 
-    // TODO finish validation
-    //  to check: type and deadline
     public boolean isValid() {
         return (mark >= 0 && mark <= 100);
     }

@@ -17,7 +17,6 @@ public class TaskDTO {
 
     private String info;
 
-    // TODO added ability to change info
     private String newInfo;
 
     private String deadline;
