@@ -153,7 +153,7 @@ public class GroupScopeController {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
-                groupScopeService.deleteTask(taskDTO);
+                groupScopeService.deleteTask(subjectName, taskDTO);
 
                 return ResponseEntity.ok().build();
             } else {
@@ -243,7 +243,7 @@ public class GroupScopeController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
@@ -257,7 +257,7 @@ public class GroupScopeController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
 
     }

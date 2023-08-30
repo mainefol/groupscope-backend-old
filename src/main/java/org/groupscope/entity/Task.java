@@ -39,12 +39,12 @@ public class Task {
     private String deadline;
 
     // Many-to-one relationship with the Subject entity. Each task belongs to a subject.
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
     // One-to-many relationship with the Grade entity. Each task can have multiple grades.
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Grade> grades;
 
     public Task() {

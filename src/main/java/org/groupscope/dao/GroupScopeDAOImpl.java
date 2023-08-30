@@ -61,7 +61,7 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public List<Subject> findAllSubjectsByGroupName(String groupName) {
-        return subjectRepository.getSubjectsByGroupName(groupName);
+        return subjectRepository.findAllByGroup_Name(groupName);
     }
 
     @Override
@@ -73,6 +73,13 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     public void deleteSubject(Subject subject) {
         subjectRepository.delete(subject);
     }
+
+    @Override
+    public void deleteSubjectByName(String name) {
+        subjectRepository.deleteSubjectByName(name);
+    }
+
+
 
     @Override
     public void saveTask(Task task) {
@@ -110,6 +117,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
         taskRepository.deleteById(id);
     }
 
+
+
     @Override
     public Learner saveStudent(Learner learner) {
         Learner result =  learnerRepository.save(learner);
@@ -146,6 +155,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
         learnerRepository.deleteById(id);
     }
 
+
+
     @Override
     public LearningGroup saveGroup(LearningGroup learningGroup) {
         LearningGroup group = learningGroupRepository.save(learningGroup);
@@ -176,8 +187,24 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
         return gradeRepository.findAllByLearner(learner);
     }
 
+
+    @Override
+    public Grade saveGrade(Grade grade) {
+        return gradeRepository.save(grade);
+    }
+
+    @Override
+    public List<Grade> saveAllGrades(List<Grade> grades) {
+        return (List<Grade>) gradeRepository.saveAll(grades);
+    }
+
     @Override
     public void deleteGradesByLearner(Learner learner) {
         gradeRepository.deleteGradesByLearner(learner);
+    }
+
+    @Override
+    public void deleteGradesByTask(Task task) {
+        gradeRepository.deleteGradesByTask(task);
     }
 }

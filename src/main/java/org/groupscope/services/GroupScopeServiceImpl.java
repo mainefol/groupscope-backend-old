@@ -72,7 +72,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public void deleteSubject(String subjectName) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectName);
         if (subject != null)
-            groupScopeDAO.deleteSubject(subject);
+            groupScopeDAO.deleteSubjectByName(subjectName);
         else
             throw new NullPointerException("Subject not found with name: " + subjectName);
     }
@@ -99,6 +99,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                             task.getGrades().add(grade);
                         });
                 groupScopeDAO.saveTask(task);
+                groupScopeDAO.saveAllGrades(task.getGrades());
             }
         }
         else
@@ -144,11 +145,17 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void deleteTask(TaskDTO taskDTO) {
-        Task task = groupScopeDAO.findTaskByName(taskDTO.getName());
-        if (task != null)
-            groupScopeDAO.deleteTask(task);
-        else
+    public void deleteTask(String subjectName, TaskDTO taskDTO) {
+        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+        Task task = subject.getTasks().stream()
+                .filter(t ->t.getName().equals(taskDTO.getName()))
+                .findFirst()
+                .orElse(null);
+
+        if (task != null) {
+            groupScopeDAO.deleteGradesByTask(task);
+            groupScopeDAO.deleteTaskById(task.getId());
+        } else
             throw new NullPointerException("Task not found with name: " + taskDTO.getName());
     }
 
@@ -164,6 +171,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             else
                 throw new IllegalArgumentException("The task is not relevant to the subject : " + gradeDTO.getSubjectName());
         } else {
+            if(!gradeDTO.isValid())
+                throw new IllegalArgumentException("The mark of grade not valid ");
+
             GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
             learner.getGrades().stream()
                     .filter(grade -> grade.getId().equals(gradeKey))

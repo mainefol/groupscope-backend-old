@@ -24,7 +24,7 @@ public interface GroupScopeService {
 
     void updateTask(TaskDTO taskDTO, String subjectName);
 
-    void deleteTask(TaskDTO taskDTO);
+    void deleteTask(String subjectName, TaskDTO taskDTO);
 
     ///////////////////////////////////////////////////
     void updateGrade(GradeDTO gradeDTO, Learner learner);

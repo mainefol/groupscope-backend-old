@@ -25,7 +25,7 @@ public class Subject {
     private String name;
 
     // One-to-many relationship with the Task entity. Each subject can have multiple tasks.
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "subject_id")
     private List<Task> tasks;
 

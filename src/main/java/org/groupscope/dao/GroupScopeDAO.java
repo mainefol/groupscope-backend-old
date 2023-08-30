@@ -21,6 +21,8 @@ public interface GroupScopeDAO {
 
     void deleteSubject(Subject subject);
 
+    void deleteSubjectByName(String name);
+
 
     void saveTask(Task task);
 
@@ -62,7 +64,13 @@ public interface GroupScopeDAO {
     List<LearningGroup> getAllGroups();
 
 
+    Grade saveGrade(Grade grade);
+
+    List<Grade> saveAllGrades(List<Grade> grades);
+
     List<Grade> findAllByLearner(Learner learner);
 
     void deleteGradesByLearner(Learner learner);
+
+    void deleteGradesByTask(Task task);
 }

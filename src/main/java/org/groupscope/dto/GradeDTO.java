@@ -32,4 +32,10 @@ public class GradeDTO {
         grade.setMark(this.mark);
         return grade;
     }
+
+    // TODO finish validation
+    //  to check: type and deadline
+    public boolean isValid() {
+        return (mark >= 0 && mark <= 100);
+    }
 }

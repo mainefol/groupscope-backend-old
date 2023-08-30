@@ -24,6 +24,7 @@ public class SubjectDTO {
         SubjectDTO dto = new SubjectDTO();
         dto.setId(subject.getId());
         dto.setName(subject.getName());
+        dto.group = subject.getGroup().getName();
 
         List<TaskDTO> taskDTOList = subject.getTasks().stream()
                 .map(TaskDTO::from).collect(Collectors.toList());
