@@ -1,6 +1,7 @@
 package org.groupscope.security.auth;
 
 import lombok.extern.slf4j.Slf4j;
+import org.groupscope.dao.GroupScopeDAOImpl;
 import org.groupscope.dao.repositories.CustomUserRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Unknown user: " + username);
         }
         Hibernate.initialize(customUser.getLearner().getGrades());
+        GroupScopeDAOImpl.removeDuplicates(customUser.getLearner().getLearningGroup().getSubjects());
         return customUser;
     }
 }

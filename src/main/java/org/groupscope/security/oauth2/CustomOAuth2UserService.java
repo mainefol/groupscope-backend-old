@@ -6,11 +6,13 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.groupscope.dao.GroupScopeDAOImpl;
 import org.groupscope.entity.Provider;
 import org.groupscope.security.auth.CustomUser;
 import org.groupscope.security.auth.CustomUserService;
 import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -49,7 +51,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
         user.setLogin(registrationRequest.getLogin());
         registrationRequest.setInviteCode(request.getInviteCode());
         registrationRequest.setGroupName(request.getGroupName());
-        return customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
+
+        user = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
+        Hibernate.initialize(user.getLearner().getGrades());
+        GroupScopeDAOImpl.removeDuplicates(user.getLearner().getLearningGroup().getSubjects());
+
+        return user;
     }
 
     private RegistrationRequest verifyIDToken(String idToken) {

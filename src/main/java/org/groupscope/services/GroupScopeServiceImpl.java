@@ -93,6 +93,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             throw new NullPointerException("Group doesnt exist");
     }
 
+    // TODO when new task has added, subject duplicating
     @Override
     @Transactional
     public void addTask(TaskDTO taskDTO, String subjectName) {
@@ -315,7 +316,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         learner.getGrades().add(grade);
                     }
                 }
-                return groupScopeDAO.saveStudent(learner);
+                Learner l = groupScopeDAO.saveStudent(learner);
+                groupScopeDAO.saveAllGrades(learner.getGrades());
+                return l;
             }
             else {
                 log.info("The learner: " + learner + " is not include in group " + newGroup.getName());
@@ -323,9 +326,5 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             }
         } else
             throw new NullPointerException("Learning group is null in method refreshLearnerGrades()");
-    }
-
-    private List<?> removeDuplicate(List<?> array) {
-        return null;
     }
 }

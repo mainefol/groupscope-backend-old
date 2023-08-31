@@ -33,13 +33,13 @@ public class GroupScopeController {
     public ResponseEntity<List<SubjectDTO>> getSubjects() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            LearningGroup group = user.getLearner().getLearningGroup();
-            List<SubjectDTO> subjects = group.getSubjects()
+            List<Subject> subjects = groupScopeService.getAllSubjectsByGroup(user.getLearner().getLearningGroup());
+            List<SubjectDTO> subjectsDto = subjects
                     .stream()
                     .map(SubjectDTO::from)
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(subjects);
+            return ResponseEntity.ok(subjectsDto);
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

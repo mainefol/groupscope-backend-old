@@ -8,8 +8,7 @@ import org.groupscope.entity.grade.GradeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -51,8 +50,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public Subject findSubjectById(Long subject_id) {
-        Optional<Subject> optionalSubject = subjectRepository.findById(subject_id);
-        return optionalSubject.orElse(null);
+        Optional<Subject> subject = subjectRepository.findById(subject_id);
+        return subject.orElse(null);
     }
 
     @Override
@@ -62,7 +61,9 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public List<Subject> findAllSubjectsByGroupName(String groupName) {
-        return subjectRepository.findAllByGroup_Name(groupName);
+        List<Subject> subjects = subjectRepository.findAllByGroup_Name(groupName);
+        removeDuplicates(subjects);
+        return subjects;
     }
 
     @Override
@@ -170,12 +171,16 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public LearningGroup findGroupById(Long id) {
         Optional<LearningGroup> learningGroup = learningGroupRepository.findById(id);
+        removeDuplicates(learningGroup.get().getSubjects());
         return learningGroup.orElse(null);
     }
 
     @Override
     public LearningGroup findLearningGroupByInviteCode(String inviteCode) {
-        return learningGroupRepository.getLearningGroupByInviteCode(inviteCode);
+        LearningGroup learningGroup = learningGroupRepository.getLearningGroupByInviteCode(inviteCode);
+        removeDuplicates(learningGroup.getSubjects());
+        return learningGroup;
+
     }
 
     @Override
@@ -218,5 +223,22 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public void deleteGradesByTask(Task task) {
         gradeRepository.deleteGradesByTask(task);
+    }
+
+    public static void removeDuplicates (List<? extends ObjectWithId> objects) {
+        if(objects == null)
+            return;
+
+        Set<Long> seenIds = new HashSet<>();
+        Iterator<? extends ObjectWithId> iterator = objects.listIterator();
+
+        while (iterator.hasNext()) {
+            ObjectWithId object = iterator.next();
+            if(seenIds.contains(object.getId())) {
+                iterator.remove();
+            } else {
+                seenIds.add(object.getId());
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@ import java.util.Objects;
 @Data
 @Entity
 @Table(name = "subjects")
-public class Subject {
+public class Subject implements ObjectWithId {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
