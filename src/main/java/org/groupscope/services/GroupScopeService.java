@@ -11,7 +11,7 @@ public interface GroupScopeService {
 
     Subject getSubjectByName(String subjectName);
 
-    List<Subject> getAllSubjects();
+    List<Subject> getAllSubjectsByGroup(LearningGroup learningGroup);
 
     void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
 

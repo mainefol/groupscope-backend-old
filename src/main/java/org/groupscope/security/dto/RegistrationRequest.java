@@ -29,4 +29,16 @@ public class RegistrationRequest {
 
         return customUser;
     }
+
+    public boolean isValid() {
+        return (login != null && login.length() != 0) && (password != null && password.length() != 0);
+    }
+
+    @Override
+    public String toString() {
+        return "RegistrationRequest {" +
+                "login = '" + login + '\'' +
+                ", password = '" + password + '\'' +
+                '}';
+    }
 }

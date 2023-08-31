@@ -10,9 +10,11 @@ import org.groupscope.security.dto.AuthResponse;
 import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
 import org.groupscope.security.oauth2.CustomOAuth2UserService;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +47,11 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
 
+            if(!request.isValid()) {
+                log.info(request.toString() + " not valid");
+                return ResponseEntity.badRequest().build();
+            }
+
             // Save new user
             CustomUser user = customUserService.saveUser(request.toUser(), request, Provider.LOCAL);
             if (user != null) {
@@ -52,7 +59,7 @@ public class AuthController {
             } else {
                 return ResponseEntity.badRequest().build();
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }

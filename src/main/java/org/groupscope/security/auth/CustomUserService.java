@@ -89,6 +89,7 @@ public class CustomUserService {
      * Find a custom user by their login (username).
      * Returns the custom user if found, or null if not found.
      */
+    @Transactional
     public CustomUser findByLogin(String login) {
         return customUserRepository.findByLogin(login);
     }
@@ -97,14 +98,16 @@ public class CustomUserService {
      * Find a custom user by their login (username) and password.
      * Returns the custom user if found and the provided password matches the stored password, or null if not found or password doesn't match.
      */
+    @Transactional
     public CustomUser findByLoginAndPassword(String login, String password) {
         CustomUser customUser = findByLogin(login);
         if(customUser != null) {
             if (passwordEncoder.matches(password, customUser.getPassword())){
                 return customUser;
-            }
-        }
-        return null;
+            } else
+                throw new IllegalArgumentException("Incorrect password");
+        } else
+            throw new NullPointerException("User with login = " + login + "not found");
     }
 
 

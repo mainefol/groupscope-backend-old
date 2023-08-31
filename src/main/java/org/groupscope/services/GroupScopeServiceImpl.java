@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -35,7 +37,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
             if(!subject.getGroup().getSubjects().contains(subject)) {
                 groupScopeDAO.saveSubject(subject);
-            }
+            } else
+                throw new IllegalArgumentException("Subject = " + subject.toString() + " has been already existing");
         }
         else {
             throw new NullPointerException("Learning group was null");
@@ -82,8 +85,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<Subject> getAllSubjects() {
-        return groupScopeDAO.findAllSubjects();
+    public List<Subject> getAllSubjectsByGroup(LearningGroup learningGroup) {
+        List<Subject> subjects = learningGroup.getSubjects();
+        if(subjects != null)
+            return subjects;
+        else
+            throw new NullPointerException("Group doesnt exist");
     }
 
     @Override
@@ -104,7 +111,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         });
                 groupScopeDAO.saveTask(task);
                 groupScopeDAO.saveAllGrades(task.getGrades());
-            }
+            } else
+                throw new IllegalArgumentException("Task = " + task.toString() + " has been already existing");
         }
         else
             throw new NullPointerException("Subject not found with name: " + subjectName);
@@ -315,5 +323,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             }
         } else
             throw new NullPointerException("Learning group is null in method refreshLearnerGrades()");
+    }
+
+    private List<?> removeDuplicate(List<?> array) {
+        return null;
     }
 }
