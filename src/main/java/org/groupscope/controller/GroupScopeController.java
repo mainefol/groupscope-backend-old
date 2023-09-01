@@ -124,6 +124,19 @@ public class GroupScopeController {
         }
     }
 
+
+    @GetMapping("/subject/{subject-name}/grade/all")
+    public ResponseEntity<List<GradeDTO>> getGradesOfSubject(@PathVariable("subject-name") String subjectName) {
+        try {
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            List<GradeDTO> gradeDTOs = groupScopeService.getAllGradesOfSubject(subjectName, user.getLearner());
+
+            return ResponseEntity.ok(gradeDTOs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+    }
+
     @PostMapping("/subject/{subject-name}/task/add")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
                                               @PathVariable("subject-name") String subjectName) {

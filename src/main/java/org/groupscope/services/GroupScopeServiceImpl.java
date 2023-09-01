@@ -177,6 +177,19 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
+    public List<GradeDTO> getAllGradesOfSubject(String subjectName, Learner learner) {
+        if(subjectName == null || learner == null)
+            throw (subjectName == null) ? new NullPointerException("Subject name is null") :
+                                        new NullPointerException("Learner is null");
+
+        return learner.getGrades().stream()
+                .filter(grade -> grade.getTask().getSubject().getName().equals(subjectName))
+                .map(GradeDTO::from)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
     public void updateGrade(GradeDTO gradeDTO, Learner learner) {
         Task task = groupScopeDAO.findTaskByName(gradeDTO.getTaskName());
         Subject subject = groupScopeDAO.findSubjectByName(gradeDTO.getSubjectName());

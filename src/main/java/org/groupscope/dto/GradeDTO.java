@@ -1,5 +1,6 @@
 package org.groupscope.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.groupscope.entity.grade.Grade;
 
@@ -33,6 +34,7 @@ public class GradeDTO {
         return grade;
     }
 
+    @JsonIgnore
     public boolean isValid() {
         return (mark >= 0 && mark <= 100);
     }
