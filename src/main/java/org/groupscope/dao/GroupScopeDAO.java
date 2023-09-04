@@ -12,6 +12,8 @@ public interface GroupScopeDAO {
 
     Subject findSubjectByName(String subjectName);
 
+    Subject findSubjectByNameAndGroupId(String name, Long groupId);
+
     Subject findSubjectById(Long subject_id);
 
     List<Subject> findAllSubjects();
@@ -32,6 +34,8 @@ public interface GroupScopeDAO {
     List<Task> findAllTasksOfSubject(Subject subject);
 
     Task findTaskByName(String name);
+
+    Task findTaskByNameAndSubjectId(String name, Long subjectId);
 
     void updateTask(Task task);
 

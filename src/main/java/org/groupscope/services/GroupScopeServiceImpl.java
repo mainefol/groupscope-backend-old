@@ -6,15 +6,13 @@ import org.groupscope.dto.*;
 import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -30,13 +28,14 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
+    public Subject addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
         Subject subject = subjectDTO.toSubject();
         if(learningGroup != null) {
             subject.setGroup(learningGroup);
 
             if(!subject.getGroup().getSubjects().contains(subject)) {
                 groupScopeDAO.saveSubject(subject);
+                return subject;
             } else
                 throw new IllegalArgumentException("Subject = " + subject.toString() + " has been already existing");
         }
@@ -46,32 +45,40 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public Subject getSubjectByName(String subjectName) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
-        if(subject != null)
-            return groupScopeDAO.findSubjectByName(subjectName);
-        else
-            throw new NullPointerException("Subject with name = " + subjectName + "not found");
+    public Subject getSubjectByName(String subjectName, LearningGroup learningGroup) {
+        if(learningGroup != null && subjectName != null) {
+            Optional<Subject> subject = learningGroup.getSubjects().stream()
+                    .filter(s -> s.getName().equals(subjectName))
+                    .findFirst();
+            if(subject.isPresent())
+                return subject.get();
+            else
+                throw new NullPointerException("Subject with name = " + subjectName + "not found");
+        } else
+            throw new NullPointerException("Learning group is null");
     }
 
     @Override
     @Transactional
-    public void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectDTO.getName());
-        if(subject != null && Objects.equals(subject.getGroup().getId(), learningGroup.getId())) {
-            if (subjectDTO.getNewName() != null) {
-                subject.setName(subjectDTO.getNewName());
+    public Subject updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
+        if(learningGroup != null && subjectDTO != null) {
+            Subject subject = learningGroup.getSubjects().stream()
+                    .filter(s -> s.getName().equals(subjectDTO.getName()))
+                    .findFirst()
+                    .get();
+
+            if(subject != null) {
+                if (subjectDTO.getNewName() != null) {
+                    subject.setName(subjectDTO.getNewName());
+                }
+                subject.setGroup(learningGroup);
+                groupScopeDAO.updateSubject(subject);
+                return subject;
             }
-            subjectDTO.setId(subject.getId());
-            subject.setGroup(learningGroup);
-            groupScopeDAO.updateSubject(subject);
-        }
-        else
-            if(subject == null)
-                throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
             else
-                throw new IllegalArgumentException("Subject" + subjectDTO.getName() +
-                        "is not relevant to group: " + learningGroup);
+                throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
+        } else
+            throw new NullPointerException("Learning group or subjectDTO are null");
     }
 
     @Override
@@ -85,15 +92,18 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<Subject> getAllSubjectsByGroup(LearningGroup learningGroup) {
+    public List<SubjectDTO> getAllSubjectsByGroup(LearningGroup learningGroup) {
         List<Subject> subjects = learningGroup.getSubjects();
         if(subjects != null)
-            return subjects;
+            return subjects.stream()
+                    .map(SubjectDTO::from)
+                    .collect(Collectors.toList());
         else
             throw new NullPointerException("Group doesnt exist");
     }
 
     // TODO when new task has added, subject duplicating
+    //  P.S. was fixed by GroupScopeDAOImpl.removeDuplicates() function, but still not fixed in Hibernate
     @Override
     @Transactional
     public void addTask(TaskDTO taskDTO, String subjectName) {
@@ -120,17 +130,18 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<TaskDTO> getAllTasksOfSubject(String subjectName) {
+    public List<TaskDTO> getAllTasksOfSubject(Learner learner, String subjectName) {
         Subject subject = groupScopeDAO.findSubjectByName(subjectName);
 
         if(subject != null) {
-            return subject.getTasks()
-                    .stream()
-                    .map(TaskDTO::from)
-                    .collect(Collectors.toList());
+            if(learner.getLearningGroup().getSubjects().contains(subject)) {
+                return subject.getTasks()
+                        .stream()
+                        .map(TaskDTO::from)
+                        .collect(Collectors.toList());
+            }
         }
-        else
-            throw new NullPointerException("Subject not found with name: " + subjectName);
+        throw new NullPointerException("Subject not found with name: " + subjectName);
     }
 
     @Override
@@ -191,24 +202,30 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Override
     @Transactional
     public void updateGrade(GradeDTO gradeDTO, Learner learner) {
-        Task task = groupScopeDAO.findTaskByName(gradeDTO.getTaskName());
-        Subject subject = groupScopeDAO.findSubjectByName(gradeDTO.getSubjectName());
+        if(!gradeDTO.isValid())
+            throw new IllegalArgumentException("The gradeDTO not valid ");
 
-        if (task == null || !subject.equals(task.getSubject())) {
-            if(task == null)
+        Subject subject = groupScopeDAO.findSubjectByNameAndGroupId(
+                gradeDTO.getSubjectName(),
+                learner.getLearningGroup().getId()
+        );
+
+        if(subject != null) {
+            Task task = groupScopeDAO.findTaskByNameAndSubjectId(
+                    gradeDTO.getTaskName(),
+                    subject.getId()
+            );
+
+            if(task != null) {
+                GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
+                Grade grade = groupScopeDAO.findGradeById(gradeKey);
+                grade.setCompletion(gradeDTO.getCompletion());
+                grade.setMark(gradeDTO.getMark());
+                groupScopeDAO.saveGrade(grade);
+            } else
                 throw new NullPointerException("Task not found with name: " + gradeDTO.getTaskName());
-            else
-                throw new IllegalArgumentException("The task is not relevant to the subject : " + gradeDTO.getSubjectName());
-        } else {
-            if(!gradeDTO.isValid())
-                throw new IllegalArgumentException("The mark of grade not valid ");
-
-            GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
-            Grade grade = groupScopeDAO.findGradeById(gradeKey);
-            grade.setCompletion(gradeDTO.getCompletion());
-            grade.setMark(gradeDTO.getMark());
-            groupScopeDAO.saveGrade(grade);
-        }
+        } else
+            throw new NullPointerException("Subject not found with name: " + gradeDTO.getSubjectName());
     }
 
     /**

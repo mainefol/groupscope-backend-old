@@ -11,5 +11,7 @@ import java.util.List;
 public interface TaskRepository extends CrudRepository<Task,Long> {
     List<Task> findTasksBySubject(Subject subject);
 
+    Task getTaskByNameAndSubject_Id(String name, Long subject_id);
+
     Task getTaskByName(String name);
 }

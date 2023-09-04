@@ -7,11 +7,15 @@ import org.groupscope.entity.*;
 import org.groupscope.security.auth.CustomUser;
 import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,22 +26,32 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class GroupScopeController {
 
+    @Value("${server.port}")
+    private int serverPort;
+
+    private final String API_LINE;
+
     private final GroupScopeService groupScopeService;
 
     @Autowired
     public GroupScopeController(GroupScopeService groupScopeService) {
         this.groupScopeService = groupScopeService;
+        API_LINE = "http://localhost:" + serverPort;
+    }
+
+    private void logRequestMapping(CustomUser user, HttpServletRequest request) {
+        String requestPath = request.getRequestURI();
+        log.info("{} {}{} {}", request.getMethod(), API_LINE, requestPath, user);
     }
 
     @GetMapping("/subject/all")
     public ResponseEntity<List<SubjectDTO>> getSubjects() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            List<Subject> subjects = groupScopeService.getAllSubjectsByGroup(user.getLearner().getLearningGroup());
-            List<SubjectDTO> subjectsDto = subjects
-                    .stream()
-                    .map(SubjectDTO::from)
-                    .collect(Collectors.toList());
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            List<SubjectDTO> subjectsDto = groupScopeService.getAllSubjectsByGroup(user.getLearner().getLearningGroup());
 
             return ResponseEntity.ok(subjectsDto);
         } catch (NullPointerException | IllegalArgumentException e) {
@@ -53,6 +67,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
                 groupScopeService.addSubject(subjectDTO, user.getLearner().getLearningGroup());
 
@@ -73,6 +90,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> patchSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
                 groupScopeService.updateSubject(subjectDTO, user.getLearner().getLearningGroup());
 
@@ -93,6 +113,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> deleteSubject(@PathVariable("subject-name") String subjectName) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
                 groupScopeService.deleteSubject(subjectName);
 
@@ -112,7 +135,11 @@ public class GroupScopeController {
     @GetMapping("/subject/{subject-name}/task/all")
     public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
-            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName);
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(user.getLearner(), subjectName);
 
             return ResponseEntity.ok(tasks);
         } catch (NullPointerException | IllegalArgumentException e) {
@@ -129,10 +156,17 @@ public class GroupScopeController {
     public ResponseEntity<List<GradeDTO>> getGradesOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             List<GradeDTO> gradeDTOs = groupScopeService.getAllGradesOfSubject(subjectName, user.getLearner());
 
             return ResponseEntity.ok(gradeDTOs);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -142,6 +176,9 @@ public class GroupScopeController {
                                               @PathVariable("subject-name") String subjectName) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
                 groupScopeService.addTask(taskDTO, subjectName);
 
@@ -163,6 +200,9 @@ public class GroupScopeController {
                                                 @PathVariable("subject-name") String subjectName) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
                 groupScopeService.updateTask(taskDTO, subjectName);
 
@@ -185,6 +225,9 @@ public class GroupScopeController {
                                                  @PathVariable("subject-name") String subjectName) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
                 groupScopeService.deleteTask(subjectName, taskDTO);
 
@@ -205,6 +248,9 @@ public class GroupScopeController {
     public ResponseEntity<LearnerDTO> getStudent() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             LearnerDTO learnerDTO = LearnerDTO.from(user.getLearner());
 
             return ResponseEntity.ok(learnerDTO);
@@ -237,6 +283,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> updateStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             groupScopeService.updateLearner(learnerDTO, user.getLearner());
 
             return ResponseEntity.ok().build();
@@ -254,6 +303,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> deleteStudent() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             // delete user
             groupScopeService.deleteLearner(user.getLearner().getName());
             // delete learner
@@ -271,6 +323,9 @@ public class GroupScopeController {
     public ResponseEntity<LearningGroupDTO> getGroup() {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             LearningGroupDTO learningGroupDTO = groupScopeService.getGroup(user.getLearner());
 
             return ResponseEntity.ok(learningGroupDTO);
@@ -287,6 +342,8 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> createGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
 
             learningGroupDTO.setHeadmen(LearnerDTO.from(user.getLearner()));
             groupScopeService.addGroup(learningGroupDTO);
@@ -305,6 +362,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> joinToGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             groupScopeService.addStudent(user.getLearner(), learningGroupDTO.getInviteCode());
 
             return ResponseEntity.ok().build();
@@ -322,6 +382,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> updateGrade(@RequestBody GradeDTO gradeDTO) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             groupScopeService.updateGrade(gradeDTO, user.getLearner());
 
             return ResponseEntity.ok().build();
@@ -338,6 +401,9 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> updateGrades(@RequestBody List<GradeDTO> gradeDTOs) {
         try {
             CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
             gradeDTOs.forEach(gradeDTO -> groupScopeService.updateGrade(gradeDTO, user.getLearner()));
 
             return ResponseEntity.ok().build();

@@ -49,6 +49,11 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public Subject findSubjectByNameAndGroupId(String name, Long groupId) {
+        return subjectRepository.getSubjectByNameAndGroup_Id(name, groupId);
+    }
+
+    @Override
     public Subject findSubjectById(Long subject_id) {
         Optional<Subject> subject = subjectRepository.findById(subject_id);
         return subject.orElse(null);
@@ -102,6 +107,11 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public Task findTaskByName(String name) {
         return taskRepository.getTaskByName(name);
+    }
+
+    @Override
+    public Task findTaskByNameAndSubjectId(String name, Long subjectId) {
+        return taskRepository.getTaskByNameAndSubject_Id(name, subjectId);
     }
 
     @Override

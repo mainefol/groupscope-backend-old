@@ -7,20 +7,20 @@ import java.util.List;
 
 public interface GroupScopeService {
 
-    void addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
+    Subject addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
 
-    Subject getSubjectByName(String subjectName);
+    Subject getSubjectByName(String subjectName, LearningGroup learningGroup);
 
-    List<Subject> getAllSubjectsByGroup(LearningGroup learningGroup);
+    List<SubjectDTO> getAllSubjectsByGroup(LearningGroup learningGroup);
 
-    void updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
+    Subject updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup);
 
     void deleteSubject(String subjectName);
 
     ///////////////////////////////////////////////////
     void addTask(TaskDTO taskDTO, String subjectName);
 
-    List<TaskDTO> getAllTasksOfSubject(String subjectName);
+    List<TaskDTO> getAllTasksOfSubject(Learner learner, String subjectName);
 
     void updateTask(TaskDTO taskDTO, String subjectName);
 

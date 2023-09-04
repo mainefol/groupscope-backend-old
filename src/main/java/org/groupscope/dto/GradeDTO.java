@@ -36,6 +36,6 @@ public class GradeDTO {
 
     @JsonIgnore
     public boolean isValid() {
-        return (mark >= 0 && mark <= 100);
+        return (mark >= 0 && mark <= 100) && subjectName != null && taskName != null;
     }
 }

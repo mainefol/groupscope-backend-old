@@ -12,6 +12,8 @@ public interface SubjectRepository extends CrudRepository<Subject, Long> {
 
     Subject getSubjectByName(String name);
 
+    Subject getSubjectByNameAndGroup_Id(String name, Long group_id);
+
     List<Subject> findAllByGroup_Name(String groupName);
 
     void deleteSubjectByName(String name);

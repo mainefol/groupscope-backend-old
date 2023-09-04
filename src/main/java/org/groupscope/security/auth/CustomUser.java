@@ -80,6 +80,6 @@ public class CustomUser implements UserDetails {
 
     @Override
     public String toString() {
-        return "User: " + this.getLogin() + '\t' + this.getPassword();
+        return "User: " + this.getLogin();
     }
 }
