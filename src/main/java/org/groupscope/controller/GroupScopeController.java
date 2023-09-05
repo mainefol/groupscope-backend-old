@@ -17,7 +17,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -117,7 +116,7 @@ public class GroupScopeController {
             logRequestMapping(user, request);
 
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
-                groupScopeService.deleteSubject(subjectName);
+                groupScopeService.deleteSubject(subjectName, user.getLearner().getLearningGroup());
 
                 return ResponseEntity.ok().build();
             } else {
@@ -152,25 +151,6 @@ public class GroupScopeController {
     }
 
 
-    @GetMapping("/subject/{subject-name}/grade/all")
-    public ResponseEntity<List<GradeDTO>> getGradesOfSubject(@PathVariable("subject-name") String subjectName) {
-        try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-            logRequestMapping(user, request);
-
-            List<GradeDTO> gradeDTOs = groupScopeService.getAllGradesOfSubject(subjectName, user.getLearner());
-
-            return ResponseEntity.ok(gradeDTOs);
-        } catch (NullPointerException | IllegalArgumentException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-        }
-    }
-
     @PostMapping("/subject/{subject-name}/task/add")
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
                                               @PathVariable("subject-name") String subjectName) {
@@ -180,7 +160,7 @@ public class GroupScopeController {
             logRequestMapping(user, request);
 
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
-                groupScopeService.addTask(taskDTO, subjectName);
+                groupScopeService.addTask(taskDTO, subjectName, user.getLearner().getLearningGroup());
 
                 return ResponseEntity.ok().build();
             } else {
@@ -376,6 +356,47 @@ public class GroupScopeController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
 
+    }
+
+    @GetMapping("/subject/{subject-name}/grade/all")
+    public ResponseEntity<List<GradeDTO>> getGradesOfSubject(@PathVariable("subject-name") String subjectName) {
+        try {
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            List<GradeDTO> gradeDTOs = groupScopeService.getAllGradesOfSubject(subjectName, user.getLearner());
+
+            return ResponseEntity.ok(gradeDTOs);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+    }
+
+    @GetMapping("/group/{subject-name}/grade/all")
+    public ResponseEntity<List<LearnerDTO>> getGradesOfSubjectFromGroup(@PathVariable("subject-name") String subjectName) {
+        try {
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                List<LearnerDTO> learnerDTOs = groupScopeService.getGradesOfSubjectFromGroup(subjectName, user.getLearner().getLearningGroup());
+                return ResponseEntity.ok(learnerDTOs);
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
     }
 
     @PostMapping("/grade")

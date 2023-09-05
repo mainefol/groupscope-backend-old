@@ -26,6 +26,8 @@ public interface GroupScopeDAO {
 
     void deleteSubjectByName(String name);
 
+    void deleteSubjectByNameAndGroupId(String name, Long groupId);
+
 
     void saveTask(Task task);
 

@@ -86,7 +86,10 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
         subjectRepository.deleteSubjectByName(name);
     }
 
-
+    @Override
+    public void deleteSubjectByNameAndGroupId(String name, Long groupId) {
+        subjectRepository.deleteSubjectByNameAndGroup_Id(name, groupId);
+    }
 
     @Override
     public void saveTask(Task task) {

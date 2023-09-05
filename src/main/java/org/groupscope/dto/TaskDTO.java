@@ -1,10 +1,14 @@
 package org.groupscope.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.groupscope.entity.*;
 
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskDTO {
 
     private Long id;
@@ -20,6 +24,13 @@ public class TaskDTO {
     private String newInfo;
 
     private String deadline;
+
+    public TaskDTO(String name, TaskType type, String info, String deadline) {
+        this.name = name;
+        this.type = type;
+        this.info = info;
+        this.deadline = deadline;
+    }
 
     public static TaskDTO from(Task task) {
         TaskDTO dto = new TaskDTO();

@@ -43,6 +43,12 @@ public class Subject implements ObjectWithId {
         tasks = new ArrayList<>();
     }
 
+    public Subject(String name, LearningGroup group) {
+        this.name = name;
+        this.group = group;
+        tasks = new ArrayList<>();
+    }
+
     @Override
     public String toString() {
         return name;

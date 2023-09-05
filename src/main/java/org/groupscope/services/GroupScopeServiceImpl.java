@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,10 +29,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public Subject addSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
+    public Subject addSubject(SubjectDTO subjectDTO, LearningGroup group) {
         Subject subject = subjectDTO.toSubject();
-        if(learningGroup != null) {
-            subject.setGroup(learningGroup);
+        if(group != null) {
+            subject.setGroup(group);
 
             if(!subject.getGroup().getSubjects().contains(subject)) {
                 groupScopeDAO.saveSubject(subject);
@@ -45,9 +46,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public Subject getSubjectByName(String subjectName, LearningGroup learningGroup) {
-        if(learningGroup != null && subjectName != null) {
-            Optional<Subject> subject = learningGroup.getSubjects().stream()
+    public Subject getSubjectByName(String subjectName, LearningGroup group) {
+        if(group != null && subjectName != null) {
+            Optional<Subject> subject = group.getSubjects().stream()
                     .filter(s -> s.getName().equals(subjectName))
                     .findFirst();
             if(subject.isPresent())
@@ -60,20 +61,19 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public Subject updateSubject(SubjectDTO subjectDTO, LearningGroup learningGroup) {
-        if(learningGroup != null && subjectDTO != null) {
-            Subject subject = learningGroup.getSubjects().stream()
+    public Subject updateSubject(SubjectDTO subjectDTO, LearningGroup group) {
+        if(group != null && subjectDTO != null) {
+            Optional<Subject> subject = group.getSubjects().stream()
                     .filter(s -> s.getName().equals(subjectDTO.getName()))
-                    .findFirst()
-                    .get();
+                    .findFirst();
 
-            if(subject != null) {
+            if(subject.isPresent()) {
                 if (subjectDTO.getNewName() != null) {
-                    subject.setName(subjectDTO.getNewName());
+                    subject.get().setName(subjectDTO.getNewName());
                 }
-                subject.setGroup(learningGroup);
-                groupScopeDAO.updateSubject(subject);
-                return subject;
+                subject.get().setGroup(group);
+                groupScopeDAO.updateSubject(subject.get());
+                return subject.get();
             }
             else
                 throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
@@ -83,32 +83,39 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void deleteSubject(String subjectName) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
-        if (subject != null)
-            groupScopeDAO.deleteSubjectByName(subjectName);
-        else
-            throw new NullPointerException("Subject not found with name: " + subjectName);
+    public void deleteSubject(String subjectName, LearningGroup group) {
+        if (group != null) {
+            Subject subject = groupScopeDAO.findSubjectByNameAndGroupId(subjectName, group.getId());
+            if (subject != null) {
+                groupScopeDAO.deleteSubject(subject);
+            } else
+                throw new NullPointerException("Subject not found with name: " + subjectName);
+
+        } else
+            throw new NullPointerException("Learning group is null");
     }
 
     @Override
-    public List<SubjectDTO> getAllSubjectsByGroup(LearningGroup learningGroup) {
-        List<Subject> subjects = learningGroup.getSubjects();
-        if(subjects != null)
-            return subjects.stream()
-                    .map(SubjectDTO::from)
-                    .collect(Collectors.toList());
-        else
+    public List<SubjectDTO> getAllSubjectsByGroup(LearningGroup group) {
+        if(group != null) {
+            List<Subject> subjects = group.getSubjects();
+            if (subjects != null)
+                return subjects.stream()
+                        .map(SubjectDTO::from)
+                        .collect(Collectors.toList());
+            else
+                return new ArrayList<>();
+        } else
             throw new NullPointerException("Group doesnt exist");
     }
 
     // TODO when new task has added, subject duplicating
-    //  P.S. was fixed by GroupScopeDAOImpl.removeDuplicates() function, but still not fixed in Hibernate
+    //  P.S. was fixed by GroupScopeDAOImpl.removeDuplicates() function, but still not fixed in Hibernate response
     @Override
     @Transactional
-    public void addTask(TaskDTO taskDTO, String subjectName) {
+    public Task addTask(TaskDTO taskDTO, String subjectName, LearningGroup group) {
         Task task = taskDTO.toTask();
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+        Subject subject = groupScopeDAO.findSubjectByNameAndGroupId(subjectName, group.getId());
         if(subject != null) {
             task.setSubject(subject);
 
@@ -122,6 +129,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         });
                 groupScopeDAO.saveTask(task);
                 groupScopeDAO.saveAllGrades(task.getGrades());
+                return task;
             } else
                 throw new IllegalArgumentException("Task = " + task.toString() + " has been already existing");
         }
@@ -197,6 +205,28 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 .filter(grade -> grade.getTask().getSubject().getName().equals(subjectName))
                 .map(GradeDTO::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LearnerDTO> getGradesOfSubjectFromGroup(String subjectName, LearningGroup group) {
+        if(subjectName != null && group != null) {
+            return group.getLearners().stream()
+                    .peek(learner -> {
+                        List<Grade> grades = groupScopeDAO.findAllGradesByLearner(learner);
+                        learner.setGrades(grades);
+                    })
+                    .map(LearnerDTO::from)
+                    .peek(learnerDTO -> {
+                        List<GradeDTO> filteredGrades = learnerDTO.getGrades().stream()
+                                .filter(gradeDTO -> gradeDTO.getSubjectName().equals(subjectName))
+                                .collect(Collectors.toList());
+
+                        learnerDTO.setGrades(filteredGrades);
+                    })
+                    .collect(Collectors.toList());
+        } else
+            throw new NullPointerException("Subject name or group is null");
+
     }
 
     @Override

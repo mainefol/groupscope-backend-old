@@ -1,6 +1,7 @@
 package org.groupscope.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.groupscope.entity.*;
 import org.springframework.util.CollectionUtils;
 
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class SubjectDTO {
 
     private Long id;
@@ -19,6 +21,10 @@ public class SubjectDTO {
     private List<TaskDTO> tasks;
 
     private String group;
+
+    public SubjectDTO(String name) {
+        this.name = name;
+    }
 
     public static SubjectDTO from(Subject subject) {
         SubjectDTO dto = new SubjectDTO();
