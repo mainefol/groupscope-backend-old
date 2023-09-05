@@ -212,17 +212,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if(subjectName != null && group != null) {
             return group.getLearners().stream()
                     .peek(learner -> {
-                        List<Grade> grades = groupScopeDAO.findAllGradesByLearner(learner);
+                        List<Grade> grades = groupScopeDAO.findAllGradesByLearner(learner).stream()
+                                        .filter(grade -> grade.getTask().getSubject().getName().equals(subjectName))
+                                                .collect(Collectors.toList());
                         learner.setGrades(grades);
                     })
                     .map(LearnerDTO::from)
-                    .peek(learnerDTO -> {
-                        List<GradeDTO> filteredGrades = learnerDTO.getGrades().stream()
-                                .filter(gradeDTO -> gradeDTO.getSubjectName().equals(subjectName))
-                                .collect(Collectors.toList());
-
-                        learnerDTO.setGrades(filteredGrades);
-                    })
                     .collect(Collectors.toList());
         } else
             throw new NullPointerException("Subject name or group is null");
