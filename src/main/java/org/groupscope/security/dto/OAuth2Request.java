@@ -3,12 +3,13 @@ package org.groupscope.security.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class OAuth2Request {
 
     @NotEmpty
-    private String IdToken;
+    private String idToken;
 
     private String learnerName;
 

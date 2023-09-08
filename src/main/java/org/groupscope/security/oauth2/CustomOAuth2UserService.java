@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -42,21 +43,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
                 .build();
     }
 
+    @Transactional
     public CustomUser loginOAuthGoogle(OAuth2Request request) {
-        RegistrationRequest registrationRequest = verifyIDToken(request.getIdToken());
-        if (registrationRequest == null) {
-            throw new IllegalArgumentException();
-        }
-        CustomUser user = new CustomUser();
-        user.setLogin(registrationRequest.getLogin());
-        registrationRequest.setInviteCode(request.getInviteCode());
-        registrationRequest.setGroupName(request.getGroupName());
+        if(request.getIdToken() != null) {
+            RegistrationRequest registrationRequest = verifyIDToken(request.getIdToken());
+            if (registrationRequest == null) {
+                throw new IllegalArgumentException("Token not verified");
+            }
+            CustomUser user = new CustomUser();
+            user.setLogin(registrationRequest.getLogin());
+            registrationRequest.setInviteCode(request.getInviteCode());
+            registrationRequest.setGroupName(request.getGroupName());
 
-        user = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
-        Hibernate.initialize(user.getLearner().getGrades());
-        GroupScopeDAOImpl.removeDuplicates(user.getLearner().getLearningGroup().getSubjects());
+            user = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
+            Hibernate.initialize(user.getLearner().getGrades());
+            GroupScopeDAOImpl.removeDuplicates(user.getLearner().getLearningGroup().getSubjects());
 
-        return user;
+            return user;
+        } else
+            throw new NullPointerException("IdToken is null");
     }
 
     private RegistrationRequest verifyIDToken(String idToken) {

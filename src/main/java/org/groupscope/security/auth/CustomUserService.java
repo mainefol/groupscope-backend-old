@@ -53,7 +53,7 @@ public class CustomUserService {
 
         // Add new learner to an existing group based on the invite code
         if(request.getInviteCode() != null) {
-            Learner student = groupScopeService.addStudent(learnerDTO.toLearner(), request.getInviteCode());
+            Learner student = groupScopeService.addLearner(learnerDTO.toLearner(), request.getInviteCode());
             return processLearner(customUser, student);
 
         // Add new learner and create a new group

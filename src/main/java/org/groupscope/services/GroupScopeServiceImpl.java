@@ -138,53 +138,51 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     @Override
-    public List<TaskDTO> getAllTasksOfSubject(Learner learner, String subjectName) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+    public List<TaskDTO> getAllTasksOfSubject(String subjectName, LearningGroup group) {
+        if(subjectName != null && group != null) {
+            Subject subject = groupScopeDAO.findSubjectByNameAndGroupId(subjectName, group.getId());
 
-        if(subject != null) {
-            if(learner.getLearningGroup().getSubjects().contains(subject)) {
+            if (subject != null) {
                 return subject.getTasks()
                         .stream()
                         .map(TaskDTO::from)
                         .collect(Collectors.toList());
+            } else
+                throw new NullPointerException("Subject not found with name: " + subjectName);
+        } else
+            throw new NullPointerException("Subject name or group is null");
+    }
+
+    @Override
+    @Transactional
+    public void updateTask(TaskDTO taskDTO, String subjectName, LearningGroup group) {
+        Subject subject = groupScopeDAO.findSubjectByNameAndGroupId(subjectName, group.getId());
+        if(subject != null) {
+            Task task = groupScopeDAO.findTaskByNameAndSubjectId(taskDTO.getName(), subject.getId());
+            if (task != null) {
+                if (taskDTO.getNewName() != null)
+                    task.setName(taskDTO.getNewName());
+                if (taskDTO.getType() != null && taskDTO.isValidTaskType())
+                    task.setType(taskDTO.getType());
+                if (taskDTO.getInfo() != null)
+                    task.setInfo(taskDTO.getInfo());
+                if (taskDTO.getDeadline() != null && taskDTO.isValidDeadline())
+                    task.setDeadline(taskDTO.getDeadline());
+                groupScopeDAO.updateTask(task);
+            } else {
+                throw new NullPointerException("Task not found with name: " + taskDTO.getName());
             }
-        }
-        throw new NullPointerException("Subject not found with name: " + subjectName);
+        } else
+            throw new NullPointerException("Subject not found with name: " + subjectName);
     }
 
     @Override
     @Transactional
-    public void updateTask(TaskDTO taskDTO, String subjectName) {
-        Task task = groupScopeDAO.findTaskByName(taskDTO.getName());
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
-        if (task != null && subject != null) {
-            task.setSubject(subject);
-            if (taskDTO.getNewName() != null)
-                task.setName(taskDTO.getNewName());
-            if (taskDTO.getType() != null)
-                task.setType(taskDTO.getType());
-            if (taskDTO.getInfo() != null)
-                task.setInfo(taskDTO.getInfo());
-            if (taskDTO.getDeadline() != null)
-                task.setDeadline(taskDTO.getDeadline());
-            groupScopeDAO.updateTask(task);
-        }
-        else {
-            throw (task == null) ? new NullPointerException("Task not found with name: " + taskDTO.getName()) :
-                                    new NullPointerException("Subject not found with name: " + subjectName);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void deleteTask(String subjectName, TaskDTO taskDTO) {
-        Subject subject = groupScopeDAO.findSubjectByName(subjectName);
+    public void deleteTask(String subjectName, TaskDTO taskDTO, LearningGroup group) {
+        Subject subject = groupScopeDAO.findSubjectByNameAndGroupId(subjectName, group.getId());
 
         if(subject != null) {
-            Task task = subject.getTasks().stream()
-                    .filter(t -> t.getName().equals(taskDTO.getName()))
-                    .findFirst()
-                    .orElse(null);
+            Task task = groupScopeDAO.findTaskByNameAndSubjectId(taskDTO.getName(), subject.getId());
             if (task != null) {
                 groupScopeDAO.deleteGradesByTask(task);
                 groupScopeDAO.deleteTaskById(task.getId());
@@ -254,31 +252,38 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     }
 
     /**
-     For saving new user
+     For saving new user or existing user
      */
     @Override
     @Transactional
-    public Learner addStudent(Learner learner, String inviteCode) {
-        LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
-        if(learningGroup != null) {
-            learner.setLearningGroup(learningGroup);
-            learner.setRole(LearningRole.STUDENT);
+    public Learner addLearner(Learner learner, String inviteCode) {
+        if(learner != null && inviteCode != null) {
+            LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
+            if (learningGroup != null) {
+                learner.setLearningGroup(learningGroup);
+                learner.setRole(LearningRole.STUDENT);
 
-            return refreshLearnerGrades(learner, learningGroup);
-        }
-        else
-            throw new NullPointerException("Group with inviteCode = " + inviteCode + " not found");
+                return refreshLearnerGrades(learner, learningGroup);
+            } else
+                throw new NullPointerException("Group with inviteCode = " + inviteCode + " not found");
+        } else
+            throw new NullPointerException("Learner or invite code is null");
     }
 
     @Override
     @Transactional
     public Learner addFreeLearner(LearnerDTO learnerDTO) {
-        Learner learner = learnerDTO.toLearner();
-        return groupScopeDAO.saveStudent(learner);
-    }
+        if (learnerDTO != null) {
+            learnerDTO.setLearningGroup(null);
+            learnerDTO.setGrades(null);
 
+            Learner learner = learnerDTO.toLearner();
+            return groupScopeDAO.saveStudent(learner);
+        } else
+            throw new NullPointerException("LearnerDTO is null");
+    }
     @Override
-    public Learner getStudentById(Long id) {
+    public Learner getLearnerById(Long id) {
         Learner learner = groupScopeDAO.findStudentById(id);
         if(learner != null)
             return learner;
@@ -288,22 +293,22 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
     @Override
     @Transactional
-    public void updateLearner(LearnerDTO learnerDTO, Learner learner) {
+    public Learner updateLearner(LearnerDTO learnerDTO, Learner learner) {
         if(learnerDTO.getNewName() != null)
             learner.setName(learnerDTO.getNewName());
         if(learnerDTO.getNewLastname() != null)
             learner.setLastname(learnerDTO.getLastname());
-        groupScopeDAO.updateLearner(learner);
+        return groupScopeDAO.updateLearner(learner);
     }
 
     @Override
     @Transactional
-    public void deleteLearner(String learrnerName) {
-        Learner learner = groupScopeDAO.findStudentByName(learrnerName);
+    public void deleteLearner(String learnerName) {
+        Learner learner = groupScopeDAO.findStudentByName(learnerName);
         if(learner != null)
             groupScopeDAO.deleteLearner(learner);
         else
-            throw new NullPointerException("Learner not found with name: " + learrnerName);
+            throw new NullPointerException("Learner not found with name: " + learnerName);
     }
 
     @Override
@@ -356,10 +361,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     /**
         The learner must be included in new group
      */
-    private Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
+    @Override
+    public Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
         if(learner.getId() != null) {
             groupScopeDAO.deleteGradesByLearner(learner);
-            learner.getGrades().clear();
+            List<Grade> grades = new ArrayList<>(learner.getGrades()); // Создаем изменяемую копию
+            grades.clear();
+            learner.setGrades(grades);
         }
         if(newGroup != null) {
             if(!newGroup.getLearners().contains(learner)) {

@@ -48,11 +48,13 @@ public class LearningGroup {
     private List<Learner> learners;
 
     public LearningGroup() {
+        this.learners = new ArrayList<>();
         this.subjects = new ArrayList<>();
     }
 
     public LearningGroup(String groupName) {
         this.name = groupName;
+        this.learners = new ArrayList<>();
         this.subjects = new ArrayList<>();
     }
 

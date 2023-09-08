@@ -51,6 +51,21 @@ public class Task {
         grades = new ArrayList<>();
     }
 
+    public Task(String name, TaskType type, String info, String deadline) {
+        this.name = name;
+        this.type = type;
+        this.info = info;
+        this.deadline = deadline;
+    }
+
+    public Task(String name, TaskType type, String info, String deadline, Subject subject) {
+        this.name = name;
+        this.type = type;
+        this.info = info;
+        this.deadline = deadline;
+        this.subject = subject;
+    }
+
     @Override
     public String toString() {
         return "Task{" +

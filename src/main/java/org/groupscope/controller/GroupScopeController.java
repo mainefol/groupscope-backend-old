@@ -138,7 +138,7 @@ public class GroupScopeController {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
-            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(user.getLearner(), subjectName);
+            List<TaskDTO> tasks = groupScopeService.getAllTasksOfSubject(subjectName, user.getLearner().getLearningGroup());
 
             return ResponseEntity.ok(tasks);
         } catch (NullPointerException | IllegalArgumentException e) {
@@ -184,7 +184,7 @@ public class GroupScopeController {
             logRequestMapping(user, request);
 
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
-                groupScopeService.updateTask(taskDTO, subjectName);
+                groupScopeService.updateTask(taskDTO, subjectName, user.getLearner().getLearningGroup());
 
                 return ResponseEntity.ok().build();
             } else {
@@ -209,7 +209,7 @@ public class GroupScopeController {
             logRequestMapping(user, request);
 
             if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
-                groupScopeService.deleteTask(subjectName, taskDTO);
+                groupScopeService.deleteTask(subjectName, taskDTO, user.getLearner().getLearningGroup());
 
                 return ResponseEntity.ok().build();
             } else {
@@ -345,7 +345,7 @@ public class GroupScopeController {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
-            groupScopeService.addStudent(user.getLearner(), learningGroupDTO.getInviteCode());
+            groupScopeService.addLearner(user.getLearner(), learningGroupDTO.getInviteCode());
 
             return ResponseEntity.ok().build();
         } catch (NullPointerException | IllegalArgumentException e) {

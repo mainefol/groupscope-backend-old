@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+// TODO make return values for methods null or empty list
+
 @Component
 @Slf4j
 public class GroupScopeDAOImpl implements GroupScopeDAO{

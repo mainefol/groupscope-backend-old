@@ -20,11 +20,11 @@ public interface GroupScopeService {
     ///////////////////////////////////////////////////
     Task addTask(TaskDTO taskDTO, String subjectName, LearningGroup group);
 
-    List<TaskDTO> getAllTasksOfSubject(Learner learner, String subjectName);
+    List<TaskDTO> getAllTasksOfSubject(String subjectName, LearningGroup group);
 
-    void updateTask(TaskDTO taskDTO, String subjectName);
+    void updateTask(TaskDTO taskDTO, String subjectName, LearningGroup group);
 
-    void deleteTask(String subjectName, TaskDTO taskDTO);
+    void deleteTask(String subjectName, TaskDTO taskDTO, LearningGroup group);
 
     ///////////////////////////////////////////////////
 
@@ -36,15 +36,17 @@ public interface GroupScopeService {
 
     ///////////////////////////////////////////////////
 
-    Learner addStudent(Learner learner, String inviteCode);
+    Learner addLearner(Learner learner, String inviteCode);
 
     Learner addFreeLearner(LearnerDTO learnerDTO);
 
-    Learner getStudentById(Long id);
+    Learner getLearnerById(Long id);
 
-    void updateLearner(LearnerDTO learnerDTO, Learner learner);
+    Learner updateLearner(LearnerDTO learnerDTO, Learner learner);
 
     void deleteLearner(String learnerName);
+
+    Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup);
 
     ///////////////////////////////////////////////////
 

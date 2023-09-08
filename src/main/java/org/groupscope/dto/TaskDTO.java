@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.groupscope.entity.*;
 
+import java.util.Objects;
+
 
 @Data
 @NoArgsConstructor
@@ -20,8 +22,6 @@ public class TaskDTO {
     private TaskType type;
 
     private String info;
-
-    private String newInfo;
 
     private String deadline;
 
@@ -59,8 +59,28 @@ public class TaskDTO {
 
     // TODO finish validation
     //  to check: type and deadline
-    private boolean isValid() {
+    public boolean isValid() {
         return true;
     }
 
+    public boolean isValidDeadline() {
+        return true;
+    }
+
+    public boolean isValidTaskType() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TaskDTO taskDTO = (TaskDTO) o;
+        return Objects.equals(name, taskDTO.name) && type == taskDTO.type && Objects.equals(info, taskDTO.info) && Objects.equals(deadline, taskDTO.deadline);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, info, deadline);
+    }
 }

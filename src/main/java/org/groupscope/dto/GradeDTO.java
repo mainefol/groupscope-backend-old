@@ -1,13 +1,17 @@
 package org.groupscope.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.groupscope.entity.grade.Grade;
 
 // This class used to get grade changes from the client
 // Then update database
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GradeDTO {
 
     private String subjectName;

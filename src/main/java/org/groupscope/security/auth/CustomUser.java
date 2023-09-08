@@ -39,7 +39,7 @@ public class CustomUser implements UserDetails {
     private Provider provider;
 
     // One-to-one relationship with the Learner entity. Each user has a corresponding learner.
-    @OneToOne
+    @OneToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "learner_id")
     private Learner learner;
 

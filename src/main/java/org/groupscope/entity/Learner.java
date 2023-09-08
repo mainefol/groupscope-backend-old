@@ -55,6 +55,22 @@ public class Learner {
         this.grades = new ArrayList<>();
     }
 
+    public void setGrades(List<Grade> grades) {
+        if(grades != null)
+            this.grades = grades;
+    }
+
+    public Learner copy() {
+        Learner learner = new Learner();
+        learner.setName(this.getName());
+        learner.setLastname(this.getLastname());
+        learner.setRole(this.getRole());
+        learner.setLearningGroup(this.getLearningGroup());
+        learner.setGrades(this.getGrades());
+
+        return learner;
+    }
+
     @Override
     public String toString() {
         return "Learner{" +
