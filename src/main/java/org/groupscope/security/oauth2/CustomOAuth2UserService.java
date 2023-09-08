@@ -57,7 +57,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
 
             user = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
             Hibernate.initialize(user.getLearner().getGrades());
-            GroupScopeDAOImpl.removeDuplicates(user.getLearner().getLearningGroup().getSubjects());
+            if(user.getLearner().getLearningGroup() != null)
+                GroupScopeDAOImpl.removeDuplicates(user.getLearner().getLearningGroup().getSubjects());
 
             return user;
         } else

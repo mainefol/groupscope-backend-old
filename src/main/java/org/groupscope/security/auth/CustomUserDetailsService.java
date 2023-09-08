@@ -29,7 +29,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Unknown user: " + username);
         }
         Hibernate.initialize(customUser.getLearner().getGrades());
-        GroupScopeDAOImpl.removeDuplicates(customUser.getLearner().getLearningGroup().getSubjects());
+        if(customUser.getLearner().getLearningGroup() != null)
+            GroupScopeDAOImpl.removeDuplicates(customUser.getLearner().getLearningGroup().getSubjects());
         return customUser;
     }
 }
