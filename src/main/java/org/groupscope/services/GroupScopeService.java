@@ -44,7 +44,7 @@ public interface GroupScopeService {
 
     Learner updateLearner(LearnerDTO learnerDTO, Learner learner);
 
-    void deleteLearner(String learnerName);
+    void deleteLearner(Learner learner);
 
     Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup);
 

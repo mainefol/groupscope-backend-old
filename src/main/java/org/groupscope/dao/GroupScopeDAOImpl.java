@@ -147,7 +147,8 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public Learner findStudentByName(String name) {
-        return learnerRepository.getLearnerByName(name);
+        Optional<Learner> learner = learnerRepository.getLearnerByName(name);
+        return learner.orElse(null);
     }
 
     @Override
@@ -173,7 +174,6 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
 
-
     @Override
     public LearningGroup saveGroup(LearningGroup learningGroup) {
         LearningGroup group = learningGroupRepository.save(learningGroup);
@@ -192,9 +192,9 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
 
     @Override
     public LearningGroup findLearningGroupByInviteCode(String inviteCode) {
-        LearningGroup learningGroup = learningGroupRepository.getLearningGroupByInviteCode(inviteCode);
-        removeDuplicates(learningGroup.getSubjects());
-        return learningGroup;
+        Optional<LearningGroup> learningGroup = learningGroupRepository.getLearningGroupByInviteCode(inviteCode);
+        removeDuplicates(learningGroup.get().getSubjects());
+        return learningGroup.orElse(null);
 
     }
 

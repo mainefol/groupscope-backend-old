@@ -87,8 +87,7 @@ public class Learner {
         Learner learner = (Learner) o;
         return Objects.equals(name, learner.name) &&
                 Objects.equals(lastname, learner.lastname) &&
-                role == learner.role &&
-                Objects.equals(learningGroup, learner.learningGroup);
+                role == learner.role;
     }
 
     @Override

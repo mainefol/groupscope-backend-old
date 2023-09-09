@@ -12,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.groupscope.services.FunctionInfo.*;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -260,10 +262,16 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if(learner != null && inviteCode != null) {
             LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
             if (learningGroup != null) {
-                learner.setLearningGroup(learningGroup);
-                learner.setRole(LearningRole.STUDENT);
+                if(!learningGroup.getLearners().contains(learner)) {
+                    learner.setLearningGroup(learningGroup);
+                    List<Learner> learners = new ArrayList<>(learningGroup.getLearners());
+                    learners.add(learner);
+                    learningGroup.setLearners(learners);
+                    learner.setRole(LearningRole.STUDENT);
 
-                return refreshLearnerGrades(learner, learningGroup);
+                    return refreshLearnerGrades(learner, learningGroup);
+                } else
+                    throw new IllegalArgumentException("Learner = " + learner + " has been already including in group = " + learningGroup);
             } else
                 throw new NullPointerException("Group with inviteCode = " + inviteCode + " not found");
         } else
@@ -294,49 +302,64 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     @Override
     @Transactional
     public Learner updateLearner(LearnerDTO learnerDTO, Learner learner) {
-        if(learnerDTO.getNewName() != null)
-            learner.setName(learnerDTO.getNewName());
-        if(learnerDTO.getNewLastname() != null)
-            learner.setLastname(learnerDTO.getLastname());
-        return groupScopeDAO.updateLearner(learner);
+        if (learnerDTO != null && learner != null) {
+            if (learnerDTO.getNewName() != null)
+                learner.setName(learnerDTO.getNewName());
+            if (learnerDTO.getNewLastname() != null)
+                learner.setLastname(learnerDTO.getNewLastname());
+            return groupScopeDAO.updateLearner(learner);
+        } else {
+            throw new NullPointerException("LearnerDTO or Learner is null in " + getCurrentFunctionName());
+        }
     }
-
     @Override
     @Transactional
-    public void deleteLearner(String learnerName) {
-        Learner learner = groupScopeDAO.findStudentByName(learnerName);
-        if(learner != null)
+    public void deleteLearner(Learner learner) {
+        if (learner != null)
             groupScopeDAO.deleteLearner(learner);
-        else
-            throw new NullPointerException("Learner not found with name: " + learnerName);
+        else {
+            throw new NullPointerException("Learner is null in " + getCurrentFunctionName());
+        }
     }
 
     @Override
     @Transactional
     public LearningGroupDTO getGroup(Learner learner) {
+        if(learner != null) {
+            if(learner.getLearningGroup() != null) {
+                for (Learner lr : learner.getLearningGroup().getLearners())
+                    lr.setGrades(groupScopeDAO.findAllGradesByLearner(lr));
 
-        for(Learner lr : learner.getLearningGroup().getLearners())
-            lr.setGrades(groupScopeDAO.findAllGradesByLearner(lr));
-
-        return LearningGroupDTO.from(learner.getLearningGroup());
+                return LearningGroupDTO.from(learner.getLearningGroup());
+            }
+            throw new NullPointerException("Learning group is null in " + getCurrentFunctionName());
+        } else {
+            throw new NullPointerException("Learner is null in " + getCurrentFunctionName());
+        }
     }
 
     @Override
     @Transactional
     public LearningGroup addGroup(LearningGroupDTO learningGroupDTO) {
-        LearningGroup group = learningGroupDTO.toLearningGroup();
-        group.getHeadmen().setRole(LearningRole.HEADMAN);
-        group.getHeadmen().setLearningGroup(group);
+        if(learningGroupDTO != null) {
+            LearningGroup group = learningGroupDTO.toLearningGroup();
+            group.getHeadmen().setRole(LearningRole.HEADMAN);
+            group.getHeadmen().setLearningGroup(group);
 
-        if(group.getHeadmen().getId() != null)
-            groupScopeDAO.deleteGradesByLearner(group.getHeadmen());
+            if (group.getHeadmen().getId() != null)
+                groupScopeDAO.deleteGradesByLearner(group.getHeadmen());
 
-        if(!groupScopeDAO.getAllGroups().contains(group)) {
-            group = groupScopeDAO.saveGroup(group);
-            group.generateInviteCode();
-            return groupScopeDAO.saveGroup(group);
+            List<LearningGroup> allGroups = groupScopeDAO.getAllGroups();
+
+            if (!allGroups.contains(group)) {
+                group = groupScopeDAO.saveGroup(group);
+                group.generateInviteCode();
+                return groupScopeDAO.saveGroup(group);
+            } else {
+                throw new IllegalArgumentException("Group " + group.getName() + " has been already existing");
+            }
         } else {
-            throw new IllegalArgumentException("Group " + group.getName() + " has been already existing");
+            throw new NullPointerException("Learning group DTO is null in " + getCurrentFunctionName());
         }
     }
 
@@ -363,14 +386,14 @@ public class GroupScopeServiceImpl implements GroupScopeService{
      */
     @Override
     public Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
-        if(learner.getId() != null) {
-            groupScopeDAO.deleteGradesByLearner(learner);
-            List<Grade> grades = new ArrayList<>(learner.getGrades()); // Создаем изменяемую копию
-            grades.clear();
-            learner.setGrades(grades);
-        }
-        if(newGroup != null) {
-            if(!newGroup.getLearners().contains(learner)) {
+        if(learner != null && newGroup != null) {
+            if (newGroup.getLearners().contains(learner)) {
+                if (learner.getId() != null) {
+                    groupScopeDAO.deleteGradesByLearner(learner);
+                    List<Grade> grades = new ArrayList<>(learner.getGrades());
+                    grades.clear();
+                    learner.setGrades(grades);
+                }
                 for (Subject subject : newGroup.getSubjects()) {
                     for (Task task : subject.getTasks()) {
                         GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
@@ -382,12 +405,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 Learner l = groupScopeDAO.saveStudent(learner);
                 groupScopeDAO.saveAllGrades(learner.getGrades());
                 return l;
+            } else {
+                throw new IllegalArgumentException("Learner = " + learner +
+                        " is not include in group = " + newGroup);
             }
-            else {
-                log.info("The learner: " + learner + " is not include in group " + newGroup.getName());
-                return null;
-            }
-        } else
-            throw new NullPointerException("Learning group is null in method refreshLearnerGrades()");
+        } else {
+            throw new NullPointerException("Learner = " + learner +
+                    " Learning group = " + newGroup + " in " + getCurrentFunctionName());
+        }
     }
 }

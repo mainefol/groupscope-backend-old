@@ -287,7 +287,7 @@ public class GroupScopeController {
             logRequestMapping(user, request);
 
             // delete user
-            groupScopeService.deleteLearner(user.getLearner().getName());
+            groupScopeService.deleteLearner(user.getLearner());
             // delete learner
             return ResponseEntity.ok().build();
         } catch (NullPointerException | IllegalArgumentException e) {

@@ -80,11 +80,13 @@ public class LearningGroup {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LearningGroup that = (LearningGroup) o;
-        return Objects.equals(name, that.name) && Objects.equals(inviteCode, that.inviteCode);
+        return Objects.equals(name, that.name) &&
+                Objects.equals(inviteCode, that.inviteCode) &&
+                Objects.equals(headmen, that.headmen);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, inviteCode);
+        return Objects.hash(name, inviteCode, headmen);
     }
 }

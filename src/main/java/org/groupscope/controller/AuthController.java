@@ -59,6 +59,7 @@ public class AuthController {
             }
         } catch (Exception e) {
             log.info(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -76,6 +77,7 @@ public class AuthController {
             }
         } catch(Exception e) {
             log.info(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }

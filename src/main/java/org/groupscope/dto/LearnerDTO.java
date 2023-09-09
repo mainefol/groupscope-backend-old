@@ -1,11 +1,13 @@
 package org.groupscope.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.groupscope.entity.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class LearnerDTO {
 
     private Long id;
@@ -24,8 +26,9 @@ public class LearnerDTO {
 
     private List<GradeDTO> grades;
 
-    public LearnerDTO() {
-
+    public LearnerDTO(String name, String lastname) {
+        this.name = name;
+        this.lastname = lastname;
     }
 
     public LearnerDTO(String name, String lastname, LearningRole role) {
