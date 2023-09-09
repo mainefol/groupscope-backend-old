@@ -1,4 +1,4 @@
-package org.groupscope.security.auth;
+package org.groupscope.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

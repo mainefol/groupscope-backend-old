@@ -8,7 +8,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dao.GroupScopeDAOImpl;
 import org.groupscope.entity.Provider;
-import org.groupscope.security.auth.CustomUser;
+import org.groupscope.entity.CustomUser;
 import org.groupscope.security.auth.CustomUserService;
 import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
@@ -55,12 +55,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
             registrationRequest.setInviteCode(request.getInviteCode());
             registrationRequest.setGroupName(request.getGroupName());
 
-            user = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
-            Hibernate.initialize(user.getLearner().getGrades());
-            if(user.getLearner().getLearningGroup() != null)
-                GroupScopeDAOImpl.removeDuplicates(user.getLearner().getLearningGroup().getSubjects());
+            CustomUser foundUser = customUserService.findByLogin(user.getLogin());
 
-            return user;
+            if(foundUser == null)
+                foundUser = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
+
+            Hibernate.initialize(foundUser.getLearner().getGrades());
+
+            if(foundUser.getLearner().getLearningGroup() != null)
+                GroupScopeDAOImpl.removeDuplicates(foundUser.getLearner().getLearningGroup().getSubjects());
+
+            return foundUser;
         } else
             throw new NullPointerException("IdToken is null");
     }

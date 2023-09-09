@@ -4,7 +4,6 @@ import org.groupscope.entity.Learner;
 import org.groupscope.entity.Task;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
-import org.groupscope.security.auth.CustomUser;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

@@ -4,7 +4,7 @@ package org.groupscope.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dto.*;
 import org.groupscope.entity.*;
-import org.groupscope.security.auth.CustomUser;
+import org.groupscope.entity.CustomUser;
 import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

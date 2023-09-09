@@ -1,6 +1,6 @@
 package org.groupscope.security;
 
-import org.groupscope.security.auth.CustomUser;
+import org.groupscope.entity.CustomUser;
 import org.groupscope.security.auth.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
