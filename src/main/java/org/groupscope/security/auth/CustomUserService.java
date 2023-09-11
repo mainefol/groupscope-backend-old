@@ -97,6 +97,7 @@ public class CustomUserService {
      */
     @Transactional
     public CustomUser findByLoginAndPassword(String login, String password) {
+        // TODO fixed multiply response
         CustomUser customUser = findByLogin(login);
         if(customUser != null) {
             if (passwordEncoder.matches(password, customUser.getPassword())){

@@ -40,7 +40,7 @@ public class Learner {
     private LearningGroup learningGroup;
 
     // One-to-many relationship with the Grade entity. Each learner can have multiple grades.
-    @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "learner", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Grade> grades;
 
     public Learner() {
@@ -58,17 +58,6 @@ public class Learner {
     public void setGrades(List<Grade> grades) {
         if(grades != null)
             this.grades = grades;
-    }
-
-    public Learner copy() {
-        Learner learner = new Learner();
-        learner.setName(this.getName());
-        learner.setLastname(this.getLastname());
-        learner.setRole(this.getRole());
-        learner.setLearningGroup(this.getLearningGroup());
-        learner.setGrades(this.getGrades());
-
-        return learner;
     }
 
     @Override

@@ -264,10 +264,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             if (learningGroup != null) {
                 if(!learningGroup.getLearners().contains(learner)) {
                     learner.setLearningGroup(learningGroup);
-                    List<Learner> learners = new ArrayList<>(learningGroup.getLearners());
-                    learners.add(learner);
-                    learningGroup.setLearners(learners);
+
+                    learningGroup.getLearners().add(learner);
+
                     learner.setRole(LearningRole.STUDENT);
+
+                    groupScopeDAO.saveGroup(learningGroup);
 
                     return refreshLearnerGrades(learner, learningGroup);
                 } else
@@ -385,14 +387,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         The learner must be included in new group
      */
     @Override
+    @Transactional
     public Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
         if(learner != null && newGroup != null) {
             if (newGroup.getLearners().contains(learner)) {
                 if (learner.getId() != null) {
                     groupScopeDAO.deleteGradesByLearner(learner);
-                    List<Grade> grades = new ArrayList<>(learner.getGrades());
-                    grades.clear();
-                    learner.setGrades(grades);
+                    learner.setGrades(new ArrayList<>());
                 }
                 for (Subject subject : newGroup.getSubjects()) {
                     for (Task task : subject.getTasks()) {

@@ -7,7 +7,9 @@ import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 // TODO make return values for methods null or empty list
@@ -238,6 +240,11 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     @Override
     public void deleteGradesByTask(Task task) {
         gradeRepository.deleteGradesByTask(task);
+    }
+
+    @Override
+    public void deleteGrades(List<Grade> grades) {
+        gradeRepository.deleteAll(grades);
     }
 
     public static void removeDuplicates (List<? extends ObjectWithId> objects) {

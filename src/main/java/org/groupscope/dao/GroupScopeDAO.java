@@ -58,6 +58,7 @@ public interface GroupScopeDAO {
 
     void deleteLearnerById(Long id);
 
+    void deleteGrades(List<Grade> grades);
 
     LearningGroup saveGroup(LearningGroup learningGroup);
 
