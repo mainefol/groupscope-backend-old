@@ -269,6 +269,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
                     learner.setRole(LearningRole.STUDENT);
 
+                    groupScopeDAO.saveLearner(learner);
                     groupScopeDAO.saveGroup(learningGroup);
 
                     return refreshLearnerGrades(learner, learningGroup);
@@ -391,10 +392,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup) {
         if(learner != null && newGroup != null) {
             if (newGroup.getLearners().contains(learner)) {
-                if (learner.getId() != null) {
-                    groupScopeDAO.deleteGradesByLearner(learner);
-                    learner.setGrades(new ArrayList<>());
-                }
+                groupScopeDAO.deleteGradesByLearner(learner);
+                learner.setGrades(new ArrayList<>());
+
                 for (Subject subject : newGroup.getSubjects()) {
                     for (Task task : subject.getTasks()) {
                         GradeKey gradeKey = new GradeKey(learner.getId(), task.getId());
@@ -403,9 +403,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         learner.getGrades().add(grade);
                     }
                 }
-                Learner l = groupScopeDAO.saveLearner(learner);
+
                 groupScopeDAO.saveAllGrades(learner.getGrades());
-                return l;
+                return groupScopeDAO.saveLearner(learner);
             } else {
                 throw new IllegalArgumentException("Learner = " + learner +
                         " is not include in group = " + newGroup);

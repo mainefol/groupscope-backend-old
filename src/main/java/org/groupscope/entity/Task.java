@@ -44,7 +44,7 @@ public class Task {
     private Subject subject;
 
     // One-to-many relationship with the Grade entity. Each task can have multiple grades.
-    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Grade> grades;
 
     public Task() {

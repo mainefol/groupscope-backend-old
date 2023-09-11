@@ -43,7 +43,7 @@ public class LearningGroup {
     private List<Subject> subjects;
 
     // List of learners in the group.
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Learner.class)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER, targetEntity = Learner.class)
     @JoinColumn(name = "group_id")
     private List<Learner> learners;
 
