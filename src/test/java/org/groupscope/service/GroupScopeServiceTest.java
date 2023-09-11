@@ -998,7 +998,7 @@ public class GroupScopeServiceTest {
             return l;
                 })
                 .when(groupScopeDAO)
-                .saveStudent(any(Learner.class));
+                .saveLearner(any(Learner.class));
 
         Learner reqiuredLearner = groupScopeService.addLearner(learner, inviteCode);
 
@@ -1046,7 +1046,7 @@ public class GroupScopeServiceTest {
 
         Mockito.doReturn(expectedLearner)
                 .when(groupScopeDAO)
-                .findStudentById(expectedLearner.getId());
+                .findLearnerById(expectedLearner.getId());
 
         Learner reqiuredLearner = groupScopeService.getLearnerById(expectedLearner.getId());
 
@@ -1055,12 +1055,12 @@ public class GroupScopeServiceTest {
 
     @Test
     public void getLearnerById_WithNotExistLearner_throwsNullPointerException() {
-        when(groupScopeDAO.findStudentById(1L)).thenReturn(null);
+        when(groupScopeDAO.findLearnerById(1L)).thenReturn(null);
 
         assertThrows(NullPointerException.class,
                 () -> groupScopeService.getLearnerById(1L));
 
-        Mockito.verify(groupScopeDAO, Mockito.times(USED_ONCE)).findStudentById(anyLong());
+        Mockito.verify(groupScopeDAO, Mockito.times(USED_ONCE)).findLearnerById(anyLong());
     }
 
     @Test
@@ -1069,7 +1069,7 @@ public class GroupScopeServiceTest {
 
         doAnswer(invocationOnMock -> {
             return invocationOnMock.getArgument(0);
-        }).when(groupScopeDAO).saveStudent(any(Learner.class));
+        }).when(groupScopeDAO).saveLearner(any(Learner.class));
 
         Learner learner = groupScopeService.addFreeLearner(learnerDTO);
 
@@ -1273,7 +1273,7 @@ public class GroupScopeServiceTest {
         doAnswer(invocationOnMock -> {
             Learner l = invocationOnMock.getArgument(0);
             return l;
-        }).when(groupScopeDAO).saveStudent(any(Learner.class));
+        }).when(groupScopeDAO).saveLearner(any(Learner.class));
 
         Learner reqiuredLearner = groupScopeService.refreshLearnerGrades(learner, group);
 
@@ -1299,7 +1299,7 @@ public class GroupScopeServiceTest {
         doAnswer(invocationOnMock -> {
             Learner l = invocationOnMock.getArgument(0);
             return l;
-        }).when(groupScopeDAO).saveStudent(any(Learner.class));
+        }).when(groupScopeDAO).saveLearner(any(Learner.class));
 
         Learner reqiuredLearner = groupScopeService.refreshLearnerGrades(learner, group);
 
@@ -1309,7 +1309,7 @@ public class GroupScopeServiceTest {
         assertIterableEquals(expectedGrades, reqiuredLearner.getGrades());
 
         verify(groupScopeDAO, atMostOnce()).deleteGradesByLearner(any());
-        verify(groupScopeDAO, atMostOnce()).saveStudent(any(Learner.class));
+        verify(groupScopeDAO, atMostOnce()).saveLearner(any(Learner.class));
         verify(groupScopeDAO, atMostOnce()).saveAllGrades(anyList());
     }
 
@@ -1324,7 +1324,7 @@ public class GroupScopeServiceTest {
                 () -> groupScopeService.refreshLearnerGrades(learner, group));
 
         verify(groupScopeDAO, never()).deleteGradesByLearner(any());
-        verify(groupScopeDAO, never()).saveStudent(any(Learner.class));
+        verify(groupScopeDAO, never()).saveLearner(any(Learner.class));
         verify(groupScopeDAO, never()).saveAllGrades(anyList());
     }
 
@@ -1338,7 +1338,7 @@ public class GroupScopeServiceTest {
                 () -> groupScopeService.refreshLearnerGrades(null, null));
 
         verify(groupScopeDAO, never()).deleteGradesByLearner(any());
-        verify(groupScopeDAO, never()).saveStudent(any(Learner.class));
+        verify(groupScopeDAO, never()).saveLearner(any(Learner.class));
         verify(groupScopeDAO, never()).saveAllGrades(anyList());
     }
 }

@@ -288,13 +288,13 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             learnerDTO.setGrades(null);
 
             Learner learner = learnerDTO.toLearner();
-            return groupScopeDAO.saveStudent(learner);
+            return groupScopeDAO.saveLearner(learner);
         } else
             throw new NullPointerException("LearnerDTO is null");
     }
     @Override
     public Learner getLearnerById(Long id) {
-        Learner learner = groupScopeDAO.findStudentById(id);
+        Learner learner = groupScopeDAO.findLearnerById(id);
         if(learner != null)
             return learner;
         else
@@ -403,7 +403,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                         learner.getGrades().add(grade);
                     }
                 }
-                Learner l = groupScopeDAO.saveStudent(learner);
+                Learner l = groupScopeDAO.saveLearner(learner);
                 groupScopeDAO.saveAllGrades(learner.getGrades());
                 return l;
             } else {

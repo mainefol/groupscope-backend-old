@@ -65,7 +65,8 @@ public class Learner {
         return "Learner{" +
                 "name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
-                ", role=" + role +
+                ", role=" + role + '\'' +
+                ", group=" + learningGroup +
                 '}';
     }
 

@@ -14,7 +14,7 @@ public interface GroupScopeDAO {
 
     Subject findSubjectByNameAndGroupId(String name, Long groupId);
 
-    Subject findSubjectById(Long subject_id);
+    Subject findSubjectById(Long subjectId);
 
     List<Subject> findAllSubjects();
 
@@ -46,11 +46,11 @@ public interface GroupScopeDAO {
     void deleteTaskById(Long id);
 
 
-    Learner saveStudent(Learner learner);
+    Learner saveLearner(Learner learner);
 
-    Learner findStudentByName(String name);
+    Learner findLearnerByName(String name);
 
-    Learner findStudentById(Long id);
+    Learner findLearnerById(Long id);
 
     Learner updateLearner(Learner learner);
 
