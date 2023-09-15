@@ -6,6 +6,7 @@ import org.groupscope.dto.*;
 import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
+import org.groupscope.util.DateValidatorOfDeadline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +122,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if(subject != null) {
             task.setSubject(subject);
 
+            if (!DateValidatorOfDeadline.isValid(task)) {
+                throw new IllegalArgumentException("Task " + task.toString() + " has wrong deadline format(dd.mm.yyyy) or the date is past");
+            }
+
             if (!subject.getTasks().contains(task)) {
                 subject.getGroup().getLearners()
                         .forEach(learner -> {
@@ -170,6 +175,11 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                     task.setInfo(taskDTO.getInfo());
                 if (taskDTO.getDeadline() != null && taskDTO.isValidDeadline())
                     task.setDeadline(taskDTO.getDeadline());
+
+                if (!DateValidatorOfDeadline.isValid(task)) {
+                    throw new IllegalArgumentException("New task " + task.toString() + " has wrong deadline format(dd.mm.yyyy) or the date is past");
+                }
+
                 groupScopeDAO.updateTask(task);
             } else {
                 throw new NullPointerException("Task not found with name: " + taskDTO.getName());
