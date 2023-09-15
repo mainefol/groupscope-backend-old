@@ -60,16 +60,13 @@ public class TaskDTO {
     // TODO finish validation
     //  to check: type and deadline
     public boolean isValid() {
-        return true;
+        return false;
     }
 
     public boolean isValidDeadline() {
-        return true;
+        return false;
     }
 
-    public boolean isValidTaskType() {
-        return true;
-    }
 
     @Override
     public boolean equals(Object o) {

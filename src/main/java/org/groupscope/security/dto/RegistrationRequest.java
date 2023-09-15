@@ -1,7 +1,7 @@
 package org.groupscope.security.dto;
 
 import lombok.Data;
-import org.groupscope.entity.CustomUser;
+import org.groupscope.security.entity.CustomUser;
 
 import javax.validation.constraints.NotEmpty;
 

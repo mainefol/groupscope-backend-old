@@ -3,7 +3,7 @@ package org.groupscope.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.entity.Provider;
 import org.groupscope.security.JwtProvider;
-import org.groupscope.entity.CustomUser;
+import org.groupscope.security.entity.CustomUser;
 import org.groupscope.security.auth.CustomUserService;
 import org.groupscope.security.dto.AuthRequest;
 import org.groupscope.security.dto.AuthResponse;

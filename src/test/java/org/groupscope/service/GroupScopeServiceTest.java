@@ -352,7 +352,7 @@ public class GroupScopeServiceTest {
                 "Doing something",
                 deadline);
 
-        assertThrows(IllegalAccessError.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> groupScopeService.addTask(taskDTO, null, null));
 
         Mockito.verify(groupScopeDAO,
@@ -559,27 +559,24 @@ public class GroupScopeServiceTest {
         String wrongDeadline = LocalDate.now().minus(7, ChronoUnit.DAYS).format(formatter);
 
         String subjectName = "Програмування";
-        LearningGroup group = new LearningGroup();
-        group.setId(1L);
-        Subject subject = new Subject("Програмування", group);
-        subject.setId(2L);
+        LearningGroup group = generateValidGroup();
+        Subject subject = generateValidSubject(subjectName);
+        subject.setGroup(group);
 
         TaskDTO taskDTO = new TaskDTO("Pz1",
                 TaskType.PRACTICAL,
                 "do nothing",
                 wrongDeadline);
 
-        Mockito.doReturn(subject)
-                .when(groupScopeDAO)
-                .findSubjectByNameAndGroupId("Програмування", 1L);
+        when(groupScopeDAO.findSubjectByNameAndGroupId(eq("Програмування"), anyLong()))
+                .thenReturn(subject);
 
-        Mockito.doReturn(new Task("Pz1",
-                        TaskType.PRACTICAL,
-                        "Doing something",
-                        deadline,
-                        subject))
-                .when(groupScopeDAO)
-                .findTaskByNameAndSubjectId("Pz1", 2L);
+        when(groupScopeDAO.findTaskByNameAndSubjectId(eq("Pz1"), anyLong()))
+                .thenReturn(new Task("Pz1",
+                TaskType.PRACTICAL,
+                "Doing something",
+                deadline,
+                subject));
 
         assertThrows(IllegalArgumentException.class,
                 () -> groupScopeService.updateTask(taskDTO, subjectName, group));

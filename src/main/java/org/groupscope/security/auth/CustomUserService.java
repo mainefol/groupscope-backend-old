@@ -6,6 +6,7 @@ import org.groupscope.dto.LearnerDTO;
 import org.groupscope.dto.LearningGroupDTO;
 import org.groupscope.entity.*;
 import org.groupscope.security.dto.RegistrationRequest;
+import org.groupscope.security.entity.CustomUser;
 import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

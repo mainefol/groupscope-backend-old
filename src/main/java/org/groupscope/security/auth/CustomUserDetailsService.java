@@ -3,7 +3,7 @@ package org.groupscope.security.auth;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dao.GroupScopeDAOImpl;
 import org.groupscope.dao.repositories.CustomUserRepository;
-import org.groupscope.entity.CustomUser;
+import org.groupscope.security.entity.CustomUser;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

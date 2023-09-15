@@ -8,7 +8,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dao.GroupScopeDAOImpl;
 import org.groupscope.entity.Provider;
-import org.groupscope.entity.CustomUser;
+import org.groupscope.security.entity.CustomUser;
 import org.groupscope.security.auth.CustomUserService;
 import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
