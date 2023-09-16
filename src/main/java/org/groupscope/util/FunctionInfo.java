@@ -1,4 +1,4 @@
-package org.groupscope.services;
+package org.groupscope.util;
 
 public class FunctionInfo {
 

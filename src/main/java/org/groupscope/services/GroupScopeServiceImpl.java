@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.groupscope.services.FunctionInfo.*;
+import static org.groupscope.util.FunctionInfo.*;
 
 @Slf4j
 @Service

@@ -5,15 +5,12 @@ import org.groupscope.dao.repositories.*;
 import org.groupscope.entity.*;
 import org.groupscope.entity.grade.Grade;
 import org.groupscope.entity.grade.GradeKey;
-import org.groupscope.services.FunctionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 
-import static org.groupscope.services.FunctionInfo.*;
+import static org.groupscope.util.FunctionInfo.*;
 
 // TODO make return values for methods null or empty list
 
