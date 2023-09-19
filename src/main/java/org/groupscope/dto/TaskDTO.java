@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.groupscope.entity.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 
@@ -60,11 +63,24 @@ public class TaskDTO {
     // TODO finish validation
     //  to check: type and deadline
     public boolean isValid() {
-        return false;
+        return this.isValidDeadline();
     }
 
     public boolean isValidDeadline() {
-        return false;
+        try {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate now = LocalDate.now();
+            LocalDate deadline = LocalDate.parse(this.getDeadline(), dateFormatter);
+
+            if (deadline.isBefore(now))
+                return false;
+
+            dateFormatter.parse(this.getDeadline());
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+
+        return true;
     }
 
 
