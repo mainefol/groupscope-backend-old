@@ -60,8 +60,6 @@ public class TaskDTO {
             throw new IllegalArgumentException("Wrong task type or date format in Task object");
     }
 
-    // TODO finish validation
-    //  to check: type and deadline
     public boolean isValid() {
         return this.isValidDeadline();
     }
@@ -70,17 +68,12 @@ public class TaskDTO {
         try {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             LocalDate now = LocalDate.now();
-            LocalDate deadline = LocalDate.parse(this.getDeadline(), dateFormatter);
+            LocalDate deadline = LocalDate.parse(this.deadline, dateFormatter);
 
-            if (deadline.isBefore(now))
-                return false;
-
-            dateFormatter.parse(this.getDeadline());
+            return deadline.isAfter(now) || deadline.isEqual(now);
         } catch (DateTimeParseException e) {
             return false;
         }
-
-        return true;
     }
 
 
