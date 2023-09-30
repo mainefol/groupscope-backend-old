@@ -48,6 +48,8 @@ public interface GroupScopeService {
 
     Learner refreshLearnerGrades(Learner learner, LearningGroup newGroup);
 
+    void processLearnerWithdrawal(Learner learner);
+
     ///////////////////////////////////////////////////
 
     LearningGroupDTO getGroup(Learner learner);

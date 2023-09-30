@@ -58,7 +58,6 @@ public interface GroupScopeDAO {
 
     void deleteLearnerById(Long id);
 
-    void deleteGrades(List<Grade> grades);
 
     LearningGroup saveGroup(LearningGroup learningGroup);
 
@@ -67,7 +66,7 @@ public interface GroupScopeDAO {
     LearningGroup findLearningGroupByInviteCode(String inviteCode);
 
     // TODO: Complete method for deleting group
-    // void deleteGroupById(Long id);
+    void deleteGroup(LearningGroup group);
 
     List<LearningGroup> getAllGroups();
 
@@ -85,4 +84,6 @@ public interface GroupScopeDAO {
     void deleteGradesByLearner(Learner learner);
 
     void deleteGradesByTask(Task task);
+
+    void deleteGrades(List<Grade> grades);
 }

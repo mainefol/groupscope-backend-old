@@ -49,7 +49,7 @@ public class GroupScopeServiceTest {
     /**This method generates a valid Learner object with a name, last name, learning role,
      * and a learning group. It returns the created Learner object.
      */
-    private Learner generateValidLearnerHeadmenAndGroup() {
+    private Learner generateValidLearnerHeadmanAndGroup() {
         Random random = new Random();
         Learner learner = new Learner("Name", "Lastname", LearningRole.HEADMAN, generateValidGroup());
         learner.setId(Math.abs(random.nextLong()) % 100);
@@ -968,7 +968,7 @@ public class GroupScopeServiceTest {
     public void addLearner_WithValidArguments_returnSavedLearner() {
         Learner learner = generateValidLearnerStudent();
 
-        LearningGroup newGroup = generateValidLearnerHeadmenAndGroup().getLearningGroup();
+        LearningGroup newGroup = generateValidLearnerHeadmanAndGroup().getLearningGroup();
         String inviteCode = newGroup.getInviteCode();
         newGroup.setSubjects(List.of(generateValidSubject("Прог")));
         Task task = generateValidTask(newGroup.getSubjects().get(0));
@@ -1009,7 +1009,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void addLearner_WithIncludingLearner_throwsIllegalArgumentException() {
-        LearningGroup group = generateValidLearnerHeadmenAndGroup().getLearningGroup();
+        LearningGroup group = generateValidLearnerHeadmanAndGroup().getLearningGroup();
         Learner learner = generateValidLearnerStudent(group);
 
         when(groupScopeDAO.findLearningGroupByInviteCode(anyString())).thenReturn(group);
@@ -1039,7 +1039,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void getLearnerById_WithValidArguments_returnLearner() {
-        Learner expectedLearner = generateValidLearnerHeadmenAndGroup();
+        Learner expectedLearner = generateValidLearnerHeadmanAndGroup();
 
         Mockito.doReturn(expectedLearner)
                 .when(groupScopeDAO)
@@ -1089,7 +1089,7 @@ public class GroupScopeServiceTest {
         learnerDTO.setNewName(newName);
         learnerDTO.setNewLastname(newLastname);
 
-        Learner learner = generateValidLearnerHeadmenAndGroup();
+        Learner learner = generateValidLearnerHeadmanAndGroup();
 
         doAnswer(invocationOnMock -> {
             return invocationOnMock.getArgument(0);
@@ -1131,7 +1131,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void getGroup_WithValidArguments_returnLearningGroup() {
-        Learner learner = generateValidLearnerHeadmenAndGroup();
+        Learner learner = generateValidLearnerHeadmanAndGroup();
 
         when(groupScopeDAO.findAllGradesByLearner(any(Learner.class))).thenReturn(new ArrayList<>());
 
@@ -1174,7 +1174,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void addGroup_WithValidArgumentsAndExistLearnerHeadman_returnSavedLearningGroup() {
-        Learner headman = generateValidLearnerHeadmenAndGroup();
+        Learner headman = generateValidLearnerHeadmanAndGroup();
 
         LearningGroupDTO learningGroupDTO = new LearningGroupDTO("Group name",
                 LearnerDTO.from(headman));
@@ -1256,7 +1256,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void refreshLearnerGrades_WithValidArgumentsAndNewLearner_returnRefreshedLearner() {
-        Learner headman = generateValidLearnerHeadmenAndGroup();
+        Learner headman = generateValidLearnerHeadmanAndGroup();
         LearningGroup group = headman.getLearningGroup();
 
         Learner learner = generateValidLearnerStudent(group);
@@ -1282,7 +1282,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void refreshLearnerGrades_WithValidArgumentsAndExistLearner_returnRefreshedLearner() {
-        Learner headman = generateValidLearnerHeadmenAndGroup();
+        Learner headman = generateValidLearnerHeadmanAndGroup();
         LearningGroup group = headman.getLearningGroup();
 
         Learner learner = generateValidLearnerStudent(group);
@@ -1312,7 +1312,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void refreshLearnerGrades_WithNotIncludedLearner_throwsIllegalArgumentException() {
-        Learner headman = generateValidLearnerHeadmenAndGroup();
+        Learner headman = generateValidLearnerHeadmanAndGroup();
         LearningGroup group = headman.getLearningGroup();
 
         Learner learner = generateValidLearnerStudent();
@@ -1337,5 +1337,62 @@ public class GroupScopeServiceTest {
         verify(groupScopeDAO, never()).deleteGradesByLearner(any());
         verify(groupScopeDAO, never()).saveLearner(any(Learner.class));
         verify(groupScopeDAO, never()).saveAllGrades(anyList());
+    }
+
+    @Test
+    public void processLearnerWithdrawal_WithHeadmanLearnerAndGroupIsEmpty_checkRunning() {
+        Learner headman = generateValidLearnerHeadmanAndGroup();
+        LearningGroup group = headman.getLearningGroup();
+
+        groupScopeService.processLearnerWithdrawal(headman);
+
+        assertNull(headman.getLearningGroup());
+        assertNull(group.getHeadmen());
+
+        verify(groupScopeDAO, atMostOnce()).deleteGroup(any(LearningGroup.class));
+    }
+
+    @Test
+    public void processLearnerWithdrawal_WithHeadmanLearnerAndNotEmptyGroup_checkRunning() {
+        Learner headman = generateValidLearnerHeadmanAndGroup();
+        LearningGroup group = headman.getLearningGroup();
+        Learner learner = generateValidLearnerStudent(group);
+
+        groupScopeService.processLearnerWithdrawal(headman);
+
+        assertEquals(learner, group.getHeadmen());
+        assertNull(headman.getLearningGroup());
+        assertFalse(group.getLearners().contains(headman));
+
+        verify(groupScopeDAO, atMostOnce()).saveGroup(any());
+    }
+
+    @Test
+    public void processLearnerWithdrawal_WithStudentLearner_checkRunning() {
+        LearningGroup group = generateValidLearnerHeadmanAndGroup().getLearningGroup();
+        Learner learner = generateValidLearnerStudent(group);
+
+        groupScopeService.processLearnerWithdrawal(learner);
+
+        assertNull(learner.getLearningGroup());
+        assertFalse(group.getLearners().contains(learner));
+
+        verify(groupScopeDAO, atMostOnce()).saveGroup(any());
+    }
+
+    @Test
+    public void processLearnerWithdrawal_WithNullGroup_checkRunning() {
+        Learner learner = generateValidLearnerStudent();
+
+        groupScopeService.processLearnerWithdrawal(learner);
+
+        verify(groupScopeDAO, never()).deleteGroup(any());
+        verify(groupScopeDAO, never()).saveGroup(any());
+    }
+
+    @Test
+    public void processLearnerWithdrawal_WithNullLearner_throwsNullPointerException() {
+        assertThrows(NullPointerException.class,
+                () -> groupScopeService.processLearnerWithdrawal(null));
     }
 }

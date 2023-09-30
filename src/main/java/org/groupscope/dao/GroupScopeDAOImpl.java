@@ -357,6 +357,16 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public void deleteGroup(LearningGroup group) {
+        if(isNull(group)) {
+            log.error("LearningGroup is null in " + getCurrentFunctionName());
+            return;
+        }
+
+        learningGroupRepository.delete(group);
+    }
+
+    @Override
     public List<LearningGroup> getAllGroups() {
         return (List<LearningGroup>) learningGroupRepository.findAll();
     }

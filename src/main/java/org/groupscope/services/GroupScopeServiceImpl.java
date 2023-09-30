@@ -267,6 +267,8 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public Learner addLearner(Learner learner, String inviteCode) {
         if(learner != null && inviteCode != null) {
             LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
+            processLearnerWithdrawal(learner);
+
             if (learningGroup != null) {
                 if(!learningGroup.getLearners().contains(learner)) {
                     learner.setLearningGroup(learningGroup);
@@ -419,6 +421,40 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         } else {
             throw new NullPointerException("Learner = " + learner +
                     " Learning group = " + newGroup + " in " + getCurrentFunctionName());
+        }
+    }
+
+    @Override
+    public void processLearnerWithdrawal(Learner learner) {
+        if(learner != null) {
+            LearningGroup group = learner.getLearningGroup();
+
+            if(group == null)
+                return;
+
+            if (learner.getRole().equals(LearningRole.HEADMAN)) {
+                if (group.getLearners().size() > 1) {
+                    Learner newHeadman = group.getLearners().stream()
+                            .filter(l -> !l.equals(group.getHeadmen()))
+                            .findFirst()
+                            .orElse(null);
+
+                    group.setHeadmen(newHeadman);
+                    group.getLearners().remove(learner);
+                    groupScopeDAO.saveGroup(group);
+                    learner.setLearningGroup(null);
+                } else {
+                    learner.setLearningGroup(null);
+                    group.setHeadmen(null);
+                    groupScopeDAO.deleteGroup(group);
+                }
+            } else {
+                group.getLearners().remove(learner);
+                learner.setLearningGroup(null);
+                groupScopeDAO.saveGroup(group);
+            }
+        } else {
+            throw new NullPointerException("Learner = " + learner + " in " + getCurrentFunctionName());
         }
     }
 }
