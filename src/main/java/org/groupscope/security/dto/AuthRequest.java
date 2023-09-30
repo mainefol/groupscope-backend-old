@@ -8,9 +8,9 @@ import javax.validation.constraints.NotEmpty;
 public class AuthRequest {
 
     @NotEmpty
-    private String login;
+    protected String login;
 
     @NotEmpty
-    private String password;
+    protected String password;
 
 }

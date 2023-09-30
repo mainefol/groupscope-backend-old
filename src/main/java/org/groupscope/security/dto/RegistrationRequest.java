@@ -1,18 +1,12 @@
 package org.groupscope.security.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.groupscope.security.entity.CustomUser;
 
-import javax.validation.constraints.NotEmpty;
-
 @Data
-public class RegistrationRequest {
-
-    @NotEmpty
-    private String login;
-
-    @NotEmpty
-    private String password;
+@EqualsAndHashCode(callSuper = true)
+public class RegistrationRequest extends AuthRequest {
 
     private String learnerName;
 

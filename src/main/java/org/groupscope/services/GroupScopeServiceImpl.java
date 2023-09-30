@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import static org.groupscope.util.FunctionInfo.*;
 
+// TODO realize deletion of empty groups
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)

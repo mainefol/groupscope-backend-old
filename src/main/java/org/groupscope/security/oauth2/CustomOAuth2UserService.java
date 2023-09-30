@@ -82,9 +82,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
             request.setLearnerName((String) payload.get("given_name"));
             request.setLearnerLastname((String) payload.get("family_name"));
             request.setLogin(payload.getEmail());
-            return request;
+
+            if(verifyMailDomain(request.getLogin()))
+                return request;
+            else
+                return null;
+
         } catch (GeneralSecurityException | IOException e) {
+            log.error(e.getMessage());
             return null;
         }
+    }
+    
+    private boolean verifyMailDomain(String mail) {
+        return mail.endsWith("@nure.ua");
     }
 }
