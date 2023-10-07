@@ -1,8 +1,15 @@
 package org.groupscope.security;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,8 +39,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
                 .authorizeRequests()
-                .antMatchers("/register", "/auth", "/oauth2").permitAll()
+                .antMatchers("/register", "/auth", "/oauth2", "/hi").permitAll()
+                .antMatchers(HttpMethod.HEAD, "/register", "/auth", "/oauth2", "/hi").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -42,7 +52,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOrigins("http://localhost:3000",
+                        "https://localhost:3000",
+                        "https://groupscope.com.ua",
+                        "https://groupscope.com.ua:3000",
+                        "https://react-app:3000")
                 .allowedMethods("*")
                 .allowedHeaders("*");
     }

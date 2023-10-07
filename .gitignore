@@ -7,7 +7,10 @@ HELP.md
 .classpath
 .factorypath
 .project
-.properties
+
+application-*.properties
+!application.properties
+
 .settings
 .springBeans
 .sts4-cache
@@ -45,3 +48,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+Dockerfile

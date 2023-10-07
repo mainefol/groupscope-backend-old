@@ -70,7 +70,7 @@ public class TaskDTO {
             LocalDate now = LocalDate.now();
             LocalDate deadline = LocalDate.parse(this.deadline, dateFormatter);
 
-            return deadline.isAfter(now) || deadline.isEqual(now);
+            return deadline.isAfter(now) || deadline.isEqual(now) || deadline.isBefore(now);
         } catch (DateTimeParseException e) {
             return false;
         }

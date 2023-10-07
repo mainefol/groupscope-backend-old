@@ -11,8 +11,10 @@ import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
 import org.groupscope.security.oauth2.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,9 +59,11 @@ public class AuthController {
             } else {
                 return ResponseEntity.badRequest().build();
             }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            log.info(e.getMessage());
-            e.printStackTrace();
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -75,9 +79,11 @@ public class AuthController {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-        } catch(Exception e) {
-            log.info(e.getMessage());
-            e.printStackTrace();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -93,10 +99,19 @@ public class AuthController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            e.printStackTrace();
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
+    }
+
+    @GetMapping("/hi")
+    public ResponseEntity<Void> handleHeadRequest() {
+        HttpHeaders headers = new HttpHeaders();
+        // Добавьте необходимые заголовки, если есть
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }
