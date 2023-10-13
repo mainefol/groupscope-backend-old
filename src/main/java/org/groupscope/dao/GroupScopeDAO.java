@@ -50,6 +50,8 @@ public interface GroupScopeDAO {
 
     Learner findLearnerByName(String name);
 
+    Learner findLearnersByNameAndLastname(String name, String lastname);
+
     Learner findLearnerById(Long id);
 
     Learner updateLearner(Learner learner);

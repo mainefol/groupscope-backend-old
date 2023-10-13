@@ -267,10 +267,12 @@ public class GroupScopeServiceImpl implements GroupScopeService{
     public Learner addLearner(Learner learner, String inviteCode) {
         if(learner != null && inviteCode != null) {
             LearningGroup learningGroup = groupScopeDAO.findLearningGroupByInviteCode(inviteCode);
-            processLearnerWithdrawal(learner);
 
             if (learningGroup != null) {
-                if(!learningGroup.getLearners().contains(learner)) {
+                boolean isGroupContainsLearner = learningGroup.getLearners().contains(learner);
+                processLearnerWithdrawal(learner);
+
+                if(!isGroupContainsLearner) {
                     learner.setLearningGroup(learningGroup);
 
                     learningGroup.getLearners().add(learner);
@@ -390,6 +392,28 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             return learningGroup;
         else
             throw new NullPointerException("Group with inviteCode = " + inviteCode + " not found");
+    }
+
+    @Override
+    @Transactional
+    public LearningGroup updateHeadmanOfGroup(LearningGroup group, LearnerDTO learnerDTO) {
+        if(group != null && learnerDTO != null) {
+            Learner oldHeadman = group.getHeadmen();
+            Learner newHeadman = groupScopeDAO.findLearnersByNameAndLastname(learnerDTO.getName(), learnerDTO.getLastname());
+            if(newHeadman != null && group.getLearners().contains(newHeadman)) {
+                oldHeadman.setRole(LearningRole.STUDENT);
+                newHeadman.setRole(LearningRole.HEADMAN);
+                group.setHeadmen(newHeadman);
+
+                groupScopeDAO.saveLearner(oldHeadman);
+                groupScopeDAO.saveLearner(newHeadman);
+                return groupScopeDAO.saveGroup(group);
+            } else
+                throw new IllegalArgumentException("Learner = " + newHeadman + " does not contains in group = " + group
+                        + " in " + getCurrentFunctionName());
+        } else
+            throw new NullPointerException("Group = " + group + ", learnerDto = " + learnerDTO
+                    + " in " + getCurrentFunctionName());
     }
 
     /**

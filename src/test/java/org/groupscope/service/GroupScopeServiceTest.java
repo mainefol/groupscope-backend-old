@@ -344,7 +344,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void addTask_WithInvalidTaskDTO_throwsIllegalArgumentException() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String deadline = LocalDate.now().minus(7, ChronoUnit.DAYS).format(formatter);
 
         TaskDTO taskDTO = new TaskDTO("Пз1",
@@ -554,7 +554,7 @@ public class GroupScopeServiceTest {
 
     @Test
     public void updateTask_WithInvalidDeadline_throwsIllegalArgumentException() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String deadline = LocalDate.now().plus(7, ChronoUnit.DAYS).format(formatter);
         String wrongDeadline = LocalDate.now().minus(7, ChronoUnit.DAYS).format(formatter);
 
@@ -1394,5 +1394,61 @@ public class GroupScopeServiceTest {
     public void processLearnerWithdrawal_WithNullLearner_throwsNullPointerException() {
         assertThrows(NullPointerException.class,
                 () -> groupScopeService.processLearnerWithdrawal(null));
+    }
+
+    @Test
+    public void updateHeadmanOfGroup_WithValidArguments_returnUpdatingGroup() {
+        Learner oldHeadman = generateValidLearnerHeadmanAndGroup();
+        LearningGroup group = oldHeadman.getLearningGroup();
+        Learner newHeadman = generateValidLearnerStudent(group);
+
+        when(groupScopeDAO.findLearnerByName(anyString())).thenReturn(newHeadman);
+
+        groupScopeService.updateHeadmanOfGroup(group, LearnerDTO.from(newHeadman));
+
+        assertEquals(oldHeadman.getRole(), LearningRole.STUDENT);
+        assertEquals(newHeadman.getRole(), LearningRole.HEADMAN);
+        assertEquals(group.getHeadmen(), newHeadman);
+
+        verify(groupScopeDAO, atMost(2)).saveLearner(any(Learner.class));
+        verify(groupScopeDAO, atMostOnce()).saveGroup(any(LearningGroup.class));
+    }
+
+    @Test
+    public void updateHeadmanOfGroup_WithLearnerAbsence_throwsIllegalArgumentException() {
+        Learner oldHeadman = generateValidLearnerHeadmanAndGroup();
+        LearningGroup group = oldHeadman.getLearningGroup();
+        Learner newHeadman = generateValidLearnerStudent();
+
+        when(groupScopeDAO.findLearnerByName(anyString())).thenReturn(newHeadman);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> groupScopeService.updateHeadmanOfGroup(group, LearnerDTO.from(newHeadman)));
+
+        verify(groupScopeDAO, never()).saveLearner(any(Learner.class));
+        verify(groupScopeDAO, never()).saveGroup(any(LearningGroup.class));
+    }
+
+    @Test
+    public void updateHeadmanOfGroup_WithInvalidLearnerDto_throwsIllegalArgumentException() {
+        Learner oldHeadman = generateValidLearnerHeadmanAndGroup();
+        LearningGroup group = oldHeadman.getLearningGroup();
+        Learner newHeadman = generateValidLearnerStudent();
+
+        when(groupScopeDAO.findLearnerByName(anyString())).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> groupScopeService.updateHeadmanOfGroup(group, LearnerDTO.from(newHeadman)));
+
+        verify(groupScopeDAO, never()).saveLearner(any(Learner.class));
+        verify(groupScopeDAO, never()).saveGroup(any(LearningGroup.class));
+    }
+
+    @Test
+    public void updateHeadmanOfGroup_WithNullArguments_throwsNullPointerException() {
+        assertThrows(NullPointerException.class,
+                () -> groupScopeService.updateHeadmanOfGroup(null, new LearnerDTO()));
+        assertThrows(NullPointerException.class,
+                () -> groupScopeService.updateHeadmanOfGroup(new LearningGroup(), null));
     }
 }

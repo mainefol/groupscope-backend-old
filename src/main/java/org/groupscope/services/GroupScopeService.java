@@ -60,4 +60,6 @@ public interface GroupScopeService {
 
     LearningGroup getGroupByInviteCode(String inviteCode);
 
+    LearningGroup updateHeadmanOfGroup(LearningGroup group, LearnerDTO learnerDTO);
+
 }

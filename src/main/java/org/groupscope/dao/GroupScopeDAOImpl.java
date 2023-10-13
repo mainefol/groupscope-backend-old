@@ -275,6 +275,17 @@ public class GroupScopeDAOImpl implements GroupScopeDAO{
     }
 
     @Override
+    public Learner findLearnersByNameAndLastname(String name, String lastname) {
+        if(isNull(name, lastname)) {
+            log.error("Learner name or lastname is null in " + getCurrentFunctionName());
+            return null;
+        }
+
+        Optional<Learner> learner = learnerRepository.getLearnersByNameAndLastname(name, lastname);
+        return learner.orElse(null);
+    }
+
+    @Override
     public Learner findLearnerById(Long id) {
         if(isNull(id)) {
             log.error("Learner id is null in " + getCurrentFunctionName());

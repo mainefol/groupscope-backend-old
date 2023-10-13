@@ -399,6 +399,28 @@ public class GroupScopeController {
         }
     }
 
+    @PatchMapping("/group/headman")
+    public ResponseEntity<HttpStatus> updateHeadmanOfGroup(@RequestBody LearnerDTO learnerDTO) {
+        try {
+            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            if(user.getLearner().getRole().equals(LearningRole.HEADMAN)) {
+                groupScopeService.updateHeadmanOfGroup(user.getLearner().getLearningGroup(), learnerDTO);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+    }
+
     @PostMapping("/grade")
     public ResponseEntity<HttpStatus> updateGrade(@RequestBody GradeDTO gradeDTO) {
         try {
