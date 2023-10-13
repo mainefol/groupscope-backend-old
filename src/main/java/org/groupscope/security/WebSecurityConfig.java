@@ -52,11 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000",
-                        "https://localhost:3000",
-                        "https://groupscope.com.ua",
-                        "https://groupscope.com.ua:3000",
-                        "https://react-app:3000")
+                .allowedOrigins("*")
                 .allowedMethods("*")
                 .allowedHeaders("*");
     }

@@ -38,6 +38,10 @@ public class Task {
     @Column(name = "deadline")
     private String deadline;
 
+    // TODO
+    //@Column(name = "max_mark")
+    //private Integer maxMark;
+
     // Many-to-one relationship with the Subject entity. Each task belongs to a subject.
     @ManyToOne
     @JoinColumn(name = "subject_id")
