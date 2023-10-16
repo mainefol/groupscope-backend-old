@@ -2,7 +2,7 @@ package org.groupscope.security.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.groupscope.security.entity.CustomUser;
+import org.groupscope.security.entity.User;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -16,12 +16,12 @@ public class RegistrationRequest extends AuthRequest {
 
     private String groupName;
 
-    public CustomUser toUser() {
-        CustomUser customUser = new CustomUser();
-        customUser.setPassword(this.getPassword());
-        customUser.setLogin(this.getLogin());
+    public User toUser() {
+        User user = new User();
+        user.setPassword(this.getPassword());
+        user.setLogin(this.getLogin());
 
-        return customUser;
+        return user;
     }
 
     public boolean isValid() {

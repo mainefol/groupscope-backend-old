@@ -42,8 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .requiresChannel(channel ->
                         channel.anyRequest().requiresSecure())
                 .authorizeRequests()
-                .antMatchers("/register", "/auth", "/oauth2", "/hi").permitAll()
-                .antMatchers(HttpMethod.HEAD, "/register", "/auth", "/oauth2", "/hi").permitAll()
+                .antMatchers("/register", "/auth", "/oauth2", "/refresh","/hi").permitAll()
+                .antMatchers(HttpMethod.HEAD, "/register", "/auth", "/oauth2", "/refresh", "/hi").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -54,7 +54,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("*")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true);
+
     }
 
     @Bean

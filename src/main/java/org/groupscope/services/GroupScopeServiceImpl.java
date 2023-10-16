@@ -176,7 +176,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
                     groupScopeDAO.updateTask(task);
                 } else
-                    throw new IllegalArgumentException("TaskDTO = " + taskDTO + " is not valid in " + getCurrentFunctionName());
+                    throw new IllegalArgumentException("TaskDTO = " + taskDTO + " is not valid in " + getCurrentMethodName());
             } else {
                 throw new NullPointerException("Task not found with name: " + taskDTO.getName());
             }
@@ -322,7 +322,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 learner.setLastname(learnerDTO.getNewLastname());
             return groupScopeDAO.updateLearner(learner);
         } else {
-            throw new NullPointerException("LearnerDTO or Learner is null in " + getCurrentFunctionName());
+            throw new NullPointerException("LearnerDTO or Learner is null in " + getCurrentMethodName());
         }
     }
     @Override
@@ -331,7 +331,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
         if (learner != null)
             groupScopeDAO.deleteLearner(learner);
         else {
-            throw new NullPointerException("Learner is null in " + getCurrentFunctionName());
+            throw new NullPointerException("Learner is null in " + getCurrentMethodName());
         }
     }
 
@@ -345,9 +345,9 @@ public class GroupScopeServiceImpl implements GroupScopeService{
 
                 return LearningGroupDTO.from(learner.getLearningGroup());
             }
-            throw new NullPointerException("Learning group is null in " + getCurrentFunctionName());
+            throw new NullPointerException("Learning group is null in " + getCurrentMethodName());
         } else {
-            throw new NullPointerException("Learner is null in " + getCurrentFunctionName());
+            throw new NullPointerException("Learner is null in " + getCurrentMethodName());
         }
     }
 
@@ -372,7 +372,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 throw new IllegalArgumentException("Group " + group.getName() + " has been already existing");
             }
         } else {
-            throw new NullPointerException("Learning group DTO is null in " + getCurrentFunctionName());
+            throw new NullPointerException("Learning group DTO is null in " + getCurrentMethodName());
         }
     }
 
@@ -410,10 +410,10 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 return groupScopeDAO.saveGroup(group);
             } else
                 throw new IllegalArgumentException("Learner = " + newHeadman + " does not contains in group = " + group
-                        + " in " + getCurrentFunctionName());
+                        + " in " + getCurrentMethodName());
         } else
             throw new NullPointerException("Group = " + group + ", learnerDto = " + learnerDTO
-                    + " in " + getCurrentFunctionName());
+                    + " in " + getCurrentMethodName());
     }
 
     /**
@@ -444,7 +444,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
             }
         } else {
             throw new NullPointerException("Learner = " + learner +
-                    " Learning group = " + newGroup + " in " + getCurrentFunctionName());
+                    " Learning group = " + newGroup + " in " + getCurrentMethodName());
         }
     }
 
@@ -478,7 +478,7 @@ public class GroupScopeServiceImpl implements GroupScopeService{
                 groupScopeDAO.saveGroup(group);
             }
         } else {
-            throw new NullPointerException("Learner = " + learner + " in " + getCurrentFunctionName());
+            throw new NullPointerException("Learner = " + learner + " in " + getCurrentMethodName());
         }
     }
 }

@@ -1,12 +1,12 @@
-package org.groupscope.security.auth;
+package org.groupscope.security.services.auth;
 
 
-import org.groupscope.dao.repositories.CustomUserRepository;
+import org.groupscope.dao.repositories.UserRepository;
 import org.groupscope.dto.LearnerDTO;
 import org.groupscope.dto.LearningGroupDTO;
 import org.groupscope.entity.*;
 import org.groupscope.security.dto.RegistrationRequest;
-import org.groupscope.security.entity.CustomUser;
+import org.groupscope.security.entity.User;
 import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CustomUserService {
+public class UserService {
 
-    private final CustomUserRepository customUserRepository;
+    private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -24,10 +24,10 @@ public class CustomUserService {
 
 
     @Autowired
-    public CustomUserService(CustomUserRepository customUserRepository,
-                             PasswordEncoder passwordEncoder,
-                             GroupScopeService groupScopeService) {
-        this.customUserRepository = customUserRepository;
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       GroupScopeService groupScopeService) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.groupScopeService = groupScopeService;
     }
@@ -40,11 +40,11 @@ public class CustomUserService {
      * Returns the saved custom user or null if the user couldn't be saved.
      */
     @Transactional
-    public CustomUser saveUser(CustomUser customUser, RegistrationRequest request, Provider provider) {
-        if(customUser.getPassword() != null) {
-            customUser.setPassword(passwordEncoder.encode(customUser.getPassword()));
+    public User saveUser(User user, RegistrationRequest request, Provider provider) {
+        if(user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        customUser.setProvider(provider);
+        user.setProvider(provider);
         LearnerDTO learnerDTO = new LearnerDTO(request.getLearnerName(),
                 request.getLearnerLastname(),
                 LearningRole.STUDENT);
@@ -52,7 +52,7 @@ public class CustomUserService {
         // Add new learner to an existing group based on the invite code
         if(request.getInviteCode() != null) {
             Learner student = groupScopeService.addLearner(learnerDTO.toLearner(), request.getInviteCode());
-            return processLearner(customUser, student);
+            return processLearner(user, student);
 
         // Add new learner and create a new group
         } else if (request.getGroupName() != null) {
@@ -62,22 +62,22 @@ public class CustomUserService {
             LearningGroupDTO learningGroupDTO = new LearningGroupDTO(request.getGroupName(), headman);
             LearningGroup learningGroup = groupScopeService.addGroup(learningGroupDTO);
             if(learningGroup != null) {
-                customUser.setLearner(learningGroup.getHeadmen());
-                return customUserRepository.save(customUser);
+                user.setLearner(learningGroup.getHeadmen());
+                return userRepository.save(user);
             } else {
                 return null;
             }
         // Add new learner without group addition
         } else {
             Learner student = groupScopeService.addFreeLearner(learnerDTO);
-            return processLearner(customUser, student);
+            return processLearner(user, student);
         }
     }
 
-    private CustomUser processLearner(CustomUser user, Learner learner) {
+    private User processLearner(User user, Learner learner) {
         if (learner != null) {
             user.setLearner(learner);
-            return customUserRepository.save(user);
+            return userRepository.save(user);
         } else {
             return null;
         }
@@ -88,8 +88,8 @@ public class CustomUserService {
      * Returns the custom user if found, or null if not found.
      */
     @Transactional
-    public CustomUser findByLogin(String login) {
-        return customUserRepository.findByLogin(login);
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login);
     }
 
     /*
@@ -97,11 +97,11 @@ public class CustomUserService {
      * Returns the custom user if found and the provided password matches the stored password, or null if not found or password doesn't match.
      */
     @Transactional
-    public CustomUser findByLoginAndPassword(String login, String password) {
-        CustomUser customUser = findByLogin(login);
-        if(customUser != null) {
-            if (passwordEncoder.matches(password, customUser.getPassword())){
-                return customUser;
+    public User findByLoginAndPassword(String login, String password) {
+        User user = findByLogin(login);
+        if(user != null) {
+            if (passwordEncoder.matches(password, user.getPassword())){
+                return user;
             } else
                 throw new IllegalArgumentException("Incorrect password");
         } else

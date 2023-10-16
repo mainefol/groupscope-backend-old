@@ -21,7 +21,7 @@ import java.util.Collections;
 @Data
 @Table(name = "users")
 @NoArgsConstructor
-public class CustomUser implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

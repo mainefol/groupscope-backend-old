@@ -3,13 +3,12 @@ package org.groupscope.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.entity.Provider;
 import org.groupscope.security.JwtProvider;
-import org.groupscope.security.entity.CustomUser;
-import org.groupscope.security.auth.CustomUserService;
-import org.groupscope.security.dto.AuthRequest;
-import org.groupscope.security.dto.AuthResponse;
-import org.groupscope.security.dto.OAuth2Request;
-import org.groupscope.security.dto.RegistrationRequest;
-import org.groupscope.security.oauth2.CustomOAuth2UserService;
+import org.groupscope.security.dto.*;
+import org.groupscope.security.entity.RefreshToken;
+import org.groupscope.security.entity.User;
+import org.groupscope.security.services.RefreshTokenService;
+import org.groupscope.security.services.auth.UserService;
+import org.groupscope.security.services.oauth2.OAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,36 +23,40 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 public class AuthController {
-    private final CustomUserService customUserService;
+    private final UserService userService;
 
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2UserService OAuth2UserService;
 
     private final JwtProvider jwtProvider;
 
+    private final RefreshTokenService refreshTokenService;
+
     @Autowired
-    public AuthController(CustomUserService customUserService,
-                          CustomOAuth2UserService customOAuth2UserService,
-                          JwtProvider jwtProvider) {
-        this.customUserService = customUserService;
-        this.customOAuth2UserService = customOAuth2UserService;
+    public AuthController(UserService userService,
+                          OAuth2UserService OAuth2UserService,
+                          JwtProvider jwtProvider,
+                          RefreshTokenService refreshTokenService) {
+        this.userService = userService;
+        this.OAuth2UserService = OAuth2UserService;
         this.jwtProvider = jwtProvider;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<HttpStatus> registerUser(@RequestBody @Valid RegistrationRequest request) {
         try {
             // Checking for user existing
-            if (customUserService.findByLogin(request.getLogin()) != null) {
+            if (userService.findByLogin(request.getLogin()) != null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
 
             if(!request.isValid()) {
-                log.info(request.toString() + " not valid");
+                log.info(request + " not valid");
                 return ResponseEntity.badRequest().build();
             }
 
             // Save new user
-            CustomUser user = customUserService.saveUser(request.toUser(), request, Provider.LOCAL);
+            User user = userService.saveUser(request.toUser(), request, Provider.LOCAL);
             if (user != null) {
                 return ResponseEntity.ok().build();
             } else {
@@ -71,11 +74,11 @@ public class AuthController {
     @PostMapping("/auth")
     public ResponseEntity<AuthResponse> auth(@RequestBody @Valid AuthRequest request) {
         try {
-            CustomUser user = customUserService.findByLoginAndPassword(request.getLogin(), request.getPassword());
+            User user = userService.findByLoginAndPassword(request.getLogin(), request.getPassword());
             if (user != null) {
-                String token = jwtProvider.generateToken(user.getLogin());
-                AuthResponse authResponse = new AuthResponse(token);
-                return ResponseEntity.ok(authResponse);
+                String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, false).getToken();
+                String jwtToken = jwtProvider.generateToken(user.getLogin());
+                return ResponseEntity.ok(new AuthResponse(jwtToken, refreshToken));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -91,11 +94,11 @@ public class AuthController {
     @PostMapping("/oauth2")
     public ResponseEntity<AuthResponse> auth(@RequestBody @Valid OAuth2Request request) {
         try {
-            CustomUser user = customOAuth2UserService.loginOAuthGoogle(request);
+            User user = OAuth2UserService.loginOAuthGoogle(request);
             if (user != null) {
-                String token = jwtProvider.generateToken(user.getLogin());
-                AuthResponse authResponse = new AuthResponse(token);
-                return ResponseEntity.ok(authResponse);
+                String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, false).getToken();
+                String jwtToken = jwtProvider.generateToken(user.getLogin());
+                return ResponseEntity.ok(new AuthResponse(jwtToken, refreshToken));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
@@ -108,10 +111,28 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshJwtToken(@RequestBody @Valid TokenRefreshRequest refreshRequest) {
+        try {
+            RefreshToken refreshTokenObj = refreshTokenService.findByToken(refreshRequest.getRefreshToken());
+
+            if(refreshTokenObj != null) {
+                User user = refreshTokenObj.getUser();
+                String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, true).getToken();
+                String jwtToken = jwtProvider.generateToken(user.getLogin());
+                return ResponseEntity.ok(new AuthResponse(jwtToken, refreshToken));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+    }
+
     @GetMapping("/hi")
     public ResponseEntity<Void> handleHeadRequest() {
         HttpHeaders headers = new HttpHeaders();
-        // Добавьте необходимые заголовки, если есть
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

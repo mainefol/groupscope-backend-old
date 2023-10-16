@@ -1,4 +1,4 @@
-package org.groupscope.security.oauth2;
+package org.groupscope.security.services.oauth2;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -8,8 +8,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dao.GroupScopeDAOImpl;
 import org.groupscope.entity.Provider;
-import org.groupscope.security.entity.CustomUser;
-import org.groupscope.security.auth.CustomUserService;
+import org.groupscope.security.entity.User;
+import org.groupscope.security.services.RefreshTokenService;
+import org.groupscope.security.services.auth.UserService;
 import org.groupscope.security.dto.OAuth2Request;
 import org.groupscope.security.dto.RegistrationRequest;
 import org.hibernate.Hibernate;
@@ -25,16 +26,20 @@ import java.util.Collections;
 
 @Service
 @Slf4j
-public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
+public class OAuth2UserService extends DefaultOAuth2UserService  {
 
-    private final CustomUserService customUserService;
+    private final UserService userService;
 
     private final GoogleIdTokenVerifier idTokenVerifier;
 
+    private final RefreshTokenService refreshTokenService;
+
     @Autowired
-    public CustomOAuth2UserService(@Value("${spring.security.oauth2.client.registration.google.client-id}") String clientId,
-                                   CustomUserService customUserService) {
-        this.customUserService = customUserService;
+    public OAuth2UserService(@Value("${spring.security.oauth2.client.registration.google.client-id}") String clientId,
+                             UserService userService,
+                             RefreshTokenService refreshTokenService) {
+        this.userService = userService;
+        this.refreshTokenService = refreshTokenService;
 
         NetHttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = new JacksonFactory();
@@ -44,21 +49,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService  {
     }
 
     @Transactional
-    public CustomUser loginOAuthGoogle(OAuth2Request request) {
+    public User loginOAuthGoogle(OAuth2Request request) {
         if(request.getIdToken() != null) {
             RegistrationRequest registrationRequest = verifyIDToken(request.getIdToken());
             if (registrationRequest == null) {
                 throw new IllegalArgumentException("Token not verified");
             }
-            CustomUser user = new CustomUser();
+            User user = new User();
             user.setLogin(registrationRequest.getLogin());
             registrationRequest.setInviteCode(request.getInviteCode());
             registrationRequest.setGroupName(request.getGroupName());
 
-            CustomUser foundUser = customUserService.findByLogin(user.getLogin());
+            User foundUser = userService.findByLogin(user.getLogin());
 
-            if(foundUser == null)
-                foundUser = customUserService.saveUser(user, registrationRequest, Provider.GOOGLE);
+            if(foundUser == null) {
+                foundUser = userService.saveUser(user, registrationRequest, Provider.GOOGLE);
+            }
 
             Hibernate.initialize(foundUser.getLearner().getGrades());
 

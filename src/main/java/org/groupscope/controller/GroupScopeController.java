@@ -4,10 +4,9 @@ package org.groupscope.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.dto.*;
 import org.groupscope.entity.*;
-import org.groupscope.security.entity.CustomUser;
+import org.groupscope.security.entity.User;
 import org.groupscope.services.GroupScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,28 +24,22 @@ import java.util.List;
 @RequestMapping("/api")
 public class GroupScopeController {
 
-    @Value("${server.port}")
-    private int serverPort;
-
-    private final String API_LINE;
-
     private final GroupScopeService groupScopeService;
 
     @Autowired
     public GroupScopeController(GroupScopeService groupScopeService) {
         this.groupScopeService = groupScopeService;
-        API_LINE = "http://localhost:" + serverPort;
     }
 
-    private void logRequestMapping(CustomUser user, HttpServletRequest request) {
+    private void logRequestMapping(User user, HttpServletRequest request) {
         String requestPath = request.getRequestURI();
-        log.info("{} {}{} {}", request.getMethod(), API_LINE, requestPath, user);
+        log.info("{} {}\t{}", request.getMethod(), requestPath, user);
     }
 
     @GetMapping("/subject/all")
     public ResponseEntity<List<SubjectDTO>> getSubjects() {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -65,7 +58,7 @@ public class GroupScopeController {
     @PostMapping("/subject/add")
     public ResponseEntity<HttpStatus> addSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -88,7 +81,7 @@ public class GroupScopeController {
     @PatchMapping("/subject/patch")
     public ResponseEntity<HttpStatus> patchSubject(@RequestBody SubjectDTO subjectDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -111,7 +104,7 @@ public class GroupScopeController {
     @DeleteMapping("/subject/{subject-name}/delete")
     public ResponseEntity<HttpStatus> deleteSubject(@PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -134,7 +127,7 @@ public class GroupScopeController {
     @GetMapping("/subject/{subject-name}/task/all")
     public ResponseEntity<List<TaskDTO>> getTasksOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -155,7 +148,7 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> addTask(@RequestBody TaskDTO taskDTO,
                                               @PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -179,7 +172,7 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> patchTask(@RequestBody TaskDTO taskDTO,
                                                 @PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -204,7 +197,7 @@ public class GroupScopeController {
     public ResponseEntity<HttpStatus> deleteTask(@RequestBody TaskDTO taskDTO,
                                                  @PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -227,7 +220,7 @@ public class GroupScopeController {
     @GetMapping("/student")
     public ResponseEntity<LearnerDTO> getStudent() {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -262,7 +255,7 @@ public class GroupScopeController {
     @PatchMapping("/student/patch")
     public ResponseEntity<HttpStatus> updateStudent(@RequestBody LearnerDTO learnerDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -282,7 +275,7 @@ public class GroupScopeController {
     @DeleteMapping("/student/delete")
     public ResponseEntity<HttpStatus> deleteStudent() {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -302,7 +295,7 @@ public class GroupScopeController {
     @GetMapping("/group")
     public ResponseEntity<LearningGroupDTO> getGroup() {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -321,7 +314,7 @@ public class GroupScopeController {
     @PostMapping("/group/create")
     public ResponseEntity<HttpStatus> createGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -341,7 +334,7 @@ public class GroupScopeController {
     @PostMapping("/group/join")
     public ResponseEntity<HttpStatus> joinToGroup(@RequestBody LearningGroupDTO learningGroupDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -361,7 +354,7 @@ public class GroupScopeController {
     @GetMapping("/subject/{subject-name}/grade/all")
     public ResponseEntity<List<GradeDTO>> getGradesOfSubject(@PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -380,7 +373,7 @@ public class GroupScopeController {
     @GetMapping("/group/{subject-name}/grade/all")
     public ResponseEntity<List<LearnerDTO>> getGradesOfSubjectFromGroup(@PathVariable("subject-name") String subjectName) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -402,7 +395,7 @@ public class GroupScopeController {
     @PatchMapping("/group/headman")
     public ResponseEntity<HttpStatus> updateHeadmanOfGroup(@RequestBody LearnerDTO learnerDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -424,7 +417,7 @@ public class GroupScopeController {
     @PostMapping("/grade")
     public ResponseEntity<HttpStatus> updateGrade(@RequestBody GradeDTO gradeDTO) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 
@@ -443,7 +436,7 @@ public class GroupScopeController {
     @PostMapping("/grades")
     public ResponseEntity<HttpStatus> updateGrades(@RequestBody List<GradeDTO> gradeDTOs) {
         try {
-            CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             logRequestMapping(user, request);
 

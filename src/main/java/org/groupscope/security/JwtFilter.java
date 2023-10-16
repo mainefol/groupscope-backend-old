@@ -1,7 +1,8 @@
 package org.groupscope.security;
 
-import org.groupscope.security.entity.CustomUser;
-import org.groupscope.security.auth.CustomUserDetailsService;
+import lombok.extern.slf4j.Slf4j;
+import org.groupscope.security.entity.User;
+import org.groupscope.security.services.auth.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +23,7 @@ import static org.springframework.util.StringUtils.hasText;
  * It intercepts incoming requests, extracts JWT tokens, validates them, and sets the user authentication in the security context.
  */
 
+@Slf4j
 @Component
 public class JwtFilter extends GenericFilterBean {
 
@@ -29,12 +31,12 @@ public class JwtFilter extends GenericFilterBean {
 
     private final JwtProvider jwtProvider;
 
-    private final CustomUserDetailsService customUserDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Autowired
-    public JwtFilter(JwtProvider jwtProvider, CustomUserDetailsService customUserDetailsService) {
+    public JwtFilter(JwtProvider jwtProvider, UserDetailsServiceImpl userDetailsServiceImpl) {
         this.jwtProvider = jwtProvider;
-        this.customUserDetailsService = customUserDetailsService;
+        this.userDetailsServiceImpl = userDetailsServiceImpl;
     }
 
     /*
@@ -47,8 +49,8 @@ public class JwtFilter extends GenericFilterBean {
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
         if(token != null && jwtProvider.validateToken(token)) {
             String userLogin = jwtProvider.getLoginFromToken(token);
-            CustomUser customUser = customUserDetailsService.loadUserByUsername(userLogin);
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, customUser.getAuthorities());
+            User user = userDetailsServiceImpl.loadUserByUsername(userLogin);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(servletRequest, servletResponse);
