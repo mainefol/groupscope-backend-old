@@ -3,6 +3,7 @@ package org.groupscope.security.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.groupscope.entity.LearningRole;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -14,6 +15,5 @@ public class AuthResponse {
     @NotEmpty
     private String jwtToken;
 
-    @NotEmpty
-    private String refreshToken;
+    private LearningRole role;
 }

@@ -9,16 +9,15 @@ import org.groupscope.security.entity.User;
 import org.groupscope.security.services.RefreshTokenService;
 import org.groupscope.security.services.auth.UserService;
 import org.groupscope.security.services.oauth2.OAuth2UserService;
+import org.groupscope.util.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
@@ -31,15 +30,19 @@ public class AuthController {
 
     private final RefreshTokenService refreshTokenService;
 
+    private final CookieUtil cookieUtil;
+
     @Autowired
     public AuthController(UserService userService,
                           OAuth2UserService OAuth2UserService,
                           JwtProvider jwtProvider,
-                          RefreshTokenService refreshTokenService) {
+                          RefreshTokenService refreshTokenService,
+                          CookieUtil cookieUtil) {
         this.userService = userService;
         this.OAuth2UserService = OAuth2UserService;
         this.jwtProvider = jwtProvider;
         this.refreshTokenService = refreshTokenService;
+        this.cookieUtil = cookieUtil;
     }
 
     @PostMapping("/register")
@@ -76,9 +79,13 @@ public class AuthController {
         try {
             User user = userService.findByLoginAndPassword(request.getLogin(), request.getPassword());
             if (user != null) {
-                String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, false).getToken();
+                String refreshTokenStr = refreshTokenService.createOrUpdateRefreshToken(user, false).getToken();
                 String jwtToken = jwtProvider.generateToken(user.getLogin());
-                return ResponseEntity.ok(new AuthResponse(jwtToken, refreshToken));
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.SET_COOKIE,
+                        cookieUtil.createRefreshTokenCookie(refreshTokenStr,  2592000000L).toString());
+
+                return ResponseEntity.ok().headers(headers).body(new AuthResponse(jwtToken, user.getLearner().getRole()));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -96,9 +103,13 @@ public class AuthController {
         try {
             User user = OAuth2UserService.loginOAuthGoogle(request);
             if (user != null) {
-                String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, false).getToken();
+                String refreshTokenStr = refreshTokenService.createOrUpdateRefreshToken(user, false).getToken();
                 String jwtToken = jwtProvider.generateToken(user.getLogin());
-                return ResponseEntity.ok(new AuthResponse(jwtToken, refreshToken));
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.SET_COOKIE,
+                        cookieUtil.createRefreshTokenCookie(refreshTokenStr,  2592000000L).toString());
+
+                return ResponseEntity.ok().headers(headers).body(new AuthResponse(jwtToken, user.getLearner().getRole()));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
@@ -111,16 +122,20 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshJwtToken(@RequestBody @Valid TokenRefreshRequest refreshRequest) {
+    @GetMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshJwtToken(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
         try {
-            RefreshToken refreshTokenObj = refreshTokenService.findByToken(refreshRequest.getRefreshToken());
+            RefreshToken refreshTokenObj = refreshTokenService.findByToken(refreshToken);
 
             if(refreshTokenObj != null) {
                 User user = refreshTokenObj.getUser();
-                String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, true).getToken();
+                String refreshTokenStr = refreshTokenService.createOrUpdateRefreshToken(user, true).getToken();
                 String jwtToken = jwtProvider.generateToken(user.getLogin());
-                return ResponseEntity.ok(new AuthResponse(jwtToken, refreshToken));
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.SET_COOKIE,
+                        cookieUtil.createRefreshTokenCookie(refreshTokenStr,  2592000000L).toString());
+
+                return ResponseEntity.ok().headers(headers).body(new AuthResponse(jwtToken, user.getLearner().getRole()));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
