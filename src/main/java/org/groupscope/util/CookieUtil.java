@@ -20,6 +20,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .path("/")
                 .domain("localhost")
+                .sameSite("Lax")
                 .build();
     }
 
