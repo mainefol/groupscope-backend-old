@@ -19,6 +19,7 @@ public class CookieUtil {
                 .maxAge(duration)
                 .httpOnly(true)
                 .path("/")
+                .domain("localhost")
                 .build();
     }
 

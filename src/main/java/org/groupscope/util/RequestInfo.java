@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 public class RequestInfo {
-    public void printRequest(HttpServletRequest request) {
+    public static void printRequest(HttpServletRequest request) {
         System.out.println("\n\nNEW REQUEST");
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {

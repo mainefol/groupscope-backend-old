@@ -3,6 +3,7 @@ package org.groupscope.security;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.security.entity.User;
 import org.groupscope.security.services.auth.UserDetailsServiceImpl;
+import org.groupscope.util.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +47,8 @@ public class JwtFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
+        RequestInfo.printRequest((HttpServletRequest) servletRequest);
+
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
         if(token != null && jwtProvider.validateToken(token)) {
             String userLogin = jwtProvider.getLoginFromToken(token);
