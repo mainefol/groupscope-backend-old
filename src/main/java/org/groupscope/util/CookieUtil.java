@@ -21,7 +21,7 @@ public class CookieUtil {
                 .path("/")
                 .domain("localhost")
                 .sameSite("None")
-                .secure(false)
+                .secure(true)
                 .build();
     }
 
