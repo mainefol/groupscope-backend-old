@@ -1402,7 +1402,7 @@ public class AssignmentManagerServiceTest {
         LearningGroup group = oldHeadman.getLearningGroup();
         Learner newHeadman = generateValidLearnerStudent(group);
 
-        when(assignmentManagerDAO.findLearnerByName(anyString())).thenReturn(newHeadman);
+        when(assignmentManagerDAO.findLearnersByNameAndLastname(anyString(), anyString())).thenReturn(newHeadman);
 
         assignmentManagerService.updateHeadmanOfGroup(group, LearnerDTO.from(newHeadman));
 
@@ -1420,7 +1420,7 @@ public class AssignmentManagerServiceTest {
         LearningGroup group = oldHeadman.getLearningGroup();
         Learner newHeadman = generateValidLearnerStudent();
 
-        when(assignmentManagerDAO.findLearnerByName(anyString())).thenReturn(newHeadman);
+        when(assignmentManagerDAO.findLearnersByNameAndLastname(anyString(), anyString())).thenReturn(newHeadman);
 
         assertThrows(IllegalArgumentException.class,
                 () -> assignmentManagerService.updateHeadmanOfGroup(group, LearnerDTO.from(newHeadman)));
@@ -1435,7 +1435,7 @@ public class AssignmentManagerServiceTest {
         LearningGroup group = oldHeadman.getLearningGroup();
         Learner newHeadman = generateValidLearnerStudent();
 
-        when(assignmentManagerDAO.findLearnerByName(anyString())).thenReturn(null);
+        when(assignmentManagerDAO.findLearnersByNameAndLastname(anyString(), anyString())).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
                 () -> assignmentManagerService.updateHeadmanOfGroup(group, LearnerDTO.from(newHeadman)));
@@ -1453,27 +1453,91 @@ public class AssignmentManagerServiceTest {
     }
 
     @Test
-    public void manageEditorRole_WithValidArguments_returnChangingLearner() {
+    public void manageEditorRole_WithValidArguments_returnChangingLearnerToEditor() {
+        LearningGroup group = generateValidLearnerHeadmanAndGroup().getLearningGroup();
+        Learner learner = generateValidLearnerStudent(group);
+        Long id = learner.getId();
 
+        when(assignmentManagerDAO.findLearnerById(anyLong())).thenReturn(learner);
+
+        doAnswer(invocationOnMock -> {
+            Learner l = invocationOnMock.getArgument(0);
+            return l;
+        }).when(assignmentManagerDAO).updateLearner(any(Learner.class));
+
+        Learner newLearner = assignmentManagerService.manageEditorRole(id, group, true);
+
+        assertEquals(newLearner.getRole(), LearningRole.EDITOR);
+    }
+
+    @Test
+    public void manageEditorRole_WithValidArguments_returnChangingLearnerToStudent() {
+        LearningGroup group = generateValidLearnerHeadmanAndGroup().getLearningGroup();
+        Learner learner = generateValidLearnerStudent(group);
+        learner.setRole(LearningRole.EDITOR);
+        Long id = learner.getId();
+
+        when(assignmentManagerDAO.findLearnerById(anyLong())).thenReturn(learner);
+
+        doAnswer(invocationOnMock -> {
+            Learner l = invocationOnMock.getArgument(0);
+            return l;
+        }).when(assignmentManagerDAO).updateLearner(any(Learner.class));
+
+        Learner newLearner = assignmentManagerService.manageEditorRole(id, group, false);
+
+        assertEquals(newLearner.getRole(), LearningRole.STUDENT);
     }
 
     @Test
     public void manageEditorRole_WithIdentityRoles_returnNonChangingLearner() {
+        LearningGroup group = generateValidLearnerHeadmanAndGroup().getLearningGroup();
+        Learner learner = generateValidLearnerStudent(group);
+        learner.setRole(LearningRole.EDITOR);
+        Long id = learner.getId();
 
+        when(assignmentManagerDAO.findLearnerById(anyLong())).thenReturn(learner);
+
+        Learner newLearner = assignmentManagerService.manageEditorRole(id, group, true);
+
+        assertEquals(newLearner.getRole(), LearningRole.EDITOR);
+
+
+        learner.setRole(LearningRole.STUDENT);
+        newLearner = assignmentManagerService.manageEditorRole(id, group, false);
+
+        assertEquals(newLearner.getRole(), LearningRole.STUDENT);
     }
 
     @Test
     public void manageEditorRole_WithHeadmanLearner_throwsIllegalArgumentException() {
+        Learner headman = generateValidLearnerHeadmanAndGroup();
+        LearningGroup group = headman.getLearningGroup();
+        Long id = headman.getId();
 
+        when(assignmentManagerDAO.findLearnerById(anyLong())).thenReturn(headman);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> assignmentManagerService.manageEditorRole(id, group, anyBoolean()));
     }
 
     @Test
-    public void manageEditorRole_WithNotExistingLearner_throwsIllegalArgumentException() {
+    public void manageEditorRole_WithNotExistingLearnerInGroup_throwsIllegalArgumentException() {
+        LearningGroup group = generateValidLearnerHeadmanAndGroup().getLearningGroup();
+        Learner learner = generateValidLearnerStudent();
+        Long id = learner.getId();
 
+        when(assignmentManagerDAO.findLearnerById(anyLong())).thenReturn(learner);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> assignmentManagerService.manageEditorRole(id, group, anyBoolean()));
     }
 
     @Test
     public void manageEditorRole_WithNullLearner_throwsNullPointerException() {
-
-    }
+        assertThrows(NullPointerException.class,
+                () -> assignmentManagerService.manageEditorRole(1L, null, anyBoolean()));
+        assertThrows(NullPointerException.class,
+                () -> assignmentManagerService.manageEditorRole(null, new LearningGroup(), anyBoolean()));
+        }
 }

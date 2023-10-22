@@ -411,7 +411,7 @@ public class AssignmentManagerController {
 
     @PostMapping("/group/editor")
     public ResponseEntity<HttpStatus> processEditor(@RequestBody LearnerDTO learnerDTO,
-                                                    @RequestParam(name = "active", required = true) Boolean active) {
+                                                    @RequestParam(name = "active") Boolean active) {
         try {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
