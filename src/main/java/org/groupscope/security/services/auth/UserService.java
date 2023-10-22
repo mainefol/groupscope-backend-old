@@ -1,13 +1,16 @@
 package org.groupscope.security.services.auth;
 
 
-import org.groupscope.dao.repositories.UserRepository;
-import org.groupscope.dto.LearnerDTO;
-import org.groupscope.dto.LearningGroupDTO;
-import org.groupscope.entity.*;
+import org.groupscope.assignment_management.dao.repositories.UserRepository;
+import org.groupscope.assignment_management.dto.LearnerDTO;
+import org.groupscope.assignment_management.dto.LearningGroupDTO;
+import org.groupscope.assignment_management.entity.Learner;
+import org.groupscope.assignment_management.entity.LearningGroup;
+import org.groupscope.assignment_management.entity.LearningRole;
 import org.groupscope.security.dto.RegistrationRequest;
+import org.groupscope.security.entity.Provider;
 import org.groupscope.security.entity.User;
-import org.groupscope.services.GroupScopeService;
+import org.groupscope.assignment_management.services.AssignmentManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,16 +23,16 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final GroupScopeService groupScopeService;
+    private final AssignmentManagerService assignmentManagerService;
 
 
     @Autowired
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       GroupScopeService groupScopeService) {
+                       AssignmentManagerService assignmentManagerService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.groupScopeService = groupScopeService;
+        this.assignmentManagerService = assignmentManagerService;
     }
 
     /*
@@ -51,7 +54,7 @@ public class UserService {
 
         // Add new learner to an existing group based on the invite code
         if(request.getInviteCode() != null) {
-            Learner student = groupScopeService.addLearner(learnerDTO.toLearner(), request.getInviteCode());
+            Learner student = assignmentManagerService.addLearner(learnerDTO.toLearner(), request.getInviteCode());
             return processLearner(user, student);
 
         // Add new learner and create a new group
@@ -60,7 +63,7 @@ public class UserService {
                     request.getLearnerLastname(),
                     LearningRole.HEADMAN);
             LearningGroupDTO learningGroupDTO = new LearningGroupDTO(request.getGroupName(), headman);
-            LearningGroup learningGroup = groupScopeService.addGroup(learningGroupDTO);
+            LearningGroup learningGroup = assignmentManagerService.addGroup(learningGroupDTO);
             if(learningGroup != null) {
                 user.setLearner(learningGroup.getHeadmen());
                 return userRepository.save(user);
@@ -69,7 +72,7 @@ public class UserService {
             }
         // Add new learner without group addition
         } else {
-            Learner student = groupScopeService.addFreeLearner(learnerDTO);
+            Learner student = assignmentManagerService.addFreeLearner(learnerDTO);
             return processLearner(user, student);
         }
     }

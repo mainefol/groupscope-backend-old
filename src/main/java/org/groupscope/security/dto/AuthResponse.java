@@ -3,7 +3,7 @@ package org.groupscope.security.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.groupscope.entity.LearningRole;
+import org.groupscope.assignment_management.entity.LearningRole;
 
 import javax.validation.constraints.NotEmpty;
 

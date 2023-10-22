@@ -1,7 +1,7 @@
 package org.groupscope.security.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.groupscope.dao.repositories.RefreshTokenRepository;
+import org.groupscope.assignment_management.dao.repositories.RefreshTokenRepository;
 import org.groupscope.security.entity.RefreshToken;
 import org.groupscope.security.entity.User;
 import org.springframework.beans.factory.annotation.Value;
