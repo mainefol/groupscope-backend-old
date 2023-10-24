@@ -116,7 +116,18 @@ public class AssignmentManagerServiceTest {
         String deadline = LocalDate.now().plus(7, ChronoUnit.DAYS).format(formatter);
         Random random = new Random();
 
-        Task task = new Task("Pz1", TaskType.PRACTICAL, "Doing something", deadline, linkedSubject);
+        Task task = new Task("Pz1", TaskType.PRACTICAL, "Doing something", deadline, 100, linkedSubject);
+        task.setId(Math.abs(random.nextLong()) % 100);
+
+        return task;
+    }
+
+    private Task generateInvalidTask(Subject linkedSubject) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String deadline = LocalDate.now().plus(7, ChronoUnit.DAYS).format(formatter);
+        Random random = new Random();
+
+        Task task = new Task("Pz1", TaskType.PRACTICAL, "Doing something", deadline, -1, linkedSubject);
         task.setId(Math.abs(random.nextLong()) % 100);
 
         return task;
@@ -319,7 +330,8 @@ public class AssignmentManagerServiceTest {
         TaskDTO taskDTO = new TaskDTO("Пз1",
                 TaskType.PRACTICAL,
                 "Doing something",
-                deadline);
+                deadline,
+                100);
         String subjectName = "Програмування";
 
         LearningGroup group = new LearningGroup();
@@ -350,7 +362,8 @@ public class AssignmentManagerServiceTest {
         TaskDTO taskDTO = new TaskDTO("Пз1",
                 TaskType.PRACTICAL,
                 "Doing something",
-                deadline);
+                deadline,
+                -1);
 
         assertThrows(IllegalArgumentException.class,
                 () -> assignmentManagerService.addTask(taskDTO, null, null));
@@ -369,7 +382,8 @@ public class AssignmentManagerServiceTest {
         TaskDTO taskDTO = new TaskDTO("Пз1",
                 TaskType.PRACTICAL,
                 "Doing something",
-                deadline);
+                deadline,
+                100);
         String subjectName = "Програмування";
         LearningGroup group = new LearningGroup();
         group.setId(1L);
@@ -389,26 +403,17 @@ public class AssignmentManagerServiceTest {
 
     @Test
     public void addTask_WithExistingTask_throwsIllegalArgumentException() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String deadline = LocalDate.now().plus(7, ChronoUnit.DAYS).format(formatter);
-
-        TaskDTO taskDTO = new TaskDTO("Пз1",
-                TaskType.PRACTICAL,
-                "Doing something",
-                deadline);
-
+        LearningGroup group = generateValidGroup();
         String subjectName = "Програмування";
-        LearningGroup group = new LearningGroup();
-        group.setId(1L);
-
-        Task task = taskDTO.toTask();
-        Subject subject = new Subject("Програмування", group);
-        task.setSubject(subject);
+        Subject subject = generateValidSubject(subjectName);
+        Task task = generateValidTask(subject);
         subject.setTasks(List.of(task));
+
+        TaskDTO taskDTO = TaskDTO.from(task);
 
         Mockito.doReturn(subject)
                 .when(assignmentManagerDAO)
-                .findSubjectByNameAndGroupId("Програмування", 1L);
+                .findSubjectByNameAndGroupId(anyString(), anyLong());
 
         assertThrows(IllegalArgumentException.class,
                 () -> assignmentManagerService.addTask(taskDTO, subjectName, group));
@@ -431,6 +436,7 @@ public class AssignmentManagerServiceTest {
                         TaskType.PRACTICAL,
                         "Doing something",
                         "09.09.2023",
+                        100,
                         subject))
         );
 
@@ -477,12 +483,14 @@ public class AssignmentManagerServiceTest {
                 TaskType.PRACTICAL,
                 "Doing something",
                 deadline,
+                100,
                 subject);
 
         TaskDTO taskDTO = new TaskDTO("Pz1",
                 TaskType.PRACTICAL,
                 "do nothing",
-                newDeadline);
+                newDeadline,
+                100);
         taskDTO.setNewName("PZ1");
 
         Mockito.doReturn(subject)
@@ -510,7 +518,8 @@ public class AssignmentManagerServiceTest {
         TaskDTO taskDTO = new TaskDTO("Pz1",
                 TaskType.PRACTICAL,
                 "do nothing",
-                deadline);
+                deadline,
+                100);
 
         Mockito.doReturn(null)
                 .when(assignmentManagerDAO)
@@ -536,7 +545,8 @@ public class AssignmentManagerServiceTest {
         TaskDTO taskDTO = new TaskDTO("Pz1",
                 TaskType.PRACTICAL,
                 "do nothing",
-                deadline);
+                deadline,
+                100);
 
         Mockito.doReturn(subject)
                 .when(assignmentManagerDAO)
@@ -566,7 +576,8 @@ public class AssignmentManagerServiceTest {
         TaskDTO taskDTO = new TaskDTO("Pz1",
                 TaskType.PRACTICAL,
                 "do nothing",
-                wrongDeadline);
+                wrongDeadline,
+                100);
 
         when(assignmentManagerDAO.findSubjectByNameAndGroupId(eq("Програмування"), anyLong()))
                 .thenReturn(subject);
@@ -576,6 +587,7 @@ public class AssignmentManagerServiceTest {
                 TaskType.PRACTICAL,
                 "Doing something",
                 deadline,
+                100,
                 subject));
 
         assertThrows(IllegalArgumentException.class,
@@ -602,6 +614,7 @@ public class AssignmentManagerServiceTest {
                 TaskType.PRACTICAL,
                 "Doing something",
                 deadline,
+                100,
                 subject);
         task.setId(3L);
 
@@ -838,7 +851,7 @@ public class AssignmentManagerServiceTest {
         learner.setLearningGroup(group);
         learner.setId(3L);
 
-        Task task = new Task("Pz1", TaskType.PRACTICAL, "Doing something", deadline);
+        Task task = new Task("Pz1", TaskType.PRACTICAL, "Doing something", deadline, 100);
         task.setId(4L);
 
         Mockito.doReturn(subject)

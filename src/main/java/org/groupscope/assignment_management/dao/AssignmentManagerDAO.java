@@ -24,7 +24,7 @@ public interface AssignmentManagerDAO {
 
     List<Subject> findAllSubjectsByGroupName(String groupName);
 
-    void updateSubject(Subject subject);
+    Subject updateSubject(Subject subject);
 
     void deleteSubject(Subject subject);
 

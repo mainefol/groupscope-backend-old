@@ -123,13 +123,13 @@ public class AssignmentManagerDAOImpl implements AssignmentManagerDAO {
     }
 
     @Override
-    public void updateSubject(Subject subject) {
+    public Subject updateSubject(Subject subject) {
         if(isNull(subject)) {
             log.error("Subject is null in " + getCurrentMethodName());
-            return;
+            return null;
         }
 
-        subjectRepository.save(subject);
+        return subjectRepository.save(subject);
     }
 
     @Override

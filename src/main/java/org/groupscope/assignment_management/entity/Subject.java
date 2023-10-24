@@ -24,6 +24,9 @@ public class Subject implements ObjectWithId {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "is_exam")
+    private Boolean isExam;
+
     // One-to-many relationship with the Task entity. Each subject can have multiple tasks.
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "subject_id")
@@ -59,12 +62,11 @@ public class Subject implements ObjectWithId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Subject subject = (Subject) o;
-        return Objects.equals(name, subject.name) &&
-                Objects.equals(group, subject.group);
+        return Objects.equals(name, subject.name) && Objects.equals(isExam, subject.isExam) && Objects.equals(group, subject.group);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, group);
+        return Objects.hash(name, isExam, group);
     }
 }

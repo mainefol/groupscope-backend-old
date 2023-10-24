@@ -30,6 +30,9 @@ public class Task implements ObjectWithId {
     @Column(name = "type")
     private TaskType type;
 
+    @Column(name = "max_mark", columnDefinition = "integer DEFAULT 100")
+    private Integer maxMark;
+
     // Additional information or description about the task.
     @Column(name = "info", length = 255)
     private String info;
@@ -37,10 +40,6 @@ public class Task implements ObjectWithId {
     // The deadline for completing the task.
     @Column(name = "deadline")
     private String deadline;
-
-    // TODO
-    //@Column(name = "max_mark")
-    //private Integer maxMark;
 
     // Many-to-one relationship with the Subject entity. Each task belongs to a subject.
     @ManyToOne
@@ -55,18 +54,20 @@ public class Task implements ObjectWithId {
         grades = new ArrayList<>();
     }
 
-    public Task(String name, TaskType type, String info, String deadline) {
+    public Task(String name, TaskType type, String info, String deadline, Integer maxMark) {
         this.name = name;
         this.type = type;
         this.info = info;
         this.deadline = deadline;
+        this.maxMark = maxMark;
     }
 
-    public Task(String name, TaskType type, String info, String deadline, Subject subject) {
+    public Task(String name, TaskType type, String info, String deadline, Integer maxMark, Subject subject) {
         this.name = name;
         this.type = type;
         this.info = info;
         this.deadline = deadline;
+        this.maxMark = maxMark;
         this.subject = subject;
     }
 
@@ -84,15 +85,11 @@ public class Task implements ObjectWithId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(name, task.name) &&
-                type == task.type &&
-                Objects.equals(info, task.info) &&
-                Objects.equals(deadline, task.deadline) &&
-                Objects.equals(subject, task.subject);
+        return Objects.equals(name, task.name) && type == task.type && Objects.equals(maxMark, task.maxMark) && Objects.equals(info, task.info) && Objects.equals(deadline, task.deadline) && Objects.equals(subject, task.subject);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, info, deadline, subject);
+        return Objects.hash(name, type, maxMark, info, deadline, subject);
     }
 }

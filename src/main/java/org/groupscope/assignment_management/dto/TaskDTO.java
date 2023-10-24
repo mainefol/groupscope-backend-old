@@ -1,5 +1,6 @@
 package org.groupscope.assignment_management.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskDTO {
-
     private Long id;
 
     private String name;
@@ -25,11 +25,13 @@ public class TaskDTO {
 
     private TaskType type;
 
+    private Integer maxMark;
+
     private String info;
 
     private String deadline;
 
-    public TaskDTO(String name, TaskType type, String info, String deadline) {
+    public TaskDTO(String name, TaskType type, String info, String deadline, Integer maxMark) {
         this.name = name;
         this.type = type;
         this.info = info;
@@ -43,6 +45,7 @@ public class TaskDTO {
         dto.setType(task.getType());
         dto.setInfo(task.getInfo());
         dto.setDeadline(task.getDeadline());
+        dto.setMaxMark(task.getMaxMark());
 
         return dto;
     }
@@ -50,21 +53,24 @@ public class TaskDTO {
     public Task toTask() {
         if(this.isValid()) {
             Task task = new Task();
-            task.setId(this.getId());
-            task.setName(this.getName());
-            task.setType(this.getType());
-            task.setInfo(this.getInfo());
-            task.setDeadline(this.getDeadline());
+            task.setId(this.id);
+            task.setName(this.name);
+            task.setType(this.type);
+            task.setInfo(this.info);
+            task.setDeadline(this.deadline);
+            task.setMaxMark(this.maxMark);
 
             return task;
         } else
             throw new IllegalArgumentException("Wrong task type or date format in Task object");
     }
 
+    @JsonIgnore
     public boolean isValid() {
-        return this.isValidDeadline();
+        return this.isValidDeadline() && isValidMaxMark();
     }
 
+    @JsonIgnore
     public boolean isValidDeadline() {
         try {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -77,6 +83,10 @@ public class TaskDTO {
         }
     }
 
+    @JsonIgnore
+    public boolean isValidMaxMark() {
+        return this.maxMark > 0;
+    }
 
     @Override
     public boolean equals(Object o) {

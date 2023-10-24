@@ -67,17 +67,17 @@ public class AssignmentManagerServiceImpl implements AssignmentManagerService {
     @Transactional
     public Subject updateSubject(SubjectDTO subjectDTO, LearningGroup group) {
         if(group != null && subjectDTO != null) {
-            Optional<Subject> subject = group.getSubjects().stream()
+            Subject subject = group.getSubjects().stream()
                     .filter(s -> s.getName().equals(subjectDTO.getName()))
-                    .findFirst();
+                    .findFirst().orElse(null);
 
-            if(subject.isPresent()) {
-                if (subjectDTO.getNewName() != null) {
-                    subject.get().setName(subjectDTO.getNewName());
-                }
-                subject.get().setGroup(group);
-                assignmentManagerDAO.updateSubject(subject.get());
-                return subject.get();
+            if(subject != null) {
+                if (subjectDTO.getNewName() != null)
+                    subject.setName(subjectDTO.getNewName());
+                if(subjectDTO.getIsExam() != null)
+                    subject.setIsExam(subjectDTO.getIsExam());
+
+                return assignmentManagerDAO.updateSubject(subject);
             }
             else
                 throw new NullPointerException("Subject not found with name: " + subjectDTO.getName());
@@ -164,19 +164,30 @@ public class AssignmentManagerServiceImpl implements AssignmentManagerService {
         if(subject != null) {
             Task task = assignmentManagerDAO.findTaskByNameAndSubjectId(taskDTO.getName(), subject.getId());
             if (task != null) {
-                if(taskDTO.isValid()) {
-                    if (taskDTO.getNewName() != null)
-                        task.setName(taskDTO.getNewName());
-                    if (taskDTO.getType() != null)
-                        task.setType(taskDTO.getType());
-                    if (taskDTO.getInfo() != null)
-                        task.setInfo(taskDTO.getInfo());
-                    if (taskDTO.getDeadline() != null)
+                if (taskDTO.getNewName() != null) {
+                    task.setName(taskDTO.getNewName());
+                }
+                if (taskDTO.getType() != null) {
+                    task.setType(taskDTO.getType());
+                }
+                if (taskDTO.getInfo() != null) {
+                    task.setInfo(taskDTO.getInfo());
+                }
+                if (taskDTO.getDeadline() != null) {
+                    if(taskDTO.isValidDeadline()) {
                         task.setDeadline(taskDTO.getDeadline());
-
-                    assignmentManagerDAO.updateTask(task);
-                } else
-                    throw new IllegalArgumentException("TaskDTO = " + taskDTO + " is not valid in " + getCurrentMethodName());
+                    } else {
+                        throw new IllegalArgumentException("TaskDTO = " + taskDTO + " is not valid in " + getCurrentMethodName());
+                    }
+                }
+                if (taskDTO.getMaxMark() != null) {
+                    if(taskDTO.isValidMaxMark()) {
+                        task.setMaxMark(taskDTO.getMaxMark());
+                    } else {
+                        throw new IllegalArgumentException("TaskDTO = " + taskDTO + " is not valid in " + getCurrentMethodName());
+                    }
+                }
+                assignmentManagerDAO.updateTask(task);
             } else {
                 throw new NullPointerException("Task not found with name: " + taskDTO.getName());
             }
