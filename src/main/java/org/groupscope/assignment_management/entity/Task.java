@@ -2,6 +2,7 @@ package org.groupscope.assignment_management.entity;
 
 import lombok.Data;
 import org.groupscope.assignment_management.entity.grade.Grade;
+import org.groupscope.security.entity.UserRole;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class Task implements ObjectWithId {
     @Column(name = "type")
     private TaskType type;
 
-    @Column(name = "max_mark", columnDefinition = "integer DEFAULT 100")
+    @Column(name = "max_mark")
     private Integer maxMark;
 
     // Additional information or description about the task.
@@ -69,6 +70,13 @@ public class Task implements ObjectWithId {
         this.deadline = deadline;
         this.maxMark = maxMark;
         this.subject = subject;
+    }
+
+    @PrePersist
+    public void setDefaultValues() {
+        if (maxMark == null) {
+            maxMark = 100;
+        }
     }
 
     @Override

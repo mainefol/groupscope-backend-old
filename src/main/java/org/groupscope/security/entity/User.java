@@ -34,13 +34,24 @@ public class User implements UserDetails {
 
     // The authentication provider of the user (e.g., LOCAL or GOOGLE).
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider")
+    @Column
     private Provider provider;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private UserRole role;
 
     // One-to-one relationship with the Learner entity. Each user has a corresponding learner.
     @OneToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "learner_id")
     private Learner learner;
+
+    @PrePersist
+    public void setDefaultValues() {
+        if (role == null) {
+            role = UserRole.USER;
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
