@@ -11,10 +11,13 @@ import org.groupscope.security.dto.RegistrationRequest;
 import org.groupscope.security.entity.Provider;
 import org.groupscope.security.entity.User;
 import org.groupscope.assignment_management.services.AssignmentManagerService;
+import org.groupscope.util.FunctionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.groupscope.util.FunctionInfo.getCurrentMethodName;
 
 @Service
 public class UserService {
@@ -35,15 +38,25 @@ public class UserService {
         this.assignmentManagerService = assignmentManagerService;
     }
 
-    /*
-     * Saves the custom user to the repository and performs additional actions based on the registration request.
+
+    /**
+     * Saves a custom user to the repository and performs additional actions based on the registration request.
      * If a user is registering with an invite code, they will be added to an existing group.
-     * If a user is registering with a group name, a new group will be created and the user will be set as the headman.
+     * If a user is registering with a group name, a new group will be created, and the user will be set as the headman.
      * If a user is registering without a group addition, they will be registered as a free learner.
-     * Returns the saved custom user or null if the user couldn't be saved.
+     *
+     * @param user The User to be saved.
+     * @param request The RegistrationRequest containing additional registration information.
+     * @param provider The Provider associated with the registration (e.g., email, social media).
+     * @return The saved custom user or null if the user couldn't be saved.
      */
     @Transactional
     public User saveUser(User user, RegistrationRequest request, Provider provider) {
+        if(user == null || request == null || provider == null) {
+            throw new NullPointerException("One of arguments is null: " + user + ", " + request + ", " + provider +
+                    " in " + getCurrentMethodName());
+        }
+
         if(user.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
@@ -70,6 +83,7 @@ public class UserService {
             } else {
                 return null;
             }
+
         // Add new learner without group addition
         } else {
             Learner student = assignmentManagerService.addFreeLearner(learnerDTO);
@@ -77,6 +91,13 @@ public class UserService {
         }
     }
 
+    /**
+     * This method associates a Learner with a User and saves the updated User in the repository.
+     *
+     * @param user The User to be updated with the new Learner.
+     * @param learner The Learner to be associated with the User.
+     * @return The updated User after the association, or null if the Learner is null.
+     */
     private User processLearner(User user, Learner learner) {
         if (learner != null) {
             user.setLearner(learner);
