@@ -66,9 +66,11 @@ public class AuthController {
             }
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -90,9 +92,11 @@ public class AuthController {
             }
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -114,9 +118,11 @@ public class AuthController {
             }
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
@@ -140,6 +146,7 @@ public class AuthController {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }

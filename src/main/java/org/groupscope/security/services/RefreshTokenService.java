@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -76,7 +77,8 @@ public class RefreshTokenService {
         SecureRandom secureRandom = new SecureRandom(buffer.array());
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String expiry = LocalDate.now().plusDays(30).format(dateFormatter);
+        long refreshLifetime = Duration.ofMillis(refreshTokenDurationMs).toDays();
+        String expiry = LocalDate.now().plusDays(refreshLifetime).format(dateFormatter);
 
         RefreshToken refreshToken = findByUserId(user.getId());
 
@@ -89,7 +91,7 @@ public class RefreshTokenService {
             refreshToken = new RefreshToken();
             refreshToken.setUser(user);
             refreshToken.setExpiryDate(expiry);
-            refreshToken.setToken(new BigInteger(32, secureRandom).toString(32));
+            refreshToken.setToken(new BigInteger(256, secureRandom).toString(32));
         }
 
         RefreshToken token = refreshTokenRepository.save(refreshToken);

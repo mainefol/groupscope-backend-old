@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -17,10 +18,11 @@ public class JwtProvider {
     private String jwtSecret;
 
     @Value("${jwt.lifetime.accessToken}")
-    private Integer jwtLifetime;
+    private Long jwtTokenDurationMs;
 
     public String generateToken(String login) {
-        Date date = Date.from(LocalDate.now().plusDays(2).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        long jwtLifetime = Duration.ofMillis(jwtTokenDurationMs).toDays();
+        Date date = Date.from(LocalDate.now().plusDays(jwtLifetime).atStartOfDay(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(login)
                 .setIssuedAt(Date.from(Instant.now()))
