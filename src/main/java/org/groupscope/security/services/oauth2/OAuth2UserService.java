@@ -4,7 +4,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+//import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.groupscope.assignment_management.dao.AssignmentManagerDAOImpl;
 import org.groupscope.security.entity.Provider;
@@ -42,7 +43,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService  {
         this.refreshTokenService = refreshTokenService;
 
         NetHttpTransport transport = new NetHttpTransport();
-        JsonFactory jsonFactory = new JacksonFactory();
+        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         this.idTokenVerifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 .setAudience(Collections.singletonList(clientId))
                 .build();
@@ -60,18 +61,18 @@ public class OAuth2UserService extends DefaultOAuth2UserService  {
             registrationRequest.setInviteCode(request.getInviteCode());
             registrationRequest.setGroupName(request.getGroupName());
 
-            User foundUser = userService.findByLogin(user.getLogin());
+            User foundedUser = userService.findByLogin(user.getLogin());
 
-            if(foundUser == null) {
-                foundUser = userService.saveUser(user, registrationRequest, Provider.GOOGLE);
+            if(foundedUser == null) {
+                foundedUser = userService.saveUser(user, registrationRequest, Provider.GOOGLE);
             }
 
-            Hibernate.initialize(foundUser.getLearner().getGrades());
+            Hibernate.initialize(foundedUser.getLearner().getGrades());
 
-            if(foundUser.getLearner().getLearningGroup() != null)
-                AssignmentManagerDAOImpl.removeDuplicates(foundUser.getLearner().getLearningGroup().getSubjects());
+            if(foundedUser.getLearner().getLearningGroup() != null)
+                AssignmentManagerDAOImpl.removeDuplicates(foundedUser.getLearner().getLearningGroup().getSubjects());
 
-            return foundUser;
+            return foundedUser;
         } else
             throw new NullPointerException("IdToken is null");
     }

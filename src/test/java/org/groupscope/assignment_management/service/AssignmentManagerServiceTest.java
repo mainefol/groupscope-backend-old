@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 
-@SpringBootTest
 @SpringJUnitConfig
 @ExtendWith(MockitoExtension.class)
 public class AssignmentManagerServiceTest {
@@ -98,12 +97,13 @@ public class AssignmentManagerServiceTest {
         return group;
     }
 
-    /**This method generates a valid Subject object with a given name and a randomly generated ID.
+    /**This method generates a valid Subject object with a given name, randomly generated ID and sets false to isExam field.
      */
     private Subject generateValidSubject(String name) {
         Random random = new Random();
         Subject subject = new Subject(name);
         subject.setId(Math.abs(random.nextLong()) % 100);
+        subject.setIsExam(false);
 
         return subject;
     }
@@ -204,12 +204,27 @@ public class AssignmentManagerServiceTest {
 
     @Test
     public void updateSubject_WithValidArguments_returnSubject() {
+        LearningGroup group = generateValidGroup();
+        Subject subject = generateValidSubject("Програмування");
+        subject.setGroup(group);
+        group.setSubjects(Collections.singletonList(subject));
+
         SubjectDTO subjectDTO = new SubjectDTO("Програмування");
         subjectDTO.setNewName("Прог");
-        LearningGroup learningGroup = new LearningGroup();
-        learningGroup.setSubjects(Collections.singletonList(new Subject("Програмування", learningGroup)));
+        subjectDTO.setIsExam(true);
 
-        Subject subject = assignmentManagerService.updateSubject(subjectDTO, learningGroup);
+        when(assignmentManagerDAO.findSubjectByNameAndGroupId(eq(subjectDTO.getName()), eq(group.getId())))
+                .thenReturn(subject);
+
+        doAnswer(invocationOnMock -> {
+            Subject s = invocationOnMock.getArgument(0);
+            return s;
+        }).when(assignmentManagerDAO).updateSubject(any(Subject.class));
+
+        Subject result = assignmentManagerService.updateSubject(subjectDTO, group);
+
+        assertEquals(true, result.getIsExam());
+        assertEquals("Прог", result.getName());
 
         Mockito.verify(assignmentManagerDAO, Mockito.times(USED_ONCE)).updateSubject(subject);
     }

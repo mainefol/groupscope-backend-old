@@ -70,6 +70,10 @@ public class LearningGroup implements ObjectWithId {
             log.info("Invite code for " + this + " has already been generated");
     }
 
+    public List<Learner> getLearners() {
+        return learners;
+    }
+
     @Override
     public String toString() {
         return name;

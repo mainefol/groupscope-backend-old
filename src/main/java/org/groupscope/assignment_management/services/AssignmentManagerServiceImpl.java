@@ -67,9 +67,7 @@ public class AssignmentManagerServiceImpl implements AssignmentManagerService {
     @Transactional
     public Subject updateSubject(SubjectDTO subjectDTO, LearningGroup group) {
         if(group != null && subjectDTO != null) {
-            Subject subject = group.getSubjects().stream()
-                    .filter(s -> s.getName().equals(subjectDTO.getName()))
-                    .findFirst().orElse(null);
+            Subject subject = assignmentManagerDAO.findSubjectByNameAndGroupId(subjectDTO.getName(), group.getId());
 
             if(subject != null) {
                 if (subjectDTO.getNewName() != null)
@@ -285,8 +283,9 @@ public class AssignmentManagerServiceImpl implements AssignmentManagerService {
 
                 if(!isGroupContainsLearner) {
                     learner.setLearningGroup(learningGroup);
-
-                    learningGroup.getLearners().add(learner);
+                    List<Learner> learners = new ArrayList<>(learningGroup.getLearners());
+                    learners.add(learner);
+                    learningGroup.setLearners(learners);
 
                     learner.setRole(LearningRole.STUDENT);
 

@@ -77,8 +77,7 @@ public class Learner implements ObjectWithId {
         Learner learner = (Learner) o;
         return Objects.equals(name, learner.name) &&
                 Objects.equals(lastname, learner.lastname) &&
-                role == learner.role &&
-                learningGroup.getName().equals(learner.getLearningGroup().getName());
+                role == learner.role;
     }
 
     @Override

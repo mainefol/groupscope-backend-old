@@ -36,6 +36,7 @@ public class TaskDTO {
         this.type = type;
         this.info = info;
         this.deadline = deadline;
+        this.maxMark = maxMark;
     }
 
     public static TaskDTO from(Task task) {

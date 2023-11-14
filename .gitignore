@@ -1,3 +1,6 @@
+credentials.json
+keystore.p12
+
 HELP.md
 /target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -49,4 +52,3 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-Dockerfile
