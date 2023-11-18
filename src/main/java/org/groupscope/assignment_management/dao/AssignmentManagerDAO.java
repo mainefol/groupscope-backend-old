@@ -41,6 +41,8 @@ public interface AssignmentManagerDAO {
 
     Task findTaskByName(String name);
 
+    Task findTaskById(Long id);
+
     Task findTaskByNameAndSubjectId(String name, Long subjectId);
 
     void updateTask(Task task);

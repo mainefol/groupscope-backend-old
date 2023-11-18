@@ -204,6 +204,16 @@ public class AssignmentManagerDAOImpl implements AssignmentManagerDAO {
     }
 
     @Override
+    public Task findTaskById(Long id) {
+        if(isNull(id)) {
+            log.error("Task id is null in " + getCurrentMethodName());
+            return null;
+        }
+
+        return taskRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public Task findTaskByNameAndSubjectId(String name, Long subjectId) {
         if(isNull(name, subjectId)) {
             log.error("Task name or subject id is null in " + getCurrentMethodName());

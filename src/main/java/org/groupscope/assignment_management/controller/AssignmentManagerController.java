@@ -2,21 +2,31 @@ package org.groupscope.assignment_management.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.io.IOUtils;
 import org.groupscope.assignment_management.dto.*;
-import org.groupscope.assignment_management.entity.*;
-import org.groupscope.security.entity.User;
+import org.groupscope.assignment_management.entity.LearningRole;
+import org.groupscope.assignment_management.entity.Task;
 import org.groupscope.assignment_management.services.AssignmentManagerService;
-import org.groupscope.util.RoleUtil;
+import org.groupscope.files.services.FileManager;
+import org.groupscope.security.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.groupscope.util.RoleUtil.getPriority;
 
@@ -27,11 +37,15 @@ import static org.groupscope.util.RoleUtil.getPriority;
 @RequestMapping("/api")
 public class AssignmentManagerController {
 
+    private final FileManager fileManager;
+
     private final AssignmentManagerService assignmentManagerService;
 
     @Autowired
-    public AssignmentManagerController(AssignmentManagerService assignmentManagerService) {
+    public AssignmentManagerController(AssignmentManagerService assignmentManagerService,
+                                       FileManager fileManager) {
         this.assignmentManagerService = assignmentManagerService;
+        this.fileManager = fileManager;
     }
 
     private boolean hasAccess(LearningRole check, LearningRole target) {
@@ -487,9 +501,80 @@ public class AssignmentManagerController {
             return ResponseEntity.ok().build();
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+    }
+
+    @GetMapping("/files")
+    public ResponseEntity<List<File>> getFiles(@RequestParam("task_id") Long taskId) {
+        try {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            Task task = assignmentManagerService.getTaskById(taskId);
+
+            String path = File.separator + task.getSubject().getGroup().getName()
+                    + File.separator + task.getSubject().getName()
+                    + File.separator + task.getName();
+
+            List<File> files = fileManager.findFilesByPath(path);
+            List<Resource> resources = fileManager.downloadFile(files);
+
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resources.get(0).getFilename() + "\"")
+                    .body(files);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+    }
+
+    @PostMapping("/files")
+    public ResponseEntity<HttpStatus> uploadFiles(@RequestParam("task_id") Long taskId,
+                                                  @RequestBody List<MultipartFile> files) {
+        try {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            logRequestMapping(user, request);
+
+            LearningRole userRole = user.getLearner().getRole();
+            if(hasAccess(userRole, LearningRole.EDITOR)) {
+
+                Task task = assignmentManagerService.getTaskById(taskId);
+
+                String path = File.separator + task.getSubject().getGroup().getName()
+                        + File.separator + task.getSubject().getName()
+                        + File.separator + task.getName()
+                        + File.separator;
+
+                for (MultipartFile file : files) {
+                    fileManager.uploadFile(path, file);
+                }
+
+                return ResponseEntity.ok().build();
+
+            } else {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+            }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }

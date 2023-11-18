@@ -157,6 +157,20 @@ public class AssignmentManagerServiceImpl implements AssignmentManagerService {
 
     @Override
     @Transactional
+    public Task getTaskById(Long id) {
+        if(id != null) {
+            Task task = assignmentManagerDAO.findTaskById(id);
+
+            if(task != null) {
+                return task;
+            } else
+                throw new NullPointerException("Task not found with id: " + id + " in " + getCurrentMethodName());
+        } else
+            throw new NullPointerException("Id is null in " + getCurrentMethodName());
+    }
+
+    @Override
+    @Transactional
     public void updateTask(TaskDTO taskDTO, String subjectName, LearningGroup group) {
         Subject subject = assignmentManagerDAO.findSubjectByNameAndGroupId(subjectName, group.getId());
         if(subject != null) {

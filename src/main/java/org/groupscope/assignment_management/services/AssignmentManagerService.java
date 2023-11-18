@@ -26,6 +26,8 @@ public interface AssignmentManagerService {
 
     List<TaskDTO> getAllTasksOfSubject(String subjectName, LearningGroup group);
 
+    Task getTaskById(Long id);
+
     void updateTask(TaskDTO taskDTO, String subjectName, LearningGroup group);
 
     void deleteTask(String subjectName, TaskDTO taskDTO, LearningGroup group);
