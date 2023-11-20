@@ -17,7 +17,7 @@ public interface FileManager {
 
     List<File> findFilesByPath(String path);
 
-    public List<Resource> downloadFile(List<File> files) throws IOException;
+    public List<byte[]> downloadFile(List<File> files) throws IOException;
 
     void deleteFile(String path, String name);
 

@@ -2,6 +2,7 @@ package org.groupscope.files.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -105,25 +108,22 @@ public class FileManagerImpl implements FileManager {
     }
 
     @Override
-    public List<Resource> downloadFile(List<File> files) throws IOException {
-        List<Resource> resources = new ArrayList<>();
+    public List<byte[]> downloadFile(List<File> files) throws IOException {
+        List<byte[]> bytesList = new ArrayList<>();
         try {
             if(files != null) {
                 for (File file : files) {
-                    Resource resource = new UrlResource(file.toURI());
+                    Path p = file.toPath();
+                    byte[] bytes = Files.readAllBytes(p);
 
-                    if (resource.exists() && resource.isReadable()) {
-                        resources.add(resource);
-                    } else {
-                        throw new IOException("Could not read file: path = " + file.getAbsolutePath());
-                    }
+                    bytesList.add(bytes);
                 }
             } else
                 throw new NullPointerException("List of files is null");
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-        return resources;
+        return bytesList;
     }
 
     @Override

@@ -152,8 +152,8 @@ public class AuthController {
     }
 
     @GetMapping("/hi")
-    public ResponseEntity<Void> handleHeadRequest() {
+    public ResponseEntity<String> handleHeadRequest() {
         HttpHeaders headers = new HttpHeaders();
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return ResponseEntity.ok("Hello!");
     }
 }

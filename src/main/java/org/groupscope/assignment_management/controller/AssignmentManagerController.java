@@ -511,7 +511,7 @@ public class AssignmentManagerController {
     }
 
     @GetMapping("/files")
-    public ResponseEntity<List<File>> getFiles(@RequestParam("task_id") Long taskId) {
+    public ResponseEntity<List<byte[]>> getFiles(@RequestParam("task_id") Long taskId) {
         try {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -524,12 +524,12 @@ public class AssignmentManagerController {
                     + File.separator + task.getName();
 
             List<File> files = fileManager.findFilesByPath(path);
-            List<Resource> resources = fileManager.downloadFile(files);
+            List<byte[]> bytes = fileManager.downloadFile(files);
 
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resources.get(0).getFilename() + "\"")
-                    .body(files);
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + files.get(0).getName() + "\"")
+                    .body(bytes);
         } catch (NullPointerException | IllegalArgumentException e) {
             log.error(e.getMessage());
             e.printStackTrace();
